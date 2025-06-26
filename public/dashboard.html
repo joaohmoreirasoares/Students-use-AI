@@ -1,0 +1,2227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENEM AI - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            color: #e2e8f0;
+        }
+        .fade-in {
+            animation: fadeIn 1s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .toolbar-btn {
+            @apply p-2 rounded hover:bg-gray-700 transition-colors;
+        }
+        .toolbar-btn.active {
+            @apply bg-purple-900 text-purple-300;
+        }
+        .editor-content {
+            min-height: 400px;
+            border: 1px solid #475569;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            outline: none;
+            background: #374151;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+        .editor-content:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+        .editor-preview {
+            min-height: 400px;
+            border: 1px solid #475569;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            background: #374151;
+            overflow-y: auto;
+            color: #e2e8f0;
+        }
+        .editor-tabs {
+            display: flex;
+            border-bottom: 1px solid #475569;
+            margin-bottom: 1rem;
+        }
+        .editor-tab {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            color: #e2e8f0;
+        }
+        .editor-tab.active {
+            border-bottom-color: #8b5cf6;
+            color: #8b5cf6;
+            font-weight: 600;
+        }
+        .editor-tab:hover {
+            background: #475569;
+        }
+        .note-item {
+            @apply p-2 border border-gray-600 rounded mb-1 cursor-pointer hover:bg-gray-700 transition;
+            color: #e2e8f0;
+        }
+        .note-item.favorite {
+            @apply bg-yellow-900 border-yellow-600;
+        }
+        .tag {
+            @apply inline-block px-2 py-1 text-xs rounded-full mr-1 mb-1;
+        }
+        .tag-purple { @apply bg-purple-900 text-purple-200; }
+        .tag-blue { @apply bg-blue-900 text-blue-200; }
+        .tag-green { @apply bg-green-900 text-green-200; }
+        .tag-red { @apply bg-red-900 text-red-200; }
+        .tag-orange { @apply bg-orange-900 text-orange-200; }
+        .editor-content[data-placeholder]:empty:before {
+            content: attr(data-placeholder);
+            color: #94a3b8;
+            pointer-events: none;
+            position: absolute;
+            margin-top: 1rem;
+            margin-left: 1rem;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* Markdown Styles - Modo Escuro */
+        .markdown-content {
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+        .markdown-content h1, .markdown-content h2, .markdown-content h3, 
+        .markdown-content h4, .markdown-content h5, .markdown-content h6 {
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+        .markdown-content h1 { font-size: 1.5em; color: #f8fafc; }
+        .markdown-content h2 { font-size: 1.3em; color: #f1f5f9; }
+        .markdown-content h3 { font-size: 1.1em; color: #e2e8f0; }
+        .markdown-content p { margin-bottom: 1em; color: #e2e8f0; }
+        .markdown-content ul, .markdown-content ol { 
+            margin-left: 1.5em; 
+            margin-bottom: 1em; 
+        }
+        .markdown-content li { margin-bottom: 0.25em; color: #e2e8f0; }
+        .markdown-content blockquote {
+            border-left: 4px solid #475569;
+            padding-left: 1em;
+            margin: 1em 0;
+            color: #94a3b8;
+            font-style: italic;
+            background: rgba(71, 85, 105, 0.1);
+            padding: 0.5em;
+            border-radius: 0.25rem;
+        }
+        .markdown-content code {
+            background-color: #374151;
+            padding: 0.125em 0.25em;
+            border-radius: 0.25em;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875em;
+            color: #f3f4f6;
+        }
+        .markdown-content pre {
+            background-color: #1f2937;
+            color: #f9fafb;
+            padding: 1em;
+            border-radius: 0.5em;
+            overflow-x: auto;
+            margin: 1em 0;
+            border: 1px solid #374151;
+        }
+        .markdown-content pre code {
+            background-color: transparent;
+            padding: 0;
+            color: inherit;
+        }
+        .markdown-content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1em 0;
+        }
+        .markdown-content th, .markdown-content td {
+            border: 1px solid #475569;
+            padding: 0.5em;
+            text-align: left;
+            color: #e2e8f0;
+        }
+        .markdown-content th {
+            background-color: #374151;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+        
+        /* Botões padronizados */
+        .btn-primary {
+            @apply bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-purple-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg;
+        }
+        .btn-secondary {
+            @apply bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg;
+        }
+        .btn-success {
+            @apply bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-green-600 hover:to-green-700 transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg;
+        }
+        .btn-warning {
+            @apply bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-orange-600 hover:to-orange-700 transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg;
+        }
+        
+        /* Estilos específicos para modo escuro */
+        .dark-text { color: #e2e8f0; }
+        .dark-bg { background-color: #1e293b; }
+        .dark-border { border-color: #475569; }
+        .dark-input {
+            background-color: #374151;
+            border-color: #475569;
+            color: #e2e8f0;
+        }
+        .dark-input:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+        .dark-placeholder::placeholder {
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <!-- Header -->
+    <header class="glass-card shadow-sm border-b border-gray-600">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-brain text-2xl text-purple-400"></i>
+                    <h1 class="text-xl font-bold text-gray-100">ENEM AI - Dashboard</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="main-dashboard-btn" class="btn-primary">
+                        <i class="fas fa-home mr-2"></i>Dashboard Principal
+                    </button>
+                    <button id="ai-chat-btn" class="btn-secondary">
+                        <i class="fas fa-comments mr-2"></i>Chat IA
+                    </button>
+                    <button id="community-btn" class="bg-pink-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-pink-700 transition" title="Comunidade">
+                        <i class="fas fa-users"></i> Comunidade
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-purple-900 flex items-center justify-center">
+                            <i class="fas fa-user text-purple-300 text-sm"></i>
+                        </div>
+                        <span id="user-name" class="font-medium text-gray-200"></span>
+                    </div>
+                    <button id="logout-btn" class="text-gray-400 hover:text-gray-200 transition">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                    <button id="settings-btn" class="bg-gray-700 text-white px-3 py-2 rounded-lg text-sm hover:bg-gray-800 transition" title="Configurações">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Seção de Anotações com Editor Rico -->
+            <div class="lg:col-span-2">
+                <div class="glass-card rounded-xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold text-gray-100 flex items-center">
+                            <i class="fas fa-sticky-note text-purple-400 mr-2"></i>Editor de Anotações
+                        </h2>
+                        <div class="flex items-center space-x-2">
+                            <span id="save-status" class="text-sm text-gray-400">Salvo</span>
+                            <button id="new-note" class="btn-success">
+                                <i class="fas fa-plus mr-1"></i>Nova
+                            </button>
+                            <button id="export-note" class="btn-secondary" title="Exportar anotação">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Busca e Filtros -->
+                    <div class="mb-4 flex flex-wrap gap-2 items-center">
+                        <div class="flex-1 min-w-48">
+                            <input type="text" id="search-notes" placeholder="Buscar anotações..." 
+                                   class="w-full px-3 py-2 border border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-700 text-gray-100 dark-placeholder">
+                        </div>
+                        <select id="filter-tags" class="px-3 py-2 border border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-700 text-gray-100">
+                            <option value="">Todas as tags</option>
+                        </select>
+                        <button id="show-favorites" class="px-3 py-2 border border-gray-600 rounded-lg text-sm hover:bg-gray-600 transition bg-gray-700 text-gray-100" title="Mostrar favoritos">
+                            <i class="fas fa-star text-yellow-400"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Lista de Anotações -->
+                    <div id="notes-list" class="mb-4 max-h-40 overflow-y-auto border border-gray-600 rounded p-2 bg-gray-700"></div>
+                    
+                    <!-- Tags da Nota Atual -->
+                    <div class="mb-4">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="text-sm font-medium text-gray-200">Tags:</span>
+                            <button id="add-tag-btn" class="text-purple-400 hover:text-purple-300 text-sm">
+                                <i class="fas fa-plus mr-1"></i>Adicionar
+                            </button>
+                        </div>
+                        <div id="current-tags" class="flex flex-wrap gap-1"></div>
+                    </div>
+                    
+                    <!-- Barra de Ferramentas -->
+                    <div class="border border-gray-600 rounded-t-lg p-2 bg-gray-700 flex flex-wrap gap-1">
+                        <!-- Formatação de Texto -->
+                        <button class="toolbar-btn" onclick="formatText('bold')" title="Negrito (Ctrl+B)">
+                            <i class="fas fa-bold"></i>
+                        </button>
+                        <button class="toolbar-btn" onclick="formatText('italic')" title="Itálico (Ctrl+I)">
+                            <i class="fas fa-italic"></i>
+                        </button>
+                        <button class="toolbar-btn" onclick="formatText('underline')" title="Sublinhado (Ctrl+U)">
+                            <i class="fas fa-underline"></i>
+                        </button>
+                        
+                        <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                        
+                        <!-- Títulos -->
+                        <button class="toolbar-btn" onclick="formatText('h1')" title="Título 1">
+                            <i class="fas fa-heading"></i>1
+                        </button>
+                        <button class="toolbar-btn" onclick="formatText('h2')" title="Título 2">
+                            <i class="fas fa-heading"></i>2
+                        </button>
+                        <button class="toolbar-btn" onclick="formatText('h3')" title="Título 3">
+                            <i class="fas fa-heading"></i>3
+                        </button>
+                        
+                        <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                        
+                        <!-- Listas -->
+                        <button class="toolbar-btn" onclick="formatText('insertUnorderedList')" title="Lista com marcadores">
+                            <i class="fas fa-list-ul"></i>
+                        </button>
+                        <button class="toolbar-btn" onclick="formatText('insertOrderedList')" title="Lista numerada">
+                            <i class="fas fa-list-ol"></i>
+                        </button>
+                        
+                        <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                        
+                        <!-- Alinhamento -->
+                        <button class="toolbar-btn" onclick="formatText('justifyLeft')" title="Alinhar à esquerda">
+                            <i class="fas fa-align-left"></i>
+                        </button>
+                        <button class="toolbar-btn" onclick="formatText('justifyCenter')" title="Centralizar">
+                            <i class="fas fa-align-center"></i>
+                        </button>
+                        <button class="toolbar-btn" onclick="formatText('justifyRight')" title="Alinhar à direita">
+                            <i class="fas fa-align-right"></i>
+                        </button>
+                        
+                        <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                        
+                        <!-- Links -->
+                        <button class="toolbar-btn" onclick="insertLink()" title="Inserir link">
+                            <i class="fas fa-link"></i>
+                        </button>
+                        
+                        <!-- Cores -->
+                        <input type="color" id="text-color" class="w-8 h-8 border rounded cursor-pointer" onchange="formatText('foreColor', this.value)" title="Cor do texto">
+                    </div>
+                    
+                    <!-- Editor com Abas Markdown/Preview -->
+                    <div class="editor-tabs">
+                        <button class="editor-tab active" onclick="switchEditorTab('edit')">
+                            <i class="fas fa-edit mr-2"></i>Editar
+                        </button>
+                        <button class="editor-tab" onclick="switchEditorTab('preview')">
+                            <i class="fas fa-eye mr-2"></i>Visualizar
+                        </button>
+                    </div>
+                    
+                    <!-- Editor Markdown -->
+                    <div id="editor-container">
+                        <div class="editor-content" id="editor" contenteditable="true" data-placeholder="Digite sua anotação em Markdown aqui...&#10;&#10;Exemplos:&#10;# Título Principal&#10;## Subtítulo&#10;**Texto em negrito**&#10;*Texto em itálico*&#10;- Lista com marcadores&#10;1. Lista numerada&#10;`código inline`&#10;&#10;```&#10;bloco de código&#10;```"></div>
+                    </div>
+                    
+                    <!-- Preview Markdown -->
+                    <div id="preview-container" class="hidden">
+                        <div class="editor-preview" id="preview"></div>
+                    </div>
+                    
+                    <!-- Botões de Ação -->
+                    <div class="flex justify-between items-center mt-4">
+                        <div class="flex space-x-2">
+                            <button id="save-note" class="btn-primary">
+                                <i class="fas fa-save mr-2"></i>Salvar
+                            </button>
+                            <button id="clear-editor" class="bg-gray-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-600 transition">
+                                Limpar
+                            </button>
+                            <button id="toggle-favorite" class="bg-yellow-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-yellow-600 transition" title="Marcar como favorito">
+                                <i class="fas fa-star"></i>
+                            </button>
+                        </div>
+                        <div class="text-sm text-gray-400">
+                            <span id="char-count">0</span> caracteres
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Agente de IA -->
+            <div class="lg:col-span-1">
+                <div class="glass-card rounded-xl p-6 flex flex-col h-fit">
+                    <h2 class="text-2xl font-bold text-gray-100 mb-4 flex items-center">
+                        <i class="fas fa-robot text-purple-400 mr-2"></i>Assistente IA Especializado
+                    </h2>
+                    
+                    <!-- Seleção de Agente -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-200 mb-2">Escolha seu Tutor:</label>
+                        <select id="agent-selector" class="w-full px-3 py-2 border border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-700 text-gray-100">
+                            <option value="">Selecione um agente...</option>
+                            <option value="socrates">Sócrates - Humanas (História, Geografia, Filosofia)</option>
+                            <option value="pitagoras">Pitágoras - Exatas (Matemática, Física, Química)</option>
+                            <option value="camoes">Camões - Linguagens (Português, Literatura, Artes)</option>
+                            <option value="machado">Machado - Redação (Dissertação, Argumentação)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="text-gray-300 mb-4">
+                        <p class="text-sm">Seu assistente especializado pode ajudar a melhorar e expandir suas anotações!</p>
+                    </div>
+                    
+                    <!-- Upload de PDF -->
+                    <div class="mb-4 p-3 border-2 border-dashed border-gray-600 rounded-lg bg-gray-700">
+                        <div class="text-center">
+                            <i class="fas fa-file-pdf text-gray-400 text-2xl mb-2"></i>
+                            <p class="text-sm text-gray-300 mb-2">Adicionar PDF como contexto</p>
+                            <input type="file" id="pdf-upload" accept=".pdf" class="hidden">
+                            <button id="upload-pdf-btn" class="bg-gray-600 text-gray-200 px-3 py-1 rounded text-sm hover:bg-gray-500 transition">
+                                <i class="fas fa-upload mr-1"></i>Escolher PDF
+                            </button>
+                        </div>
+                        <div id="pdf-info" class="hidden mt-2 p-2 bg-blue-900 rounded text-xs text-blue-200">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            <span id="pdf-name"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Botões de Ação Rápida -->
+                    <div class="space-y-2 mb-4">
+                        <button id="improve-text-btn" class="w-full btn-primary">
+                            <i class="fas fa-magic mr-2"></i>Melhorar Texto
+                        </button>
+                        <button id="correct-grammar-btn" class="w-full btn-secondary">
+                            <i class="fas fa-spell-check mr-2"></i>Corrigir Gramática
+                        </button>
+                        <button id="summarize-btn" class="w-full btn-success">
+                            <i class="fas fa-compress-alt mr-2"></i>Resumir
+                        </button>
+                        <button id="explain-concepts-btn" class="w-full btn-warning">
+                            <i class="fas fa-question-circle mr-2"></i>Explicar Conceitos
+                        </button>
+                        
+                        <!-- Novos botões para escrita direta -->
+                        <div class="border-t border-gray-600 pt-2 mt-2">
+                            <p class="text-xs text-gray-400 mb-2 font-medium">Escrita Direta:</p>
+                            <button id="expand-note-btn" class="w-full bg-indigo-900 text-indigo-200 px-3 py-2 rounded text-sm hover:bg-indigo-800 transition flex items-center justify-center">
+                                <i class="fas fa-plus mr-2"></i>Expandir Anotação
+                            </button>
+                            <button id="rewrite-note-btn" class="w-full bg-teal-900 text-teal-200 px-3 py-2 rounded text-sm hover:bg-teal-800 transition flex items-center justify-center">
+                                <i class="fas fa-edit mr-2"></i>Reescrever Texto
+                            </button>
+                            <button id="create-note-btn" class="w-full bg-pink-900 text-pink-200 px-3 py-2 rounded text-sm hover:bg-pink-800 transition flex items-center justify-center">
+                                <i class="fas fa-lightbulb mr-2"></i>Criar Nova Anotação
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Chat com IA -->
+                    <div class="border border-gray-600 rounded p-3 bg-gray-700 flex-1 min-h-[200px] max-h-[300px] flex flex-col">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs text-gray-300">Chat com IA</span>
+                            <button id="clear-chat-btn" class="text-xs text-gray-400 hover:text-red-400" title="Limpar histórico">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <div id="chat-messages" class="flex-1 overflow-y-auto mb-2 text-sm max-h-[200px]">
+                            <div class="text-gray-400 text-center py-4">
+                                <i class="fas fa-robot text-2xl mb-2"></i>
+                                <p>Selecione um agente especializado e comece a interagir!</p>
+                                <p class="text-xs mt-1">Você também pode carregar PDFs como contexto.</p>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <input type="text" id="chat-input" placeholder="Digite sua pergunta..." 
+                                   class="flex-1 px-3 py-2 border border-gray-600 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-600 text-gray-100 dark-placeholder">
+                            <button id="send-chat" class="bg-purple-600 text-white px-3 py-2 rounded text-sm hover:bg-purple-700 transition">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal para Adicionar Tags -->
+    <div id="tag-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 border border-gray-600">
+            <h3 class="text-lg font-bold mb-4 text-gray-100">Adicionar Tag</h3>
+            <div class="mb-4">
+                <input type="text" id="new-tag-input" placeholder="Nome da tag" 
+                       class="w-full px-3 py-2 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 bg-gray-700 text-gray-100 dark-placeholder">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2 text-gray-200">Cor:</label>
+                <div class="flex space-x-2">
+                    <button class="w-8 h-8 bg-purple-500 rounded-full border-2 border-transparent hover:border-gray-400" data-color="purple"></button>
+                    <button class="w-8 h-8 bg-blue-500 rounded-full border-2 border-transparent hover:border-gray-400" data-color="blue"></button>
+                    <button class="w-8 h-8 bg-green-500 rounded-full border-2 border-transparent hover:border-gray-400" data-color="green"></button>
+                    <button class="w-8 h-8 bg-red-500 rounded-full border-2 border-transparent hover:border-gray-400" data-color="red"></button>
+                    <button class="w-8 h-8 bg-orange-500 rounded-full border-2 border-transparent hover:border-gray-400" data-color="orange"></button>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2">
+                <button id="cancel-tag" class="px-4 py-2 text-gray-300 hover:text-gray-100">Cancelar</button>
+                <button id="save-tag" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">Adicionar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sistema de Notificações Toast -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <!-- Footer -->
+    <footer class="glass-card border-t border-gray-600 mt-8">
+        <div class="container mx-auto px-6 py-4">
+            <div class="text-center text-gray-300">
+                <span>© 2024 ENEM AI. Todos os direitos reservados.</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    // --- Sistema de Notificações ---
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        
+        const colors = {
+            success: 'bg-green-500',
+            error: 'bg-red-500',
+            warning: 'bg-yellow-500',
+            info: 'bg-blue-500'
+        };
+        
+        toast.className = `${colors[type]} text-white px-4 py-2 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300`;
+        toast.textContent = message;
+        
+        container.appendChild(toast);
+        
+        // Animar entrada
+        setTimeout(() => {
+            toast.classList.remove('translate-x-full');
+        }, 100);
+        
+        // Remover após 3 segundos
+        setTimeout(() => {
+            toast.classList.add('translate-x-full');
+            setTimeout(() => {
+                container.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
+
+    // --- Autenticação ---
+    function getUser() {
+        return JSON.parse(localStorage.getItem('enemai_user'));
+    }
+    function logout() {
+        localStorage.removeItem('enemai_user');
+        window.location.href = 'login.html';
+    }
+    const user = getUser();
+    if (!user) {
+        window.location.href = 'login.html';
+    } else {
+        document.getElementById('user-name').textContent = user.name || user.email;
+    }
+    document.getElementById('logout-btn').onclick = logout;
+    document.getElementById('main-dashboard-btn').onclick = () => {
+        window.location.href = 'main-dashboard.html';
+    };
+    
+    document.getElementById('ai-chat-btn').onclick = () => {
+        window.location.href = 'ai-chat.html';
+    };
+
+    document.getElementById('community-btn').onclick = function() {
+        window.location.href = 'community.html';
+    };
+
+    document.getElementById('settings-btn').onclick = function() {
+        window.location.href = 'settings.html';
+    };
+
+    // --- Google Gemini API ---
+    const GEMINI_API_KEY = 'AIzaSyCSs6saGHeHDUAZMIJWGbfP8Bvx_cvmtl4';
+    const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent';
+
+    // --- Configuração dos Agentes Especializados ---
+    const agents = {
+        socrates: {
+            name: "Sócrates",
+            area: "Humanas",
+            icon: "fas fa-landmark",
+            color: "blue",
+            gradient: "from-blue-500 to-blue-600",
+            description: "Especialista em História, Geografia, Filosofia e Sociologia",
+            prompt: `Você é Sócrates, um tutor especialista em Ciências Humanas para o ENEM. 
+            Você domina História, Geografia, Filosofia e Sociologia. 
+            Suas respostas devem ser didáticas, contextualizadas e sempre relacionadas ao conteúdo do ENEM. 
+            Use exemplos práticos, conecte com atualidades quando relevante e ajude o aluno a desenvolver pensamento crítico. 
+            Seja paciente, encorajador e sempre motive o aluno a questionar e refletir.`
+        },
+        pitagoras: {
+            name: "Pitágoras",
+            area: "Exatas",
+            icon: "fas fa-calculator",
+            color: "green",
+            gradient: "from-green-500 to-green-600",
+            description: "Especialista em Matemática, Física e Química",
+            prompt: `Você é Pitágoras, um tutor especialista em Ciências da Natureza e Matemática para o ENEM. 
+            Você domina Matemática, Física e Química. 
+            Suas respostas devem ser claras, com resolução passo a passo de problemas, 
+            explicação de fórmulas e conceitos fundamentais. 
+            Sempre mostre o raciocínio matemático, use exemplos práticos e conecte com situações reais. 
+            Seja preciso, didático e ajude o aluno a desenvolver lógica matemática.`
+        },
+        camoes: {
+            name: "Camões",
+            area: "Linguagens",
+            icon: "fas fa-book",
+            color: "purple",
+            gradient: "from-purple-500 to-purple-600",
+            description: "Especialista em Português, Literatura e Artes",
+            prompt: `Você é Camões, um tutor especialista em Linguagens para o ENEM. 
+            Você domina Português, Literatura, Artes e Educação Física. 
+            Suas respostas devem focar em gramática, interpretação de textos, 
+            análise literária e compreensão de diferentes linguagens. 
+            Ajude com análise de textos, figuras de linguagem, gêneros textuais e produção textual. 
+            Seja criativo, inspire o aluno e desenvolva sua capacidade de interpretação.`
+        },
+        machado: {
+            name: "Machado",
+            area: "Redação",
+            icon: "fas fa-pen-fancy",
+            color: "orange",
+            gradient: "from-orange-500 to-orange-600",
+            description: "Especialista em Redação e Argumentação",
+            prompt: `Você é Machado de Assis, um tutor especialista em Redação para o ENEM. 
+            Você domina a estrutura da dissertação argumentativa, argumentação, 
+            coesão, coerência e técnicas de escrita. 
+            Suas respostas devem focar em como estruturar uma redação nota 1000, 
+            desenvolver argumentos, usar conectivos, evitar vícios de linguagem e 
+            criar uma conclusão impactante. Seja crítico, criativo e ajude o aluno a 
+            desenvolver sua voz autoral.`
+        }
+    };
+
+    // --- Variáveis Globais ---
+    let currentAgent = null;
+    let pdfContent = null;
+    let pdfFileName = null;
+    let chatHistory = [];
+    let currentNoteId = null;
+    let autoSaveTimer = null;
+    let selectedTagColor = 'purple';
+
+    // --- Sistema de Tratamento de Erros Robusto ---
+    let apiRetryCount = 0;
+    const MAX_RETRIES = 3;
+    const RETRY_DELAY = 2000; // 2 segundos
+
+    async function callGeminiAPIWithRetry(prompt, context = '') {
+        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            try {
+                console.log(`Tentativa ${attempt}/${MAX_RETRIES} para API`);
+                const result = await callGeminiAPI(prompt, context);
+                apiRetryCount = 0; // Reset retry count on success
+                return result;
+            } catch (error) {
+                console.error(`Erro na tentativa ${attempt}:`, error);
+                
+                if (attempt === MAX_RETRIES) {
+                    // Última tentativa falhou, retorna erro
+                    throw error;
+                }
+                
+                // Aguarda antes da próxima tentativa
+                await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * attempt));
+            }
+        }
+    }
+
+    async function callGeminiAPI(prompt, context = '') {
+        try {
+            let fullPrompt = prompt;
+            
+            // Adiciona contexto do agente se selecionado
+            if (appState.currentAgent && agents[appState.currentAgent]) {
+                fullPrompt = `${agents[appState.currentAgent].prompt}\n\nIMPORTANTE: Use markdown para formatar suas respostas. Use:\n- **negrito** para títulos e palavras importantes\n- *itálico* para ênfase\n- \`código\` para termos técnicos\n- \`\`\` para blocos de código\n- - para listas\n- > para citações\n- Tabelas quando apropriado\n\n${prompt}`;
+            }
+            
+            // Adiciona contexto do PDF se disponível
+            if (appState.pdfContent) {
+                fullPrompt = `Contexto do PDF "${appState.pdfFileName}":\n${appState.pdfContent}\n\n${fullPrompt}`;
+            }
+            
+            // Adiciona contexto da anotação atual
+            const editorContent = document.getElementById('editor').innerText.trim();
+            if (editorContent) {
+                fullPrompt = `Anotação atual:\n${editorContent}\n\n${fullPrompt}`;
+            }
+            
+            // Adiciona histórico de chat se disponível
+            if (appState.chatHistory.length > 0) {
+                const recentHistory = appState.chatHistory.slice(-6); // Últimas 6 mensagens
+                const historyText = recentHistory.map(msg => 
+                    `${msg.type === 'user' ? 'Usuário' : 'Assistente'}: ${msg.content}`
+                ).join('\n');
+                fullPrompt = `Histórico da conversa:\n${historyText}\n\n${fullPrompt}`;
+            }
+            
+            console.log('Enviando prompt para API:', fullPrompt.substring(0, 200) + '...');
+            
+            // Timeout para a requisição
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos timeout
+            
+            const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: fullPrompt
+                        }]
+                    }]
+                }),
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Erro na API:', response.status, errorText);
+                
+                // Tratamento específico de erros
+                if (response.status === 429) {
+                    throw new Error('Limite de requisições excedido. Aguarde um momento e tente novamente.');
+                } else if (response.status === 400) {
+                    throw new Error('Requisição inválida. Verifique o conteúdo da mensagem.');
+                } else if (response.status >= 500) {
+                    throw new Error('Erro no servidor. Tente novamente em alguns instantes.');
+                } else {
+                    throw new Error(`Erro na API: ${response.status} - ${errorText}`);
+                }
+            }
+
+            const data = await response.json();
+            console.log('Resposta da API:', data);
+            
+            if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                return data.candidates[0].content.parts[0].text;
+            } else {
+                throw new Error('Resposta inválida da API');
+            }
+        } catch (error) {
+            console.error('Erro ao chamar Gemini API:', error);
+            
+            // Se for erro de timeout ou rede, tenta novamente
+            if (error.name === 'AbortError') {
+                throw new Error('Tempo limite excedido. Verifique sua conexão e tente novamente.');
+            }
+            
+            throw error;
+        }
+    }
+
+    function renderChatHistory() {
+        const chatMessages = document.getElementById('chat-messages');
+        chatMessages.innerHTML = '';
+        
+        if (appState.chatHistory.length === 0) {
+            chatMessages.innerHTML = `
+                <div class="text-gray-500 text-center py-4">
+                    <i class="fas fa-robot text-2xl mb-2"></i>
+                    <p>Selecione um agente especializado e comece a interagir!</p>
+                    <p class="text-xs mt-1">Você também pode carregar PDFs como contexto.</p>
+                </div>
+            `;
+        } else {
+            appState.chatHistory.forEach(msg => {
+                addChatMessage(msg.content, msg.type === 'user');
+            });
+        }
+    }
+
+    // Inicializar quando o DOM estiver pronto
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+    } else {
+        initializeDashboard();
+    }
+
+    // --- Sistema de Validação e Sanitização ---
+    function sanitizeHTML(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function validateInput(input, maxLength = 10000) {
+        if (!input || typeof input !== 'string') {
+            throw new Error('Entrada inválida');
+        }
+        
+        if (input.length > maxLength) {
+            throw new Error(`Texto muito longo. Máximo de ${maxLength} caracteres.`);
+        }
+        
+        // Remove caracteres potencialmente perigosos
+        const sanitized = input.replace(/[<>]/g, '');
+        
+        if (sanitized.length === 0) {
+            throw new Error('Texto não pode estar vazio');
+        }
+        
+        return sanitized;
+    }
+
+    function validateFile(file) {
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        const allowedTypes = ['application/pdf'];
+        
+        if (!file) {
+            throw new Error('Nenhum arquivo selecionado');
+        }
+        
+        if (file.size > maxSize) {
+            throw new Error('Arquivo muito grande. Máximo 10MB.');
+        }
+        
+        if (!allowedTypes.includes(file.type)) {
+            throw new Error('Tipo de arquivo não suportado. Apenas PDF.');
+        }
+        
+        return true;
+    }
+
+    // --- Sistema de Backup Automático ---
+    function saveToBackup(data, type = 'notes') {
+        try {
+            const backupKey = `enemai_backup_${type}_${user.email}`;
+            const backupData = {
+                data: data,
+                timestamp: new Date().toISOString(),
+                version: '1.0'
+            };
+            localStorage.setItem(backupKey, JSON.stringify(backupData));
+            console.log(`Backup salvo: ${type}`);
+        } catch (error) {
+            console.error('Erro ao salvar backup:', error);
+        }
+    }
+
+    function loadFromBackup(type = 'notes') {
+        try {
+            const backupKey = `enemai_backup_${type}_${user.email}`;
+            const backupData = localStorage.getItem(backupKey);
+            if (backupData) {
+                const parsed = JSON.parse(backupData);
+                return parsed.data;
+            }
+        } catch (error) {
+            console.error('Erro ao carregar backup:', error);
+        }
+        return null;
+    }
+
+    function exportData() {
+        try {
+            const exportData = {
+                notes: loadFromBackup('notes'),
+                chatHistory: appState.chatHistory,
+                pdfContent: appState.pdfContent,
+                pdfFileName: appState.pdfFileName,
+                timestamp: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `enemai_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast('Dados exportados com sucesso!', 'success');
+        } catch (error) {
+            console.error('Erro ao exportar dados:', error);
+            showToast('Erro ao exportar dados', 'error');
+        }
+    }
+
+    function importData(file) {
+        try {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    if (importedData.notes) {
+                        // Restaura anotações
+                        saveToBackup(importedData.notes, 'notes');
+                    }
+                    
+                    if (importedData.chatHistory) {
+                        appState.chatHistory = importedData.chatHistory;
+                    }
+                    
+                    if (importedData.pdfContent) {
+                        appState.setPDF(importedData.pdfContent, importedData.pdfFileName);
+                        document.getElementById('pdf-info').classList.remove('hidden');
+                        document.getElementById('pdf-name').textContent = `${importedData.pdfFileName} (importado)`;
+                    }
+                    
+                    showToast('Dados importados com sucesso!', 'success');
+                    location.reload(); // Recarrega para aplicar mudanças
+                } catch (error) {
+                    showToast('Arquivo de backup inválido', 'error');
+                }
+            };
+            reader.readAsText(file);
+        } catch (error) {
+            console.error('Erro ao importar dados:', error);
+            showToast('Erro ao importar dados', 'error');
+        }
+    }
+
+    // --- Sistema de Gerenciamento de Estado ---
+    class AppState {
+        constructor() {
+            this.currentAgent = null;
+            this.pdfContent = null;
+            this.pdfFileName = null;
+            this.chatHistory = [];
+            this.currentNoteId = null;
+            this.autoSaveTimer = null;
+            this.selectedTagColor = 'purple';
+            this.apiRetryCount = 0;
+            this.isProcessing = false;
+        }
+        
+        setAgent(agent) {
+            this.currentAgent = agent;
+            this.saveState();
+        }
+        
+        setPDF(content, fileName) {
+            this.pdfContent = content;
+            this.pdfFileName = fileName;
+            this.saveState();
+        }
+        
+        addChatMessage(message, isUser = false) {
+            this.chatHistory.push({
+                type: isUser ? 'user' : 'assistant',
+                content: message,
+                timestamp: new Date().toISOString()
+            });
+            this.saveState();
+        }
+        
+        clearChatHistory() {
+            this.chatHistory = [];
+            this.saveState();
+        }
+        
+        setProcessing(processing) {
+            this.isProcessing = processing;
+        }
+        
+        saveState() {
+            try {
+                const stateData = {
+                    currentAgent: this.currentAgent,
+                    pdfContent: this.pdfContent,
+                    pdfFileName: this.pdfFileName,
+                    chatHistory: this.chatHistory,
+                    selectedTagColor: this.selectedTagColor,
+                    timestamp: new Date().toISOString()
+                };
+                localStorage.setItem(`enemai_state_${user.email}`, JSON.stringify(stateData));
+            } catch (error) {
+                console.error('Erro ao salvar estado:', error);
+            }
+        }
+        
+        loadState() {
+            try {
+                const stateData = localStorage.getItem(`enemai_state_${user.email}`);
+                if (stateData) {
+                    const parsed = JSON.parse(stateData);
+                    this.currentAgent = parsed.currentAgent;
+                    this.pdfContent = parsed.pdfContent;
+                    this.pdfFileName = parsed.pdfFileName;
+                    this.chatHistory = parsed.chatHistory || [];
+                    this.selectedTagColor = parsed.selectedTagColor || 'purple';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar estado:', error);
+            }
+        }
+        
+        reset() {
+            this.currentAgent = null;
+            this.pdfContent = null;
+            this.pdfFileName = null;
+            this.chatHistory = [];
+            this.currentNoteId = null;
+            this.selectedTagColor = 'purple';
+            this.saveState();
+        }
+    }
+
+    // Instância global do estado
+    const appState = new AppState();
+
+    // --- Chat com IA ---
+    function addChatMessage(message, isUser = false) {
+        const chatMessages = document.getElementById('chat-messages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `mb-3 ${isUser ? 'text-right' : 'text-left'}`;
+        
+        const bubbleDiv = document.createElement('div');
+        bubbleDiv.className = `inline-block max-w-xs lg:max-w-md px-3 py-2 rounded-lg text-sm ${
+            isUser 
+                ? 'bg-purple-600 text-white' 
+                : 'bg-gray-700 text-gray-100'
+        }`;
+        
+        if (isUser) {
+            // Para mensagens do usuário, apenas quebra de linha
+            const processedMessage = message.replace(/\n/g, '<br>');
+            bubbleDiv.innerHTML = processedMessage;
+        } else {
+            // Para mensagens da IA, processa markdown com melhor formatação
+            try {
+                // Configura marked para melhor formatação
+                marked.setOptions({
+                    breaks: true,
+                    gfm: true,
+                    headerIds: false,
+                    mangle: false
+                });
+                
+                // Processa o markdown
+                const htmlContent = marked.parse(message);
+                bubbleDiv.innerHTML = htmlContent;
+                bubbleDiv.classList.add('markdown-content');
+                
+                // Aplica syntax highlighting nos blocos de código
+                setTimeout(() => {
+                    bubbleDiv.querySelectorAll('pre code').forEach((block) => {
+                        hljs.highlightElement(block);
+                    });
+                }, 100);
+                
+                // Adiciona indentação para listas e parágrafos
+                bubbleDiv.querySelectorAll('p, li, blockquote').forEach(element => {
+                    element.style.marginBottom = '0.5em';
+                });
+                
+                // Melhora a formatação de listas
+                bubbleDiv.querySelectorAll('ul, ol').forEach(list => {
+                    list.style.paddingLeft = '1.5em';
+                    list.style.marginBottom = '0.5em';
+                });
+                
+                // Melhora a formatação de blocos de código
+                bubbleDiv.querySelectorAll('pre').forEach(pre => {
+                    pre.style.margin = '0.5em 0';
+                    pre.style.padding = '0.75em';
+                    pre.style.borderRadius = '0.375rem';
+                    pre.style.backgroundColor = '#1f2937';
+                    pre.style.color = '#f9fafb';
+                    pre.style.overflowX = 'auto';
+                });
+                
+                // Melhora a formatação de código inline
+                bubbleDiv.querySelectorAll('code:not(pre code)').forEach(code => {
+                    code.style.backgroundColor = '#f3f4f6';
+                    code.style.padding = '0.125em 0.25em';
+                    code.style.borderRadius = '0.25rem';
+                    code.style.fontFamily = 'monospace';
+                    code.style.fontSize = '0.875em';
+                });
+                
+            } catch (error) {
+                console.error('Erro ao processar markdown:', error);
+                // Fallback para texto simples com quebras de linha
+                const processedMessage = message.replace(/\n/g, '<br>');
+                bubbleDiv.innerHTML = processedMessage;
+            }
+        }
+        
+        messageDiv.appendChild(bubbleDiv);
+        chatMessages.appendChild(messageDiv);
+        
+        // Salvar no histórico usando appState
+        appState.addChatMessage(message, isUser);
+        
+        // Scroll to bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function clearChatHistory() {
+        appState.clearChatHistory();
+        const chatMessages = document.getElementById('chat-messages');
+        chatMessages.innerHTML = `
+            <div class="text-gray-400 text-center py-4">
+                <i class="fas fa-robot text-2xl mb-2"></i>
+                <p>Selecione um agente especializado e comece a interagir!</p>
+                <p class="text-xs mt-1">Você também pode carregar PDFs como contexto.</p>
+            </div>
+        `;
+    }
+
+    function showLoadingMessage() {
+        const chatMessages = document.getElementById('chat-messages');
+        const loadingDiv = document.createElement('div');
+        loadingDiv.id = 'loading-message';
+        loadingDiv.className = 'mb-3 text-left';
+        loadingDiv.innerHTML = `
+            <div class="inline-block max-w-xs lg:max-w-md px-3 py-2 rounded-lg text-sm bg-gray-700 text-gray-100">
+                <div class="flex items-center space-x-2">
+                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-400"></div>
+                    <span>Processando...</span>
+                </div>
+            </div>
+        `;
+        chatMessages.appendChild(loadingDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function removeLoadingMessage() {
+        const loadingMessage = document.getElementById('loading-message');
+        if (loadingMessage) {
+            loadingMessage.remove();
+        }
+    }
+
+    // --- Processamento de PDF ---
+    async function processPDF(file) {
+        try {
+            // Valida o arquivo
+            validateFile(file);
+            
+            showToast('Processando PDF...', 'info');
+            
+            // Verificar se PDF.js está disponível
+            if (typeof pdfjsLib === 'undefined') {
+                throw new Error('Biblioteca PDF.js não carregada. Recarregue a página.');
+            }
+            
+            console.log('Iniciando processamento do PDF:', file.name);
+            
+            // Usando PDF.js para extrair texto
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+            
+            console.log('PDF carregado, páginas:', pdf.numPages);
+            
+            let fullText = '';
+            
+            for (let i = 1; i <= pdf.numPages; i++) {
+                console.log(`Processando página ${i}/${pdf.numPages}`);
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                const pageText = textContent.items.map(item => item.str).join(' ');
+                fullText += pageText + '\n';
+            }
+            
+            if (!fullText.trim()) {
+                throw new Error('Não foi possível extrair texto do PDF. O arquivo pode estar protegido ou ser uma imagem.');
+            }
+            
+            // Sanitiza o texto extraído
+            const sanitizedText = sanitizeHTML(fullText);
+            
+            appState.setPDF(sanitizedText, file.name);
+            
+            // Mostra informações do PDF
+            document.getElementById('pdf-info').classList.remove('hidden');
+            document.getElementById('pdf-name').textContent = `${file.name} (${Math.round(sanitizedText.length / 1000)}KB de texto, ${pdf.numPages} páginas)`;
+            
+            showToast(`PDF processado com sucesso! ${pdf.numPages} páginas extraídas.`, 'success');
+            addChatMessage(`PDF "${file.name}" carregado como contexto. Agora posso usar esse conteúdo para ajudar com suas anotações!`);
+            
+            console.log('PDF processado com sucesso');
+            
+        } catch (error) {
+            console.error('Erro ao processar PDF:', error);
+            let errorMessage = 'Erro ao processar PDF. ';
+            
+            if (error.message.includes('Biblioteca PDF.js')) {
+                errorMessage += 'Recarregue a página e tente novamente.';
+            } else if (error.message.includes('Não foi possível extrair texto')) {
+                errorMessage += 'O arquivo pode estar protegido ou ser uma imagem.';
+            } else if (error.message.includes('Arquivo muito grande')) {
+                errorMessage += 'Selecione um arquivo menor que 10MB.';
+            } else if (error.message.includes('Tipo de arquivo não suportado')) {
+                errorMessage += 'Selecione apenas arquivos PDF.';
+            } else {
+                errorMessage += 'Tente novamente com outro arquivo.';
+            }
+            
+            showToast(errorMessage, 'error');
+            addChatMessage('Erro ao processar PDF: ' + error.message);
+        }
+    }
+
+    // --- Funções de Escrita Direta pela IA ---
+    async function expandNote() {
+        if (!appState.currentAgent) {
+            showToast('Selecione um agente primeiro!', 'warning');
+            return;
+        }
+        
+        const editorContent = document.getElementById('editor').innerText.trim();
+        if (!editorContent) {
+            showToast('Escreva algo no editor primeiro!', 'warning');
+            return;
+        }
+        
+        showLoadingMessage();
+        
+        try {
+            const response = await callGeminiAPIWithRetry(
+                'Expanda esta anotação adicionando mais detalhes, exemplos e explicações. Mantenha o conteúdo original e apenas adicione informações complementares. Retorne apenas o texto expandido:'
+            );
+            
+            document.getElementById('editor').innerHTML = response;
+            addChatMessage('Anotação expandida com sucesso!');
+            showToast('Anotação expandida!', 'success');
+            
+        } catch (error) {
+            addChatMessage('Erro ao expandir anotação: ' + error.message);
+            showToast('Erro ao expandir anotação', 'error');
+        } finally {
+            removeLoadingMessage();
+        }
+    }
+
+    async function rewriteNote() {
+        if (!appState.currentAgent) {
+            showToast('Selecione um agente primeiro!', 'warning');
+            return;
+        }
+        
+        const editorContent = document.getElementById('editor').innerText.trim();
+        if (!editorContent) {
+            showToast('Escreva algo no editor primeiro!', 'warning');
+            return;
+        }
+        
+        if (!confirm('Tem certeza que deseja reescrever completamente esta anotação?')) {
+            return;
+        }
+        
+        showLoadingMessage();
+        
+        try {
+            const response = await callGeminiAPIWithRetry(
+                'Reescreva completamente esta anotação de forma mais clara, organizada e didática. Mantenha todas as informações importantes mas melhore a estrutura e clareza. Retorne apenas o texto reescrito:'
+            );
+            
+            document.getElementById('editor').innerHTML = response;
+            addChatMessage('Anotação reescrita com sucesso!');
+            showToast('Anotação reescrita!', 'success');
+            
+        } catch (error) {
+            addChatMessage('Erro ao reescrever anotação: ' + error.message);
+            showToast('Erro ao reescrever anotação', 'error');
+        } finally {
+            removeLoadingMessage();
+        }
+    }
+
+    async function createNewNote() {
+        if (!appState.currentAgent) {
+            showToast('Selecione um agente primeiro!', 'warning');
+            return;
+        }
+        
+        const topic = prompt('Sobre qual tópico você gostaria que eu criasse uma anotação?');
+        if (!topic) return;
+        
+        showLoadingMessage();
+        
+        try {
+            const response = await callGeminiAPIWithRetry(
+                `Crie uma anotação completa e detalhada sobre "${topic}". A anotação deve ser estruturada, didática e adequada para estudo do ENEM. Retorne apenas o texto da anotação:`
+            );
+            
+            document.getElementById('editor').innerHTML = response;
+            addChatMessage(`Nova anotação sobre "${topic}" criada com sucesso!`);
+            showToast('Nova anotação criada!', 'success');
+            
+        } catch (error) {
+            addChatMessage('Erro ao criar anotação: ' + error.message);
+            showToast('Erro ao criar anotação', 'error');
+        } finally {
+            removeLoadingMessage();
+        }
+    }
+
+    async function processUserMessage(message) {
+        if (!appState.currentAgent) {
+            addChatMessage('Por favor, selecione um agente especializado primeiro!');
+            return;
+        }
+        
+        try {
+            // Valida e sanitiza a mensagem
+            const validatedMessage = validateInput(message, 5000);
+            
+            const editorContent = document.getElementById('editor').innerText.trim();
+            
+            // Verifica se é um comando de modificação de anotação
+            const modificationCommands = [
+                'modifique', 'modificar', 'altere', 'alterar', 'mude', 'mudar',
+                'reescreva', 'reescrever', 'melhore', 'melhorar', 'expanda', 'expandir',
+                'adicione', 'adicionar', 'inclua', 'incluir', 'corrija', 'corrigir'
+            ];
+            
+            const isModificationCommand = modificationCommands.some(cmd => 
+                validatedMessage.toLowerCase().includes(cmd)
+            );
+            
+            if (isModificationCommand && editorContent) {
+                // É um comando de modificação
+                await handleNoteModification(validatedMessage, editorContent);
+                return;
+            }
+            
+            if (!editorContent && !appState.pdfContent) {
+                addChatMessage('Por favor, escreva algo no editor ou carregue um PDF primeiro para que eu possa ajudar!');
+                return;
+            }
+
+            showLoadingMessage();
+            
+            try {
+                const response = await callGeminiAPIWithRetry(validatedMessage);
+                removeLoadingMessage();
+                addChatMessage(response);
+            } catch (error) {
+                removeLoadingMessage();
+                addChatMessage('Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente.');
+                console.error('Erro no chat:', error);
+            }
+        } catch (error) {
+            addChatMessage('❌ Erro de validação: ' + error.message);
+            showToast('Erro de validação', 'error');
+        }
+    }
+
+    // --- Função para lidar com modificações de anotações ---
+    async function handleNoteModification(command, currentContent) {
+        showLoadingMessage();
+        
+        try {
+            let prompt = '';
+            
+            if (command.toLowerCase().includes('modifique') || command.toLowerCase().includes('modificar')) {
+                prompt = `Modifique a anotação atual seguindo estas instruções: "${command}". Não altere a formatação, markdown, nem a identação do texto. Apenas modifique o conteúdo solicitado. Mantenha a estrutura original mas faça as alterações solicitadas. Retorne apenas o texto modificado:`;
+            } else if (command.toLowerCase().includes('reescreva') || command.toLowerCase().includes('reescrever')) {
+                prompt = `Reescreva completamente a anotação atual seguindo estas instruções: "${command}". Não altere a formatação, markdown, nem a identação do texto. Apenas modifique o conteúdo solicitado. Mantenha as informações importantes mas melhore conforme solicitado. Retorne apenas o texto reescrito:`;
+            } else if (command.toLowerCase().includes('melhore') || command.toLowerCase().includes('melhorar')) {
+                prompt = `Melhore a anotação atual seguindo estas instruções: "${command}". Não altere a formatação, markdown, nem a identação do texto. Apenas modifique o conteúdo solicitado. Mantenha o conteúdo mas aprimore a qualidade, clareza e organização. Retorne apenas o texto melhorado:`;
+            } else if (command.toLowerCase().includes('expanda') || command.toLowerCase().includes('expandir')) {
+                prompt = `Expanda a anotação atual seguindo estas instruções: "${command}". Não altere a formatação, markdown, nem a identação do texto. Apenas modifique o conteúdo solicitado. Adicione mais detalhes, exemplos e explicações mantendo o conteúdo original. Retorne apenas o texto expandido:`;
+            } else if (command.toLowerCase().includes('adicione') || command.toLowerCase().includes('adicionar') || 
+                       command.toLowerCase().includes('inclua') || command.toLowerCase().includes('incluir')) {
+                prompt = `Adicione conteúdo à anotação atual seguindo estas instruções: "${command}". Não altere a formatação, markdown, nem a identação do texto. Apenas modifique o conteúdo solicitado. Mantenha todo o conteúdo existente e adicione as informações solicitadas. Retorne apenas o texto completo:`;
+            } else if (command.toLowerCase().includes('corrija') || command.toLowerCase().includes('corrigir')) {
+                prompt = `Corrija a anotação atual seguindo estas instruções: "${command}". Não altere a formatação, markdown, nem a identação do texto. Apenas modifique o conteúdo solicitado. Identifique e corrija erros, melhore a clareza e precisão. Retorne apenas o texto corrigido:`;
+            } else {
+                prompt = `Modifique a anotação atual seguindo estas instruções: "${command}". Não altere a formatação, markdown, nem a identação do texto. Apenas modifique o conteúdo solicitado. Retorne apenas o texto modificado:`;
+            }
+            
+            const response = await callGeminiAPIWithRetry(prompt);
+            
+            // Aplica as modificações ao editor
+            document.getElementById('editor').innerHTML = response;
+            
+            removeLoadingMessage();
+            addChatMessage('✅ Anotação modificada com sucesso! As alterações foram aplicadas ao editor.');
+            showToast('Anotação modificada!', 'success');
+            
+        } catch (error) {
+            removeLoadingMessage();
+            addChatMessage('❌ Erro ao modificar anotação: ' + error.message);
+            showToast('Erro ao modificar anotação', 'error');
+        }
+    }
+
+    // --- Sistema de Anotações ---
+    let notes = [];
+    let currentNote = null;
+    let isFavorite = false;
+
+    function loadNotes() {
+        try {
+            const savedNotes = localStorage.getItem(`enemai_notes_${user.email}`);
+            notes = savedNotes ? JSON.parse(savedNotes) : [];
+            renderNotesList();
+        } catch (error) {
+            console.error('Erro ao carregar anotações:', error);
+            notes = [];
+        }
+    }
+
+    function saveNotes() {
+        try {
+            localStorage.setItem(`enemai_notes_${user.email}`, JSON.stringify(notes));
+            saveToBackup(notes, 'notes');
+        } catch (error) {
+            console.error('Erro ao salvar anotações:', error);
+            showToast('Erro ao salvar anotações', 'error');
+        }
+    }
+
+    function createNote() {
+        const note = {
+            id: Date.now().toString(),
+            title: 'Nova Anotação',
+            content: '',
+            tags: [],
+            favorite: false,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        
+        notes.unshift(note);
+        saveNotes();
+        loadNote(note.id);
+        renderNotesList();
+        showToast('Nova anotação criada!', 'success');
+    }
+
+    function loadNote(noteId) {
+        const note = notes.find(n => n.id === noteId);
+        if (note) {
+            currentNote = note;
+            currentNoteId = noteId;
+            document.getElementById('editor').innerHTML = note.content;
+            document.getElementById('editor').focus();
+            
+            // Atualiza tags
+            renderCurrentTags();
+            
+            // Atualiza status de favorito
+            isFavorite = note.favorite;
+            updateFavoriteButton();
+            
+            // Atualiza contador de caracteres
+            updateCharCount();
+            
+            showToast('Anotação carregada!', 'success');
+        }
+    }
+
+    function saveCurrentNote() {
+        if (!currentNote) {
+            createNote();
+            return;
+        }
+        
+        const content = document.getElementById('editor').innerHTML;
+        const title = extractTitle(content) || 'Anotação sem título';
+        
+        currentNote.content = content;
+        currentNote.title = title;
+        currentNote.tags = getCurrentTags();
+        currentNote.favorite = isFavorite;
+        currentNote.updatedAt = new Date().toISOString();
+        
+        saveNotes();
+        renderNotesList();
+        
+        document.getElementById('save-status').textContent = 'Salvo';
+        document.getElementById('save-status').className = 'text-sm text-gray-400';
+        
+        setTimeout(() => {
+            document.getElementById('save-status').textContent = 'Salvo';
+            document.getElementById('save-status').className = 'text-sm text-gray-400';
+        }, 2000);
+        
+        showToast('Anotação salva!', 'success');
+    }
+
+    function deleteNote(noteId) {
+        if (confirm('Tem certeza que deseja excluir esta anotação?')) {
+            notes = notes.filter(n => n.id !== noteId);
+            saveNotes();
+            
+            if (currentNote && currentNote.id === noteId) {
+                currentNote = null;
+                currentNoteId = null;
+                document.getElementById('editor').innerHTML = '';
+                document.getElementById('current-tags').innerHTML = '';
+                isFavorite = false;
+                updateFavoriteButton();
+            }
+            
+            renderNotesList();
+            showToast('Anotação excluída!', 'success');
+        }
+    }
+
+    function toggleFavorite() {
+        isFavorite = !isFavorite;
+        updateFavoriteButton();
+        
+        if (currentNote) {
+            currentNote.favorite = isFavorite;
+            saveNotes();
+            renderNotesList();
+        }
+        
+        showToast(isFavorite ? 'Adicionado aos favoritos!' : 'Removido dos favoritos!', 'success');
+    }
+
+    function updateFavoriteButton() {
+        const btn = document.getElementById('toggle-favorite');
+        if (isFavorite) {
+            btn.innerHTML = '<i class="fas fa-star"></i>';
+            btn.className = 'bg-yellow-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-yellow-600 transition';
+        } else {
+            btn.innerHTML = '<i class="far fa-star"></i>';
+            btn.className = 'bg-gray-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-600 transition';
+        }
+    }
+
+    function renderNotesList() {
+        const notesList = document.getElementById('notes-list');
+        const searchTerm = document.getElementById('search-notes').value.toLowerCase();
+        const filterTag = document.getElementById('filter-tags').value;
+        const showOnlyFavorites = document.getElementById('show-favorites').classList.contains('bg-yellow-100');
+        
+        let filteredNotes = notes;
+        
+        // Filtro por busca
+        if (searchTerm) {
+            filteredNotes = filteredNotes.filter(note => 
+                note.title.toLowerCase().includes(searchTerm) ||
+                note.content.toLowerCase().includes(searchTerm) ||
+                note.tags.some(tag => tag.name.toLowerCase().includes(searchTerm))
+            );
+        }
+        
+        // Filtro por tag
+        if (filterTag) {
+            filteredNotes = filteredNotes.filter(note => 
+                note.tags.some(tag => tag.name === filterTag)
+            );
+        }
+        
+        // Filtro por favoritos
+        if (showOnlyFavorites) {
+            filteredNotes = filteredNotes.filter(note => note.favorite);
+        }
+        
+        notesList.innerHTML = '';
+        
+        if (filteredNotes.length === 0) {
+            notesList.innerHTML = '<div class="text-gray-400 text-center py-4">Nenhuma anotação encontrada</div>';
+            return;
+        }
+        
+        filteredNotes.forEach(note => {
+            const noteDiv = document.createElement('div');
+            noteDiv.className = `note-item ${note.favorite ? 'favorite' : ''} ${currentNote && currentNote.id === note.id ? 'bg-purple-100 border-purple-300' : ''}`;
+            
+            const title = extractTitle(note.content) || 'Anotação sem título';
+            const preview = note.content.replace(/<[^>]*>/g, '').substring(0, 100) + '...';
+            
+            noteDiv.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <div class="font-medium text-sm">${title}</div>
+                        <div class="text-xs text-gray-400 mt-1">${preview}</div>
+                        <div class="flex flex-wrap mt-1">
+                            ${note.tags.map(tag => `<span class="tag tag-${tag.color}">${tag.name}</span>`).join('')}
+                        </div>
+                        <div class="text-xs text-gray-400 mt-1">
+                            ${new Date(note.updatedAt).toLocaleDateString()}
+                        </div>
+                    </div>
+                    <div class="flex space-x-1 ml-2">
+                        ${note.favorite ? '<i class="fas fa-star text-yellow-500 text-xs"></i>' : ''}
+                        <button onclick="deleteNote('${note.id}')" class="text-red-500 hover:text-red-700 text-xs">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            noteDiv.onclick = (e) => {
+                if (!e.target.closest('button')) {
+                    loadNote(note.id);
+                }
+            };
+            
+            notesList.appendChild(noteDiv);
+        });
+    }
+
+    function extractTitle(content) {
+        const div = document.createElement('div');
+        div.innerHTML = content;
+        const text = div.textContent || div.innerText || '';
+        const lines = text.split('\n').filter(line => line.trim());
+        return lines[0] ? lines[0].substring(0, 50) : 'Anotação sem título';
+    }
+
+    // --- Sistema de Tags ---
+    function addTag() {
+        const modal = document.getElementById('tag-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.getElementById('new-tag-input').focus();
+    }
+
+    function saveTag() {
+        const tagName = document.getElementById('new-tag-input').value.trim();
+        if (!tagName) {
+            showToast('Digite um nome para a tag!', 'warning');
+            return;
+        }
+        
+        const tag = {
+            name: tagName,
+            color: selectedTagColor
+        };
+        
+        if (currentNote) {
+            // Verifica se a tag já existe
+            const existingTag = currentNote.tags.find(t => t.name.toLowerCase() === tagName.toLowerCase());
+            if (existingTag) {
+                showToast('Tag já existe!', 'warning');
+                return;
+            }
+            
+            currentNote.tags.push(tag);
+            saveNotes();
+            renderCurrentTags();
+            renderNotesList();
+        }
+        
+        // Atualiza filtro de tags
+        updateTagFilter();
+        
+        // Fecha modal
+        document.getElementById('new-tag-input').value = '';
+        document.getElementById('tag-modal').classList.add('hidden');
+        document.getElementById('tag-modal').classList.remove('flex');
+        
+        showToast('Tag adicionada!', 'success');
+    }
+
+    function removeTag(tagName) {
+        if (currentNote) {
+            currentNote.tags = currentNote.tags.filter(t => t.name !== tagName);
+            saveNotes();
+            renderCurrentTags();
+            renderNotesList();
+            updateTagFilter();
+            showToast('Tag removida!', 'success');
+        }
+    }
+
+    function renderCurrentTags() {
+        const tagsContainer = document.getElementById('current-tags');
+        tagsContainer.innerHTML = '';
+        
+        if (currentNote) {
+            currentNote.tags.forEach(tag => {
+                const tagSpan = document.createElement('span');
+                tagSpan.className = `tag tag-${tag.color} cursor-pointer hover:opacity-75`;
+                tagSpan.textContent = tag.name;
+                tagSpan.onclick = () => removeTag(tag.name);
+                tagsContainer.appendChild(tagSpan);
+            });
+        }
+    }
+
+    function getCurrentTags() {
+        if (!currentNote) return [];
+        return currentNote.tags || [];
+    }
+
+    function updateTagFilter() {
+        const filterSelect = document.getElementById('filter-tags');
+        const allTags = new Set();
+        
+        notes.forEach(note => {
+            note.tags.forEach(tag => allTags.add(tag.name));
+        });
+        
+        // Mantém a opção atual se ainda existir
+        const currentValue = filterSelect.value;
+        
+        filterSelect.innerHTML = '<option value="">Todas as tags</option>';
+        Array.from(allTags).sort().forEach(tag => {
+            const option = document.createElement('option');
+            option.value = tag;
+            option.textContent = tag;
+            filterSelect.appendChild(option);
+        });
+        
+        // Restaura valor se ainda existir
+        if (allTags.has(currentValue)) {
+            filterSelect.value = currentValue;
+        }
+    }
+
+    // --- Editor Rico ---
+    function formatText(command, value = null) {
+        document.getElementById('editor').focus();
+        
+        if (command === 'foreColor' && value) {
+            document.execCommand('foreColor', false, value);
+        } else {
+            document.execCommand(command, false, null);
+        }
+        
+        updateCharCount();
+    }
+
+    function insertLink() {
+        const url = prompt('Digite a URL do link:');
+        if (url) {
+            document.execCommand('createLink', false, url);
+        }
+    }
+
+    function updateCharCount() {
+        const content = document.getElementById('editor').innerText;
+        document.getElementById('char-count').textContent = content.length;
+    }
+
+    function clearEditor() {
+        if (confirm('Tem certeza que deseja limpar o editor?')) {
+            document.getElementById('editor').innerHTML = '';
+            updateCharCount();
+            showToast('Editor limpo!', 'success');
+        }
+    }
+
+    function exportCurrentNote() {
+        if (!currentNote) {
+            showToast('Nenhuma anotação para exportar!', 'warning');
+            return;
+        }
+        
+        const content = document.getElementById('editor').innerText;
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${currentNote.title.replace(/[^a-z0-9]/gi, '_')}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        showToast('Anotação exportada!', 'success');
+    }
+
+    // --- Atalhos de Teclado ---
+    function setupKeyboardShortcuts() {
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key.toLowerCase()) {
+                    case 's':
+                        e.preventDefault();
+                        saveCurrentNote();
+                        break;
+                    case 'n':
+                        e.preventDefault();
+                        createNote();
+                        break;
+                    case 'b':
+                        e.preventDefault();
+                        formatText('bold');
+                        break;
+                    case 'i':
+                        e.preventDefault();
+                        formatText('italic');
+                        break;
+                    case 'u':
+                        e.preventDefault();
+                        formatText('underline');
+                        break;
+                }
+            }
+        });
+    }
+
+    // --- Busca e Filtros ---
+    function setupSearchAndFilters() {
+        document.getElementById('search-notes').addEventListener('input', () => {
+            renderNotesList();
+        });
+        
+        document.getElementById('filter-tags').addEventListener('change', () => {
+            renderNotesList();
+        });
+        
+        document.getElementById('show-favorites').addEventListener('click', function() {
+            this.classList.toggle('bg-yellow-100');
+            renderNotesList();
+        });
+    }
+
+    // --- Auto-save ---
+    function setupAutoSave() {
+        const editor = document.getElementById('editor');
+        let autoSaveTimer;
+        
+        editor.addEventListener('input', () => {
+            updateCharCount();
+            
+            // Cancela timer anterior
+            if (autoSaveTimer) {
+                clearTimeout(autoSaveTimer);
+            }
+            
+            // Mostra status de salvamento
+            document.getElementById('save-status').textContent = 'Salvando...';
+            document.getElementById('save-status').className = 'text-sm text-orange-500';
+            
+            // Agenda novo salvamento
+            autoSaveTimer = setTimeout(() => {
+                if (currentNote) {
+                    saveCurrentNote();
+                }
+            }, 3000);
+        });
+    }
+
+    // --- Inicialização ---
+    function initializeDashboard() {
+        console.log('Inicializando dashboard...');
+        
+        // Carrega estado da aplicação
+        appState.loadState();
+        
+        // Carrega anotações
+        loadNotes();
+        
+        // Configura eventos
+        setupEventListeners();
+        setupKeyboardShortcuts();
+        setupSearchAndFilters();
+        setupAutoSave();
+        setupEditorPreview();
+        
+        // Renderiza interface
+        renderChatHistory();
+        updateTagFilter();
+        
+        // Seleciona agente se existir
+        if (appState.currentAgent) {
+            document.getElementById('agent-selector').value = appState.currentAgent;
+        }
+        
+        // Mostra PDF se existir
+        if (appState.pdfContent) {
+            document.getElementById('pdf-info').classList.remove('hidden');
+            document.getElementById('pdf-name').textContent = `${appState.pdfFileName} (carregado)`;
+        }
+        
+        console.log('Dashboard inicializado com sucesso!');
+        showToast('Dashboard carregado com sucesso!', 'success');
+    }
+
+    function setupEventListeners() {
+        console.log('Configurando event listeners...');
+        
+        // Botões do editor
+        const newNoteBtn = document.getElementById('new-note');
+        const saveNoteBtn = document.getElementById('save-note');
+        const clearEditorBtn = document.getElementById('clear-editor');
+        const toggleFavoriteBtn = document.getElementById('toggle-favorite');
+        const exportNoteBtn = document.getElementById('export-note');
+        
+        if (newNoteBtn) newNoteBtn.onclick = createNote;
+        if (saveNoteBtn) saveNoteBtn.onclick = saveCurrentNote;
+        if (clearEditorBtn) clearEditorBtn.onclick = clearEditor;
+        if (toggleFavoriteBtn) toggleFavoriteBtn.onclick = toggleFavorite;
+        if (exportNoteBtn) exportNoteBtn.onclick = exportCurrentNote;
+        
+        // Tags
+        const addTagBtn = document.getElementById('add-tag-btn');
+        const saveTagBtn = document.getElementById('save-tag');
+        const cancelTagBtn = document.getElementById('cancel-tag');
+        
+        if (addTagBtn) addTagBtn.onclick = addTag;
+        if (saveTagBtn) saveTagBtn.onclick = saveTag;
+        if (cancelTagBtn) {
+            cancelTagBtn.onclick = () => {
+                document.getElementById('tag-modal').classList.add('hidden');
+                document.getElementById('tag-modal').classList.remove('flex');
+            };
+        }
+        
+        // Seleção de cor das tags
+        document.querySelectorAll('[data-color]').forEach(btn => {
+            btn.onclick = function() {
+                selectedTagColor = this.dataset.color;
+                document.querySelectorAll('[data-color]').forEach(b => b.classList.remove('border-gray-400'));
+                this.classList.add('border-gray-400');
+            };
+        });
+        
+        // Agente IA
+        const agentSelector = document.getElementById('agent-selector');
+        if (agentSelector) {
+            agentSelector.onchange = function() {
+                appState.setAgent(this.value);
+                if (this.value) {
+                    const agent = agents[this.value];
+                    addChatMessage(`Olá! Sou ${agent.name}, seu tutor especialista em ${agent.area}. Como posso ajudar você hoje?`);
+                }
+            };
+        }
+        
+        // PDF
+        const uploadPdfBtn = document.getElementById('upload-pdf-btn');
+        const pdfUpload = document.getElementById('pdf-upload');
+        
+        if (uploadPdfBtn) {
+            uploadPdfBtn.onclick = () => {
+                if (pdfUpload) pdfUpload.click();
+            };
+        }
+        
+        if (pdfUpload) {
+            pdfUpload.onchange = (e) => {
+                if (e.target.files.length > 0) {
+                    processPDF(e.target.files[0]);
+                }
+            };
+        }
+        
+        // Botões de ação rápida
+        const improveTextBtn = document.getElementById('improve-text-btn');
+        const correctGrammarBtn = document.getElementById('correct-grammar-btn');
+        const summarizeBtn = document.getElementById('summarize-btn');
+        const explainConceptsBtn = document.getElementById('explain-concepts-btn');
+        
+        if (improveTextBtn) improveTextBtn.onclick = async () => {
+            if (!appState.currentAgent) {
+                showToast('Selecione um agente primeiro!', 'warning');
+                return;
+            }
+            
+            const content = document.getElementById('editor').innerText.trim();
+            if (!content) {
+                showToast('Escreva algo no editor primeiro!', 'warning');
+                return;
+            }
+            
+            showLoadingMessage();
+            try {
+                const response = await callGeminiAPIWithRetry('Melhore este texto tornando-o mais claro, organizado e didático:');
+                document.getElementById('editor').innerHTML = response;
+                addChatMessage('Texto melhorado com sucesso!');
+                showToast('Texto melhorado!', 'success');
+            } catch (error) {
+                addChatMessage('Erro ao melhorar texto: ' + error.message);
+                showToast('Erro ao melhorar texto', 'error');
+            } finally {
+                removeLoadingMessage();
+            }
+        };
+        
+        if (correctGrammarBtn) correctGrammarBtn.onclick = async () => {
+            if (!appState.currentAgent) {
+                showToast('Selecione um agente primeiro!', 'warning');
+                return;
+            }
+            
+            const content = document.getElementById('editor').innerText.trim();
+            if (!content) {
+                showToast('Escreva algo no editor primeiro!', 'warning');
+                return;
+            }
+            
+            showLoadingMessage();
+            try {
+                const response = await callGeminiAPIWithRetry('Corrija os erros gramaticais e ortográficos deste texto:');
+                document.getElementById('editor').innerHTML = response;
+                addChatMessage('Gramática corrigida com sucesso!');
+                showToast('Gramática corrigida!', 'success');
+            } catch (error) {
+                addChatMessage('Erro ao corrigir gramática: ' + error.message);
+                showToast('Erro ao corrigir gramática', 'error');
+            } finally {
+                removeLoadingMessage();
+            }
+        };
+        
+        if (summarizeBtn) summarizeBtn.onclick = async () => {
+            if (!appState.currentAgent) {
+                showToast('Selecione um agente primeiro!', 'warning');
+                return;
+            }
+            
+            const content = document.getElementById('editor').innerText.trim();
+            if (!content) {
+                showToast('Escreva algo no editor primeiro!', 'warning');
+                return;
+            }
+            
+            showLoadingMessage();
+            try {
+                const response = await callGeminiAPIWithRetry('Crie um resumo conciso e organizado deste texto:');
+                document.getElementById('editor').innerHTML = response;
+                addChatMessage('Resumo criado com sucesso!');
+                showToast('Resumo criado!', 'success');
+            } catch (error) {
+                addChatMessage('Erro ao criar resumo: ' + error.message);
+                showToast('Erro ao criar resumo', 'error');
+            } finally {
+                removeLoadingMessage();
+            }
+        };
+        
+        if (explainConceptsBtn) explainConceptsBtn.onclick = async () => {
+            if (!appState.currentAgent) {
+                showToast('Selecione um agente primeiro!', 'warning');
+                return;
+            }
+            
+            const content = document.getElementById('editor').innerText.trim();
+            if (!content) {
+                showToast('Escreva algo no editor primeiro!', 'warning');
+                return;
+            }
+            
+            showLoadingMessage();
+            try {
+                const response = await callGeminiAPIWithRetry('Explique os conceitos principais deste texto de forma didática e detalhada:');
+                document.getElementById('editor').innerHTML = response;
+                addChatMessage('Conceitos explicados com sucesso!');
+                showToast('Conceitos explicados!', 'success');
+            } catch (error) {
+                addChatMessage('Erro ao explicar conceitos: ' + error.message);
+                showToast('Erro ao explicar conceitos', 'error');
+            } finally {
+                removeLoadingMessage();
+            }
+        };
+        
+        // Botões de escrita direta
+        const expandNoteBtn = document.getElementById('expand-note-btn');
+        const rewriteNoteBtn = document.getElementById('rewrite-note-btn');
+        const createNoteBtn = document.getElementById('create-note-btn');
+        
+        if (expandNoteBtn) expandNoteBtn.onclick = expandNote;
+        if (rewriteNoteBtn) rewriteNoteBtn.onclick = rewriteNote;
+        if (createNoteBtn) createNoteBtn.onclick = createNewNote;
+        
+        // Chat
+        const sendChatBtn = document.getElementById('send-chat');
+        const chatInput = document.getElementById('chat-input');
+        const clearChatBtn = document.getElementById('clear-chat-btn');
+        
+        if (sendChatBtn) {
+            sendChatBtn.onclick = () => {
+                if (chatInput) {
+                    const message = chatInput.value.trim();
+                    if (message) {
+                        addChatMessage(message, true);
+                        processUserMessage(message);
+                        chatInput.value = '';
+                    }
+                }
+            };
+        }
+        
+        if (chatInput) {
+            chatInput.onkeypress = (e) => {
+                if (e.key === 'Enter') {
+                    if (sendChatBtn) sendChatBtn.click();
+                }
+            };
+        }
+        
+        if (clearChatBtn) {
+            clearChatBtn.onclick = () => {
+                if (confirm('Tem certeza que deseja limpar o histórico do chat?')) {
+                    clearChatHistory();
+                }
+            };
+        }
+        
+        console.log('Event listeners configurados com sucesso!');
+    }
+
+    // --- Sistema de Abas do Editor ---
+    function switchEditorTab(tab) {
+        const editTab = document.querySelector('.editor-tab[onclick*="edit"]');
+        const previewTab = document.querySelector('.editor-tab[onclick*="preview"]');
+        const editorContainer = document.getElementById('editor-container');
+        const previewContainer = document.getElementById('preview-container');
+        
+        if (tab === 'edit') {
+            editTab.classList.add('active');
+            previewTab.classList.remove('active');
+            editorContainer.classList.remove('hidden');
+            previewContainer.classList.add('hidden');
+        } else {
+            previewTab.classList.add('active');
+            editTab.classList.remove('active');
+            previewContainer.classList.remove('hidden');
+            editorContainer.classList.add('hidden');
+            updatePreview();
+        }
+    }
+    
+    function updatePreview() {
+        const editor = document.getElementById('editor');
+        const preview = document.getElementById('preview');
+        
+        // Converte HTML do editor para markdown
+        const markdown = htmlToMarkdown(editor.innerHTML);
+        
+        // Processa markdown para HTML
+        try {
+            marked.setOptions({
+                breaks: true,
+                gfm: true,
+                headerIds: false,
+                mangle: false
+            });
+            
+            const htmlContent = marked.parse(markdown);
+            preview.innerHTML = htmlContent;
+            preview.classList.add('markdown-content');
+            
+            // Aplica syntax highlighting
+            setTimeout(() => {
+                preview.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightElement(block);
+                });
+            }, 100);
+            
+        } catch (error) {
+            console.error('Erro ao processar markdown:', error);
+            preview.innerHTML = markdown.replace(/\n/g, '<br>');
+        }
+    }
+    
+    function htmlToMarkdown(html) {
+        // Função simples para converter HTML básico para markdown
+        let markdown = html;
+        
+        // Remove tags de formatação HTML e converte para markdown
+        markdown = markdown.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '# $1\n\n');
+        markdown = markdown.replace(/<h2[^>]*>(.*?)<\/h2>/gi, '## $1\n\n');
+        markdown = markdown.replace(/<h3[^>]*>(.*?)<\/h3>/gi, '### $1\n\n');
+        markdown = markdown.replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**');
+        markdown = markdown.replace(/<b[^>]*>(.*?)<\/b>/gi, '**$1**');
+        markdown = markdown.replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*');
+        markdown = markdown.replace(/<i[^>]*>(.*?)<\/i>/gi, '*$1*');
+        markdown = markdown.replace(/<u[^>]*>(.*?)<\/u>/gi, '__$1__');
+        markdown = markdown.replace(/<code[^>]*>(.*?)<\/code>/gi, '`$1`');
+        markdown = markdown.replace(/<pre[^>]*>(.*?)<\/pre>/gi, '```\n$1\n```\n\n');
+        markdown = markdown.replace(/<ul[^>]*>(.*?)<\/ul>/gi, (match, content) => {
+            return content.replace(/<li[^>]*>(.*?)<\/li>/gi, '- $1\n') + '\n';
+        });
+        markdown = markdown.replace(/<ol[^>]*>(.*?)<\/ol>/gi, (match, content) => {
+            let counter = 1;
+            return content.replace(/<li[^>]*>(.*?)<\/li>/gi, () => `${counter++}. $1\n`) + '\n';
+        });
+        markdown = markdown.replace(/<br\s*\/?>/gi, '\n');
+        markdown = markdown.replace(/<div[^>]*>/gi, '\n');
+        markdown = markdown.replace(/<\/div>/gi, '\n');
+        markdown = markdown.replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n\n');
+        
+        // Remove tags HTML restantes
+        markdown = markdown.replace(/<[^>]*>/g, '');
+        
+        // Limpa espaços extras
+        markdown = markdown.replace(/\n\s*\n\s*\n/g, '\n\n');
+        markdown = markdown.trim();
+        
+        return markdown;
+    }
+    
+    // Atualiza preview quando o editor muda
+    function setupEditorPreview() {
+        const editor = document.getElementById('editor');
+        let previewTimeout;
+        
+        editor.addEventListener('input', () => {
+            clearTimeout(previewTimeout);
+            previewTimeout = setTimeout(() => {
+                if (!document.getElementById('preview-container').classList.contains('hidden')) {
+                    updatePreview();
+                }
+            }, 500);
+        });
+    }
+    </script>
+</body>
+</html> 

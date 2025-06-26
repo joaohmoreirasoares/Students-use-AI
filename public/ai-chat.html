@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENEM AI - Chat com Agentes Especializados</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            color: #e2e8f0;
+        }
+        .agent-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .agent-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        .agent-card.selected {
+            border: 3px solid;
+            transform: scale(1.05);
+        }
+        .chat-message {
+            animation: fadeInUp 0.3s ease;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .typing-indicator {
+            display: inline-block;
+        }
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #8b5cf6;
+            margin: 0 2px;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        .conversation-item {
+            transition: all 0.2s ease;
+            color: #e2e8f0;
+        }
+        .conversation-item:hover {
+            background: rgba(139, 92, 246, 0.2);
+        }
+        .conversation-item.active {
+            background: rgba(139, 92, 246, 0.3);
+            border-left: 4px solid #8b5cf6;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .quick-action-btn {
+            @apply bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-purple-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg;
+        }
+        .quick-action-btn.secondary {
+            @apply bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700;
+        }
+        .quick-action-btn.success {
+            @apply bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700;
+        }
+        .quick-action-btn.warning {
+            @apply bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700;
+        }
+        .delete-conversation-btn {
+            @apply text-red-400 hover:text-red-300 transition-colors opacity-0 group-hover:opacity-100;
+        }
+        
+        /* Markdown Styles - Modo Escuro */
+        .markdown-content {
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+        .markdown-content h1, .markdown-content h2, .markdown-content h3, 
+        .markdown-content h4, .markdown-content h5, .markdown-content h6 {
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+        .markdown-content h1 { font-size: 1.5em; color: #f8fafc; }
+        .markdown-content h2 { font-size: 1.3em; color: #f1f5f9; }
+        .markdown-content h3 { font-size: 1.1em; color: #e2e8f0; }
+        .markdown-content p { margin-bottom: 1em; color: #e2e8f0; }
+        .markdown-content ul, .markdown-content ol { 
+            margin-left: 1.5em; 
+            margin-bottom: 1em; 
+        }
+        .markdown-content li { margin-bottom: 0.25em; color: #e2e8f0; }
+        .markdown-content blockquote {
+            border-left: 4px solid #475569;
+            padding-left: 1em;
+            margin: 1em 0;
+            color: #94a3b8;
+            font-style: italic;
+            background: rgba(71, 85, 105, 0.1);
+            padding: 0.5em;
+            border-radius: 0.25rem;
+        }
+        .markdown-content code {
+            background-color: #374151;
+            padding: 0.125em 0.25em;
+            border-radius: 0.25em;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875em;
+            color: #f3f4f6;
+        }
+        .markdown-content pre {
+            background-color: #1f2937;
+            color: #f9fafb;
+            padding: 1em;
+            border-radius: 0.5em;
+            overflow-x: auto;
+            margin: 1em 0;
+            border: 1px solid #374151;
+        }
+        .markdown-content pre code {
+            background-color: transparent;
+            padding: 0;
+            color: inherit;
+        }
+        .markdown-content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1em 0;
+        }
+        .markdown-content th, .markdown-content td {
+            border: 1px solid #475569;
+            padding: 0.5em;
+            text-align: left;
+            color: #e2e8f0;
+        }
+        .markdown-content th {
+            background-color: #374151;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+        
+        /* Estilos específicos para modo escuro */
+        .dark-text { color: #e2e8f0; }
+        .dark-bg { background-color: #1e293b; }
+        .dark-border { border-color: #475569; }
+        .dark-input {
+            background-color: #374151;
+            border-color: #475569;
+            color: #e2e8f0;
+        }
+        .dark-input:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+        .dark-placeholder::placeholder {
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <!-- Header -->
+    <header class="glass-card shadow-sm border-b border-gray-600">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-brain text-2xl text-purple-400"></i>
+                    <h1 class="text-xl font-bold text-gray-100">ENEM AI - Chat Especializado</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="main-dashboard-btn" class="bg-purple-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-purple-700 transition">
+                        <i class="fas fa-home mr-2"></i>Dashboard Principal
+                    </button>
+                    <button id="community-btn" class="bg-pink-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-pink-700 transition" title="Comunidade">
+                        <i class="fas fa-users"></i> Comunidade
+                    </button>
+                    <button id="settings-btn" class="bg-gray-700 text-white px-3 py-2 rounded-lg text-sm hover:bg-gray-800 transition" title="Configurações">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-purple-900 flex items-center justify-center">
+                            <i class="fas fa-user text-purple-300 text-sm"></i>
+                        </div>
+                        <span id="user-name" class="font-medium text-gray-200"></span>
+                    </div>
+                    <button id="logout-btn" class="text-gray-400 hover:text-gray-200 transition">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            <!-- Sidebar - Histórico de Conversas -->
+            <div class="lg:col-span-1">
+                <div class="glass-card rounded-xl p-6 h-fit">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-gray-100">Conversas</h3>
+                        <button id="new-chat-btn" class="bg-purple-600 text-white p-2 rounded-lg hover:bg-purple-700 transition" title="Nova conversa">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div id="conversations-list" class="space-y-2 max-h-96 overflow-y-auto scrollbar-hide">
+                        <!-- Conversas serão carregadas aqui -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Chat Area -->
+            <div class="lg:col-span-4">
+                <div class="glass-card rounded-xl p-6">
+                    <!-- Seleção de Agentes -->
+                    <div class="mb-6">
+                        <h2 class="text-xl font-bold text-gray-100 mb-4">Escolha seu Tutor Especializado</h2>
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                            <!-- Sócrates - Humanas -->
+                            <div class="agent-card bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl p-4 text-center" data-agent="socrates">
+                                <div class="w-16 h-16 mx-auto mb-3 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-landmark text-2xl"></i>
+                                </div>
+                                <h3 class="font-bold text-lg mb-1">Sócrates</h3>
+                                <p class="text-sm opacity-90">Humanas</p>
+                                <p class="text-xs opacity-75 mt-1">História, Geografia, Filosofia</p>
+                            </div>
+
+                            <!-- Pitágoras - Exatas -->
+                            <div class="agent-card bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl p-4 text-center" data-agent="pitagoras">
+                                <div class="w-16 h-16 mx-auto mb-3 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-calculator text-2xl"></i>
+                                </div>
+                                <h3 class="font-bold text-lg mb-1">Pitágoras</h3>
+                                <p class="text-sm opacity-90">Exatas</p>
+                                <p class="text-xs opacity-75 mt-1">Matemática, Física, Química</p>
+                            </div>
+
+                            <!-- Camões - Linguagens -->
+                            <div class="agent-card bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl p-4 text-center" data-agent="camoes">
+                                <div class="w-16 h-16 mx-auto mb-3 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-book text-2xl"></i>
+                                </div>
+                                <h3 class="font-bold text-lg mb-1">Camões</h3>
+                                <p class="text-sm opacity-90">Linguagens</p>
+                                <p class="text-xs opacity-75 mt-1">Português, Literatura, Artes</p>
+                            </div>
+
+                            <!-- Machado - Redação -->
+                            <div class="agent-card bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-xl p-4 text-center" data-agent="machado">
+                                <div class="w-16 h-16 mx-auto mb-3 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-pen-fancy text-2xl"></i>
+                                </div>
+                                <h3 class="font-bold text-lg mb-1">Machado</h3>
+                                <p class="text-sm opacity-90">Redação</p>
+                                <p class="text-xs opacity-75 mt-1">Dissertação, Argumentação</p>
+                            </div>
+
+                            <!-- Orientador Profissional -->
+                            <div class="agent-card bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-xl p-4 text-center" data-agent="orientador">
+                                <div class="w-16 h-16 mx-auto mb-3 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-graduation-cap text-2xl"></i>
+                                </div>
+                                <h3 class="font-bold text-lg mb-1">Dr. Futuro</h3>
+                                <p class="text-sm opacity-90">Carreiras</p>
+                                <p class="text-xs opacity-75 mt-1">Orientação Profissional</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Area -->
+                    <div id="chat-container" class="hidden">
+                        <!-- Agent Info -->
+                        <div id="agent-info" class="flex items-center space-x-3 mb-4 p-3 bg-gray-800 rounded-lg">
+                            <div id="agent-avatar" class="w-12 h-12 rounded-full flex items-center justify-center text-white">
+                                <i class="fas fa-robot text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 id="agent-name" class="font-bold text-gray-100">Selecione um agente</h3>
+                                <p id="agent-description" class="text-sm text-gray-300">Clique em um agente acima para começar</p>
+                            </div>
+                        </div>
+
+                        <!-- Messages -->
+                        <div id="messages-container" class="border border-gray-600 rounded-lg p-4 bg-gray-800 mb-4 h-[500px] overflow-y-auto scrollbar-hide">
+                            <div id="messages" class="space-y-4">
+                                <!-- Mensagens serão adicionadas aqui -->
+                            </div>
+                        </div>
+
+                        <!-- Input Area -->
+                        <div class="flex space-x-3">
+                            <div class="flex-1 relative">
+                                <textarea id="message-input" 
+                                          placeholder="Digite sua pergunta ou dúvida..." 
+                                          class="w-full px-4 py-3 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none bg-gray-700 text-gray-100 dark-placeholder"
+                                          rows="3"></textarea>
+                                <div class="absolute bottom-2 right-2 text-xs text-gray-400">
+                                    <span id="char-count">0</span>/1000
+                                </div>
+                            </div>
+                            <div class="flex flex-col space-y-2">
+                                <button id="send-btn" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition flex items-center justify-center">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                                <button id="clear-btn" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition flex items-center justify-center" title="Limpar conversa">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="mt-4">
+                            <h4 class="text-sm font-medium text-gray-200 mb-3">Ferramentas de Estudo:</h4>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button class="quick-action-btn" data-action="summary">
+                                    <i class="fas fa-compress-alt mr-2"></i>Fazer Resumo
+                                </button>
+                                <button class="quick-action-btn secondary" data-action="flashcards">
+                                    <i class="fas fa-cards-blank mr-2"></i>Criar Flashcards
+                                </button>
+                                <button class="quick-action-btn success" data-action="questions">
+                                    <i class="fas fa-question-circle mr-2"></i>Questões de Revisão
+                                </button>
+                                <button class="quick-action-btn warning" data-action="schedule">
+                                    <i class="fas fa-calendar-alt mr-2"></i>Cronograma de Estudos
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Botão Especial do Dr. Futuro -->
+                        <div id="dr-futuro-special-btn" class="mt-6 hidden">
+                            <div class="bg-gradient-to-r from-teal-500 to-teal-600 rounded-xl p-4 text-center">
+                                <div class="w-16 h-16 mx-auto mb-3 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-rocket text-2xl text-white"></i>
+                                </div>
+                                <h4 class="text-lg font-bold text-white mb-2">🚀 Missão Especial do Dr. Futuro</h4>
+                                <p class="text-teal-100 mb-4 text-sm">Descubra seu caminho profissional com nossa análise avançada!</p>
+                                <button id="start-mission-btn" class="bg-white text-teal-600 px-6 py-3 rounded-lg font-bold hover:bg-teal-50 transition-all duration-200 transform hover:scale-105 shadow-lg">
+                                    <i class="fas fa-play mr-2"></i>Iniciar Missão
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Welcome Message -->
+                    <div id="welcome-message" class="text-center py-12">
+                        <div class="w-24 h-24 mx-auto mb-6 bg-purple-900 rounded-full flex items-center justify-center">
+                            <i class="fas fa-robot text-4xl text-purple-300"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-100 mb-4">Bem-vindo ao Chat Especializado!</h3>
+                        <p class="text-gray-300 mb-6 max-w-md mx-auto">
+                            Escolha um dos nossos tutores especializados para receber ajuda personalizada em suas dúvidas do ENEM.
+                        </p>
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-3xl mx-auto">
+                            <div class="text-center">
+                                <div class="w-12 h-12 mx-auto mb-2 bg-blue-900 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-landmark text-blue-300"></i>
+                                </div>
+                                <p class="text-sm font-medium text-gray-200">Humanas</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-12 h-12 mx-auto mb-2 bg-green-900 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-calculator text-green-300"></i>
+                                </div>
+                                <p class="text-sm font-medium text-gray-200">Exatas</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-12 h-12 mx-auto mb-2 bg-purple-900 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-book text-purple-300"></i>
+                                </div>
+                                <p class="text-sm font-medium text-gray-200">Linguagens</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-12 h-12 mx-auto mb-2 bg-orange-900 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-pen-fancy text-orange-300"></i>
+                                </div>
+                                <p class="text-sm font-medium text-gray-200">Redação</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-12 h-12 mx-auto mb-2 bg-teal-900 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-graduation-cap text-teal-300"></i>
+                                </div>
+                                <p class="text-sm font-medium text-gray-200">Carreiras</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <script>
+        // ===== CHAT IA APPLICATION =====
+        (function() {
+            'use strict';
+            
+            // Global variables
+            let currentUser = null;
+            let currentAgent = null;
+            let currentConversation = null;
+            let conversations = [];
+            
+            // ===== AGENTS CONFIGURATION =====
+            const agents = {
+                socrates: {
+                    name: "Sócrates",
+                    area: "Humanas",
+                    icon: "fas fa-landmark",
+                    color: "blue",
+                    gradient: "from-blue-500 to-blue-600",
+                    description: "Especialista em História, Geografia, Filosofia e Sociologia",
+                    prompt: `Você é Sócrates, um tutor especialista em Ciências Humanas para o ENEM. 
+                    Você domina História, Geografia, Filosofia e Sociologia. 
+                    Suas respostas devem ser didáticas, contextualizadas e sempre relacionadas ao conteúdo do ENEM. 
+                    Use exemplos práticos, conecte com atualidades quando relevante e ajude o aluno a desenvolver pensamento crítico. 
+                    Seja paciente, encorajador e sempre motive o aluno a questionar e refletir.`
+                },
+                pitagoras: {
+                    name: "Pitágoras",
+                    area: "Exatas",
+                    icon: "fas fa-calculator",
+                    color: "green",
+                    gradient: "from-green-500 to-green-600",
+                    description: "Especialista em Matemática, Física e Química",
+                    prompt: `Você é Pitágoras, um tutor especialista em Ciências da Natureza e Matemática para o ENEM. 
+                    Você domina Matemática, Física e Química. 
+                    Suas respostas devem ser claras, com resolução passo a passo de problemas, 
+                    explicação de fórmulas e conceitos fundamentais. 
+                    Sempre mostre o raciocínio matemático, use exemplos práticos e conecte com situações reais. 
+                    Seja preciso, didático e ajude o aluno a desenvolver lógica matemática.`
+                },
+                camoes: {
+                    name: "Camões",
+                    area: "Linguagens",
+                    icon: "fas fa-book",
+                    color: "purple",
+                    gradient: "from-purple-500 to-purple-600",
+                    description: "Especialista em Português, Literatura e Artes",
+                    prompt: `Você é Camões, um tutor especialista em Linguagens para o ENEM. 
+                    Você domina Português, Literatura, Artes e Educação Física. 
+                    Suas respostas devem focar em gramática, interpretação de textos, 
+                    análise literária e compreensão de diferentes linguagens. 
+                    Ajude com análise de textos, figuras de linguagem, gêneros textuais e produção textual. 
+                    Seja criativo, inspire o aluno e desenvolva sua capacidade de interpretação.`
+                },
+                machado: {
+                    name: "Machado",
+                    area: "Redação",
+                    icon: "fas fa-pen-fancy",
+                    color: "orange",
+                    gradient: "from-orange-500 to-orange-600",
+                    description: "Especialista em Redação e Argumentação",
+                    prompt: `Você é Machado de Assis, um tutor especialista em Redação para o ENEM. 
+                    Você domina a estrutura da dissertação argumentativa, argumentação, 
+                    coesão, coerência e técnicas de escrita. 
+                    Suas respostas devem focar em como estruturar uma redação nota 1000, 
+                    desenvolver argumentos, usar conectivos, evitar vícios de linguagem e 
+                    criar uma conclusão impactante. Seja crítico, criativo e ajude o aluno a 
+                    desenvolver sua voz autoral.`
+                },
+                orientador: {
+                    name: "Dr. Futuro",
+                    area: "Orientação",
+                    icon: "fas fa-graduation-cap",
+                    color: "teal",
+                    gradient: "from-teal-500 to-teal-600",
+                    description: "Especialista em Orientação Profissional e Universitária",
+                    prompt: `Você é Dr. Futuro, um orientador profissional especializado em ajudar estudantes a escolher carreiras e universidades. 
+                    Você tem conhecimento profundo sobre:
+                    
+                    **Universidades de Teresina, Piauí:**
+                    - UFPI (Universidade Federal do Piauí)
+                    - UESPI (Universidade Estadual do Piauí)
+                    - IFPI (Instituto Federal do Piauí)
+                    - UNINOVAFAPI
+                    - CEUT
+                    - FACID
+                    - FSA
+                    - UNIFSA
+                    - FACIME
+                    - FACET
+                    
+                    **Processo de Orientação:**
+                    1. **Avaliação de Perfil:** Faça perguntas sobre interesses, habilidades, valores e objetivos
+                    2. **Análise de Mercado:** Informe sobre demanda, salários e oportunidades
+                    3. **Recomendação de Cursos:** Sugira cursos baseados no perfil
+                    4. **Análise de Universidades:** Compare instituições, notas de corte, estrutura
+                    5. **Planejamento:** Ajude com cronograma de estudos e estratégias
+                    
+                    **Sempre use markdown para organizar suas respostas e seja detalhado, empático e prático.**
+                    
+                    Comece fazendo perguntas para entender o perfil do estudante antes de dar recomendações.`
+                }
+            };
+            
+            // ===== AUTHENTICATION =====
+            function initAuth() {
+                const user = JSON.parse(localStorage.getItem('enemai_user'));
+                if (!user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                currentUser = user;
+                document.getElementById('user-name').textContent = user.name || user.email;
+            }
+            
+            function logout() {
+                localStorage.removeItem('enemai_user');
+                window.location.href = 'login.html';
+            }
+            
+            // ===== DATA MANAGEMENT =====
+            function getConversations() {
+                return JSON.parse(localStorage.getItem('enemai_conversations_' + currentUser.email)) || [];
+            }
+            
+            function saveConversations() {
+                localStorage.setItem('enemai_conversations_' + currentUser.email, JSON.stringify(conversations));
+            }
+            
+            function createNewConversation(agentId) {
+                const agent = agents[agentId];
+                const conversation = {
+                    id: Date.now().toString(),
+                    agentId: agentId,
+                    agentName: agent.name,
+                    agentArea: agent.area,
+                    title: `Conversa com ${agent.name}`,
+                    messages: [],
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    isTemporary: true // Marca como temporária até primeira mensagem do usuário
+                };
+                
+                return conversation; // Não salva ainda, só retorna
+            }
+            
+            function saveConversationToHistory(conversation, firstUserMessage) {
+                // Remove a marca de temporária
+                conversation.isTemporary = false;
+                
+                // Cria título inteligente baseado na primeira mensagem
+                const title = generateConversationTitle(firstUserMessage, conversation.agentName);
+                conversation.title = title;
+                
+                // Adiciona ao histórico
+                conversations.unshift(conversation);
+                saveConversations();
+                renderConversations();
+            }
+            
+            function generateConversationTitle(message, agentName) {
+                // Remove caracteres especiais e limita o tamanho
+                let title = message.replace(/[^\w\s]/g, '').trim();
+                
+                // Se a mensagem for muito longa, pega apenas as primeiras palavras
+                if (title.length > 40) {
+                    title = title.substring(0, 40).trim();
+                    // Encontra o último espaço para não cortar palavras
+                    const lastSpace = title.lastIndexOf(' ');
+                    if (lastSpace > 0) {
+                        title = title.substring(0, lastSpace);
+                    }
+                    title += '...';
+                }
+                
+                // Se a mensagem for muito curta, adiciona contexto
+                if (title.length < 10) {
+                    title = `Dúvida sobre ${title}`;
+                }
+                
+                return title;
+            }
+            
+            function updateConversationTitle(conversationId, firstMessage) {
+                const conversation = conversations.find(c => c.id === conversationId);
+                if (conversation) {
+                    conversation.title = generateConversationTitle(firstMessage, conversation.agentName);
+                    conversation.updatedAt = new Date().toISOString();
+                    saveConversations();
+                    renderConversations();
+                }
+            }
+            
+            // ===== UI UPDATES =====
+            function selectAgent(agentId) {
+                currentAgent = agents[agentId];
+                
+                // Update agent cards
+                document.querySelectorAll('.agent-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                document.querySelector(`[data-agent="${agentId}"]`).classList.add('selected');
+                
+                // Update agent info
+                document.getElementById('agent-avatar').className = `w-12 h-12 rounded-full flex items-center justify-center text-white bg-gradient-to-br ${currentAgent.gradient}`;
+                document.getElementById('agent-avatar').innerHTML = `<i class="${currentAgent.icon} text-xl"></i>`;
+                document.getElementById('agent-name').textContent = currentAgent.name;
+                document.getElementById('agent-description').textContent = currentAgent.description;
+                
+                // Show chat container
+                document.getElementById('welcome-message').classList.add('hidden');
+                document.getElementById('chat-container').classList.remove('hidden');
+                
+                // Create new temporary conversation
+                currentConversation = createNewConversation(agentId);
+                clearMessages();
+                
+                // Add welcome message
+                addMessage({
+                    type: 'agent',
+                    content: `Olá! Sou ${currentAgent.name}, seu tutor especialista em ${currentAgent.area}. Como posso ajudá-lo hoje?`,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // Mostra/esconde botão especial do Dr. Futuro
+                const specialBtn = document.getElementById('dr-futuro-special-btn');
+                if (agentId === 'orientador') {
+                    specialBtn.classList.remove('hidden');
+                } else {
+                    specialBtn.classList.add('hidden');
+                }
+            }
+            
+            function renderConversations() {
+                const container = document.getElementById('conversations-list');
+                container.innerHTML = '';
+                
+                // Filtra apenas conversas que não são temporárias
+                const savedConversations = conversations.filter(c => !c.isTemporary);
+                
+                savedConversations.forEach(conversation => {
+                    const agent = agents[conversation.agentId];
+                    const div = document.createElement('div');
+                    div.className = `conversation-item group p-3 rounded-lg cursor-pointer ${conversation.id === currentConversation?.id ? 'active' : ''}`;
+                    div.onclick = () => loadConversation(conversation.id);
+                    
+                    div.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br ${agent.gradient} flex items-center justify-center">
+                                <i class="${agent.icon} text-white text-sm"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-medium text-gray-100 truncate">${conversation.title}</p>
+                                <p class="text-xs text-gray-400">${agent.name} • ${new Date(conversation.updatedAt).toLocaleDateString()}</p>
+                            </div>
+                            <button class="delete-conversation-btn" onclick="deleteConversation('${conversation.id}'); event.stopPropagation();" title="Excluir conversa">
+                                <i class="fas fa-trash text-sm"></i>
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+                
+                if (savedConversations.length === 0) {
+                    container.innerHTML = '<p class="text-gray-400 text-center py-4">Nenhuma conversa ainda</p>';
+                }
+            }
+            
+            function loadConversation(conversationId) {
+                currentConversation = conversations.find(c => c.id === conversationId);
+                if (!currentConversation || currentConversation.isTemporary) return;
+                
+                currentAgent = agents[currentConversation.agentId];
+                
+                // Update UI
+                document.querySelectorAll('.agent-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                document.querySelector(`[data-agent="${currentConversation.agentId}"]`).classList.add('selected');
+                
+                document.getElementById('agent-avatar').className = `w-12 h-12 rounded-full flex items-center justify-center text-white bg-gradient-to-br ${currentAgent.gradient}`;
+                document.getElementById('agent-avatar').innerHTML = `<i class="${currentAgent.icon} text-xl"></i>`;
+                document.getElementById('agent-name').textContent = currentAgent.name;
+                document.getElementById('agent-description').textContent = currentAgent.description;
+                
+                document.getElementById('welcome-message').classList.add('hidden');
+                document.getElementById('chat-container').classList.remove('hidden');
+                
+                // Load messages
+                renderMessages();
+                renderConversations();
+            }
+            
+            function clearMessages() {
+                document.getElementById('messages').innerHTML = '';
+            }
+            
+            function renderMessages() {
+                if (!currentConversation) return;
+                
+                clearMessages();
+                currentConversation.messages.forEach(message => {
+                    addMessageToUI(message);
+                });
+                scrollToBottom();
+            }
+            
+            function addMessage(message) {
+                if (!currentConversation) return;
+                
+                currentConversation.messages.push(message);
+                currentConversation.updatedAt = new Date().toISOString();
+                
+                addMessageToUI(message);
+                scrollToBottom();
+                
+                // Se é a primeira mensagem do usuário, salva a conversa no histórico
+                if (message.type === 'user' && currentConversation.isTemporary) {
+                    const userMessages = currentConversation.messages.filter(m => m.type === 'user');
+                    if (userMessages.length === 1) {
+                        saveConversationToHistory(currentConversation, message.content);
+                    }
+                } else if (!currentConversation.isTemporary) {
+                    // Se já não é temporária, apenas atualiza
+                    saveConversations();
+                }
+            }
+            
+            function addMessageToUI(message) {
+                const messagesContainer = document.getElementById('messages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `chat-message ${message.type === 'user' ? 'text-right' : 'text-left'}`;
+                
+                const bubbleDiv = document.createElement('div');
+                bubbleDiv.className = `inline-block max-w-xs lg:max-w-md px-4 py-3 rounded-lg ${
+                    message.type === 'user' 
+                        ? 'bg-purple-600 text-white' 
+                        : 'bg-gray-700 text-gray-100'
+                }`;
+                
+                if (message.type === 'user') {
+                    // Para mensagens do usuário, apenas quebra de linha
+                    const processedContent = message.content.replace(/\n/g, '<br>');
+                    bubbleDiv.innerHTML = processedContent;
+                } else {
+                    // Para mensagens da IA, processa markdown com melhor formatação
+                    try {
+                        // Configura marked para melhor formatação
+                        marked.setOptions({
+                            breaks: true,
+                            gfm: true,
+                            headerIds: false,
+                            mangle: false
+                        });
+                        
+                        // Processa o markdown
+                        const htmlContent = marked.parse(message.content);
+                        bubbleDiv.innerHTML = htmlContent;
+                        bubbleDiv.classList.add('markdown-content');
+                        
+                        // Aplica syntax highlighting nos blocos de código
+                        setTimeout(() => {
+                            bubbleDiv.querySelectorAll('pre code').forEach((block) => {
+                                hljs.highlightElement(block);
+                            });
+                        }, 100);
+                        
+                        // Adiciona indentação para listas e parágrafos
+                        bubbleDiv.querySelectorAll('p, li, blockquote').forEach(element => {
+                            element.style.marginBottom = '0.5em';
+                        });
+                        
+                        // Melhora a formatação de listas
+                        bubbleDiv.querySelectorAll('ul, ol').forEach(list => {
+                            list.style.paddingLeft = '1.5em';
+                            list.style.marginBottom = '0.5em';
+                        });
+                        
+                        // Melhora a formatação de blocos de código
+                        bubbleDiv.querySelectorAll('pre').forEach(pre => {
+                            pre.style.margin = '0.5em 0';
+                            pre.style.padding = '0.75em';
+                            pre.style.borderRadius = '0.375rem';
+                            pre.style.backgroundColor = '#1f2937';
+                            pre.style.color = '#f9fafb';
+                            pre.style.overflowX = 'auto';
+                        });
+                        
+                        // Melhora a formatação de código inline
+                        bubbleDiv.querySelectorAll('code:not(pre code)').forEach(code => {
+                            code.style.backgroundColor = '#f3f4f6';
+                            code.style.padding = '0.125em 0.25em';
+                            code.style.borderRadius = '0.25rem';
+                            code.style.fontFamily = 'monospace';
+                            code.style.fontSize = '0.875em';
+                        });
+                        
+                    } catch (error) {
+                        console.error('Erro ao processar markdown:', error);
+                        // Fallback para texto simples com quebras de linha
+                        const processedContent = message.content.replace(/\n/g, '<br>');
+                        bubbleDiv.innerHTML = processedContent;
+                    }
+                }
+                
+                // Add timestamp
+                const timestamp = document.createElement('div');
+                timestamp.className = `text-xs mt-1 ${message.type === 'user' ? 'text-purple-200' : 'text-gray-500'}`;
+                timestamp.textContent = new Date(message.timestamp).toLocaleTimeString();
+                bubbleDiv.appendChild(timestamp);
+                
+                messageDiv.appendChild(bubbleDiv);
+                messagesContainer.appendChild(messageDiv);
+            }
+            
+            function scrollToBottom() {
+                const container = document.getElementById('messages-container');
+                container.scrollTop = container.scrollHeight;
+            }
+            
+            // ===== GOOGLE GEMINI API =====
+            const GEMINI_API_KEY = 'AIzaSyCSs6saGHeHDUAZMIJWGbfP8Bvx_cvmtl4';
+            const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent';
+            
+            async function callGeminiAPI(message) {
+                try {
+                    const fullPrompt = `${currentAgent.prompt}\n\nIMPORTANTE: Use markdown para formatar suas respostas. Use:\n- **negrito** para títulos e palavras importantes\n- *itálico* para ênfase\n- \`código\` para termos técnicos\n- \`\`\` para blocos de código\n- - para listas\n- > para citações\n- Tabelas quando apropriado\n\nAluno: ${message}\n\n${currentAgent.name}:`;
+                    
+                    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [{
+                                    text: fullPrompt
+                                }]
+                            }]
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`Erro na API: ${response.status} - ${errorText}`);
+                    }
+
+                    const data = await response.json();
+                    
+                    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                        return data.candidates[0].content.parts[0].text;
+                    } else {
+                        throw new Error('Resposta inválida da API');
+                    }
+                } catch (error) {
+                    console.error('Erro ao chamar Gemini API:', error);
+                    throw error;
+                }
+            }
+            
+            function showTypingIndicator() {
+                const messagesContainer = document.getElementById('messages');
+                const typingDiv = document.createElement('div');
+                typingDiv.id = 'typing-indicator';
+                typingDiv.className = 'chat-message text-left';
+                typingDiv.innerHTML = `
+                    <div class="inline-block max-w-xs lg:max-w-md px-4 py-3 rounded-lg bg-gray-100 text-gray-800">
+                        <div class="typing-indicator">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                `;
+                messagesContainer.appendChild(typingDiv);
+                scrollToBottom();
+            }
+            
+            function removeTypingIndicator() {
+                const typingIndicator = document.getElementById('typing-indicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+            }
+            
+            async function sendMessage(message) {
+                if (!currentAgent || !currentConversation) return;
+                
+                // Add user message
+                addMessage({
+                    type: 'user',
+                    content: message,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // Show typing indicator
+                showTypingIndicator();
+                
+                try {
+                    // Get AI response
+                    let response;
+                    
+                    // Se for o orientador, usa lógica especial
+                    if (currentAgent.area === 'Orientação') {
+                        response = await callOrientadorAPI(message);
+                    } else {
+                        response = await callGeminiAPI(message);
+                    }
+                    
+                    // Remove typing indicator
+                    removeTypingIndicator();
+                    
+                    // Add AI response
+                    addMessage({
+                        type: 'agent',
+                        content: response,
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                } catch (error) {
+                    removeTypingIndicator();
+                    addMessage({
+                        type: 'agent',
+                        content: 'Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente.',
+                        timestamp: new Date().toISOString()
+                    });
+                    showToast('Erro na comunicação com a IA', 'error');
+                }
+            }
+            
+            // ===== ORIENTADOR PROFISSIONAL API =====
+            async function callOrientadorAPI(message) {
+                try {
+                    // Constrói o contexto da conversa
+                    const conversationHistory = currentConversation.messages
+                        .filter(m => m.type === 'user' || m.type === 'agent')
+                        .map(m => `${m.type === 'user' ? 'Estudante' : 'Orientador'}: ${m.content}`)
+                        .join('\n\n');
+                    
+                    const fullPrompt = `${currentAgent.prompt}
+
+**Contexto da Conversa Atual:**
+${conversationHistory}
+
+**Última Mensagem do Estudante:** ${message}
+
+**Instruções Específicas para Orientação:**
+1. Se esta for a primeira mensagem, faça perguntas para entender o perfil do estudante
+2. Mantenha o contexto da conversa anterior
+3. Use as informações sobre universidades de Teresina quando relevante
+4. Seja empático e encorajador
+5. Sempre use markdown para organizar suas respostas
+6. Se o estudante quiser informações sobre outras cidades, adapte suas recomendações
+
+**Orientador Profissional:**`;
+
+                    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [{
+                                    text: fullPrompt
+                                }]
+                            }]
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`Erro na API: ${response.status} - ${errorText}`);
+                    }
+
+                    const data = await response.json();
+                    
+                    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                        return data.candidates[0].content.parts[0].text;
+                    } else {
+                        throw new Error('Resposta inválida da API');
+                    }
+                } catch (error) {
+                    console.error('Erro ao chamar Orientador API:', error);
+                    throw error;
+                }
+            }
+            
+            // ===== QUICK ACTIONS =====
+            function handleQuickAction(action) {
+                if (!currentAgent) {
+                    showToast('Selecione um agente primeiro', 'warning');
+                    return;
+                }
+                
+                let actions = {};
+                
+                // Ações específicas para o orientador
+                if (currentAgent.area === 'Orientação') {
+                    actions = {
+                        summary: 'Faça um resumo completo do meu perfil profissional e das recomendações que você me deu até agora. Inclua pontos fortes, áreas de interesse e próximos passos.',
+                        flashcards: 'Crie um guia de estudo personalizado para o ENEM baseado no meu perfil. Inclua dicas específicas para as áreas que preciso focar.',
+                        questions: 'Me ajude a criar um cronograma de estudos para o ENEM considerando minhas preferências e objetivos profissionais.',
+                        schedule: 'Analise as universidades de Teresina e me dê um ranking das melhores opções para o curso que estou interessado, incluindo notas de corte e estrutura.'
+                    };
+                } else {
+                    // Ações para outros agentes
+                    actions = {
+                        summary: 'Crie um resumo completo e estruturado do conteúdo que discutimos, com os pontos principais, conceitos-chave e exemplos importantes. Organize de forma didática para facilitar o estudo.',
+                        flashcards: 'Crie 10 flashcards para revisão do conteúdo que discutimos. Cada flashcard deve ter uma pergunta na frente e a resposta no verso. Foque nos conceitos mais importantes.',
+                        questions: 'Crie 5 questões de revisão sobre o conteúdo que discutimos. Inclua diferentes tipos de questões (múltipla escolha, verdadeiro/falso, dissertativa) para testar a compreensão.',
+                        schedule: 'Crie um cronograma de estudos de 1 semana para revisar o conteúdo que discutimos. Inclua horários, tópicos específicos e dicas de como estudar de forma eficiente.'
+                    };
+                }
+                
+                const message = actions[action];
+                if (message) {
+                    document.getElementById('message-input').value = message;
+                    document.getElementById('send-btn').click();
+                }
+            }
+            
+            // ===== DELETE CONVERSATION =====
+            function deleteConversation(conversationId) {
+                if (confirm('Tem certeza que deseja excluir esta conversa? Esta ação não pode ser desfeita.')) {
+                    // Remove a conversa da lista
+                    conversations = conversations.filter(c => c.id !== conversationId);
+                    
+                    // Se a conversa atual foi excluída, limpa a interface
+                    if (currentConversation && currentConversation.id === conversationId) {
+                        currentConversation = null;
+                        currentAgent = null;
+                        document.getElementById('welcome-message').classList.remove('hidden');
+                        document.getElementById('chat-container').classList.add('hidden');
+                        document.querySelectorAll('.agent-card').forEach(card => {
+                            card.classList.remove('selected');
+                        });
+                    }
+                    
+                    // Salva as mudanças
+                    saveConversations();
+                    
+                    // Atualiza a interface
+                    renderConversations();
+                    
+                    showToast('Conversa excluída com sucesso!', 'success');
+                }
+            }
+            
+            // ===== TOAST NOTIFICATIONS =====
+            function showToast(message, type = 'success') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                
+                const colors = {
+                    success: 'bg-green-500',
+                    error: 'bg-red-500',
+                    warning: 'bg-yellow-500',
+                    info: 'bg-blue-500'
+                };
+                
+                toast.className = `${colors[type]} text-white px-4 py-2 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300`;
+                toast.textContent = message;
+                
+                container.appendChild(toast);
+                
+                setTimeout(() => toast.classList.remove('translate-x-full'), 100);
+                setTimeout(() => {
+                    toast.classList.add('translate-x-full');
+                    setTimeout(() => container.removeChild(toast), 300);
+                }, 3000);
+            }
+            
+            // ===== BOTÃO ESPECIAL DO DR. FUTURO =====
+            function startDrFuturoMission() {
+                if (!currentAgent || currentAgent.area !== 'Orientação') {
+                    showToast('Selecione o Dr. Futuro primeiro!', 'warning');
+                    return;
+                }
+                
+                const missionMessage = `🚀 **MISSÃO ESPECIAL DO DR. FUTURO** 🚀
+
+Olá, estudante! Vou conduzir você através de uma **análise profunda e personalizada** do seu futuro profissional!
+
+**O que vamos fazer:**
+1. 🔍 **Análise Completa de Perfil** - Vamos descobrir seus pontos fortes
+2. 🎯 **Mapeamento de Interesses** - Identificar suas paixões e habilidades
+3. 💼 **Análise de Mercado** - Ver as melhores oportunidades profissionais
+4. 🏫 **Ranking de Universidades** - Encontrar a instituição perfeita para você
+5. 📈 **Plano de Ação** - Criar um roteiro para o sucesso
+
+**Vamos começar?** 
+
+Me conte um pouco sobre você:
+- Que matérias você mais gosta na escola?
+- Quais são seus hobbies e interesses?
+- Que tipo de trabalho você imagina fazendo no futuro?
+- Tem alguma área específica que te interessa?
+
+*Estou aqui para te ajudar a descobrir seu caminho!* ✨`;
+
+                // Adiciona a mensagem da missão
+                addMessage({
+                    type: 'agent',
+                    content: missionMessage,
+                    timestamp: new Date().toISOString()
+                });
+                
+                showToast('🚀 Missão iniciada! Vamos descobrir seu futuro!', 'success');
+            }
+            
+            // ===== EVENT LISTENERS =====
+            function setupEventListeners() {
+                // Agent selection
+                document.querySelectorAll('.agent-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const agentId = card.dataset.agent;
+                        selectAgent(agentId);
+                    });
+                });
+                
+                // Send message
+                document.getElementById('send-btn').addEventListener('click', () => {
+                    const input = document.getElementById('message-input');
+                    const message = input.value.trim();
+                    
+                    if (message && currentAgent) {
+                        sendMessage(message);
+                        input.value = '';
+                        updateCharCount();
+                    } else if (!currentAgent) {
+                        showToast('Selecione um agente primeiro', 'warning');
+                    }
+                });
+                
+                // Enter key to send
+                document.getElementById('message-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        document.getElementById('send-btn').click();
+                    }
+                });
+                
+                // Character count
+                document.getElementById('message-input').addEventListener('input', updateCharCount);
+                
+                // Clear conversation
+                document.getElementById('clear-btn').addEventListener('click', () => {
+                    if (confirm('Tem certeza que deseja limpar esta conversa?')) {
+                        if (currentConversation) {
+                            if (currentConversation.isTemporary) {
+                                // Se é temporária, apenas limpa as mensagens
+                                currentConversation.messages = [];
+                                renderMessages();
+                            } else {
+                                // Se é salva, limpa e atualiza
+                                currentConversation.messages = [];
+                                saveConversations();
+                                renderMessages();
+                                renderConversations();
+                            }
+                        }
+                    }
+                });
+                
+                // New chat
+                document.getElementById('new-chat-btn').addEventListener('click', () => {
+                    document.getElementById('welcome-message').classList.remove('hidden');
+                    document.getElementById('chat-container').classList.add('hidden');
+                    currentConversation = null;
+                    currentAgent = null;
+                    document.querySelectorAll('.agent-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                });
+                
+                // Quick actions
+                document.querySelectorAll('.quick-action-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const action = btn.dataset.action;
+                        handleQuickAction(action);
+                    });
+                });
+                
+                // Navigation
+                document.getElementById('main-dashboard-btn').addEventListener('click', () => {
+                    window.location.href = 'main-dashboard.html';
+                });
+                
+                document.getElementById('logout-btn').addEventListener('click', logout);
+                
+                // Start mission
+                document.getElementById('start-mission-btn').addEventListener('click', startDrFuturoMission);
+
+                // Community button
+                document.getElementById('community-btn').onclick = function() {
+                    window.location.href = 'community.html';
+                };
+
+                // Settings button
+                document.getElementById('settings-btn').onclick = function() {
+                    window.location.href = 'settings.html';
+                };
+            }
+            
+            function updateCharCount() {
+                const input = document.getElementById('message-input');
+                const count = input.value.length;
+                document.getElementById('char-count').textContent = count;
+                
+                if (count > 1000) {
+                    input.value = input.value.substring(0, 1000);
+                    document.getElementById('char-count').textContent = '1000';
+                }
+            }
+            
+            // ===== INITIALIZATION =====
+            function init() {
+                initAuth();
+                conversations = getConversations();
+                renderConversations();
+                setupEventListeners();
+                updateCharCount();
+            }
+            
+            // Make deleteConversation globally available
+            window.deleteConversation = deleteConversation;
+            
+            // Start the application
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+            
+        })();
+    </script>
+</body>
+</html> 

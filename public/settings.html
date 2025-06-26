@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENEM AI - Configurações</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://apis.google.com/js/api.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1.5px solid rgba(148, 163, 184, 0.25);
+            color: #e2e8f0;
+            box-shadow: 0 8px 32px 0 #a78bfa22;
+        }
+        .danger {
+            background: linear-gradient(90deg, #ef4444 0%, #b91c1c 100%);
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 28px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #374151;
+            border-radius: 34px;
+            transition: .4s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px; width: 20px;
+            left: 4px; bottom: 4px;
+            background: #a78bfa;
+            border-radius: 50%;
+            transition: .4s;
+        }
+        input:checked + .slider {
+            background: #a78bfa;
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+            background: #fff;
+        }
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .divider {
+            border-bottom: 1.5px solid #475569;
+            margin: 2rem 0 1.5rem 0;
+        }
+        .fade-in {
+            animation: fadeIn 0.7s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <header class="glass-card shadow-sm border-b border-gray-600">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-cog text-2xl text-gray-300 animate-spin-slow"></i>
+                <h1 class="text-xl font-bold text-gray-100">Configurações</h1>
+            </div>
+            <div class="flex gap-2">
+                <button id="back-dashboard" class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-purple-700 transition flex items-center gap-2">
+                    <i class="fas fa-home"></i> Dashboard
+                </button>
+                <button id="back-community" class="bg-pink-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-pink-700 transition flex items-center gap-2">
+                    <i class="fas fa-users"></i> Comunidade
+                </button>
+            </div>
+        </div>
+    </header>
+    <main class="container mx-auto px-6 py-10">
+        <div class="max-w-2xl mx-auto glass-card rounded-2xl p-8 flex flex-col gap-8 shadow-2xl fade-in">
+            <div>
+                <div class="section-title"><i class="fas fa-user-edit text-purple-400"></i> Alterar Nome</div>
+                <form id="form-name" class="flex gap-3 items-center mb-2">
+                    <input id="input-name" type="text" class="dark-input px-4 py-2 rounded-lg flex-1" required />
+                    <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-bold shadow transition"><i class="fas fa-save"></i> Salvar</button>
+                </form>
+                <div id="name-feedback" class="text-sm mt-1"></div>
+            </div>
+            <div>
+                <div class="section-title"><i class="fas fa-key text-blue-400"></i> Alterar Senha</div>
+                <form id="form-password" class="flex flex-col gap-2 mb-2">
+                    <input id="input-old-password" type="password" placeholder="Senha atual" class="dark-input px-4 py-2 rounded-lg" required />
+                    <input id="input-new-password" type="password" placeholder="Nova senha" class="dark-input px-4 py-2 rounded-lg" required />
+                    <input id="input-new-password2" type="password" placeholder="Confirmar nova senha" class="dark-input px-4 py-2 rounded-lg" required />
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold shadow transition"><i class="fas fa-save"></i> Salvar</button>
+                </form>
+                <div id="password-feedback" class="text-sm mt-1"></div>
+            </div>
+            <div class="divider"></div>
+            <div>
+                <div class="section-title"><i class="fas fa-eye text-pink-400"></i> Privacidade do Perfil</div>
+                <label class="flex items-center gap-3 mb-2">
+                    <span>Perfil público na comunidade</span>
+                    <span class="switch"><input type="checkbox" id="toggle-public" /><span class="slider"></span></span>
+                </label>
+                <p class="text-gray-400 text-sm">Se desmarcado, seu perfil não aparecerá para outros usuários na aba Comunidade.</p>
+            </div>
+            <div class="divider"></div>
+            <div>
+                <div class="section-title"><i class="fas fa-database text-green-400"></i> Exportar Dados</div>
+                <button id="export-data" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold shadow transition flex items-center gap-2"><i class="fas fa-download"></i> Baixar meus dados</button>
+                <div id="export-feedback" class="text-sm mt-1"></div>
+            </div>
+            <div>
+                <div class="section-title"><i class="fas fa-undo text-yellow-400"></i> Resetar Progresso</div>
+                <button id="reset-progress" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg font-bold shadow transition flex items-center gap-2"><i class="fas fa-undo"></i> Resetar minhas anotações e conquistas</button>
+                <div id="reset-feedback" class="text-sm mt-1"></div>
+            </div>
+            <div class="divider"></div>
+            <div>
+                <div class="section-title"><i class="fas fa-bell text-pink-400"></i> Notificações</div>
+                <label class="flex items-center gap-3 mb-2">
+                    <span>Receber notificações (simulado)</span>
+                    <span class="switch"><input type="checkbox" id="toggle-notify" /><span class="slider"></span></span>
+                </label>
+            </div>
+            <div>
+                <div class="section-title"><i class="fas fa-moon text-indigo-400"></i> Modo Escuro</div>
+                <label class="flex items-center gap-3 mb-2">
+                    <span>Ativar modo escuro (simulado)</span>
+                    <span class="switch"><input type="checkbox" id="toggle-dark" checked /><span class="slider"></span></span>
+                </label>
+            </div>
+            <div class="divider"></div>
+            <div>
+                <div class="section-title"><i class="fab fa-google-drive text-green-400"></i> Backup em Nuvem</div>
+                <div class="flex flex-col md:flex-row gap-4 items-center mb-2">
+                    <button id="gdrive-backup" class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg font-bold shadow transition flex items-center gap-2"><i class="fab fa-google-drive"></i> Fazer backup no Google Drive</button>
+                    <button id="gdrive-restore" class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg font-bold shadow transition flex items-center gap-2"><i class="fas fa-cloud-download-alt"></i> Restaurar backup do Google Drive</button>
+                </div>
+                <div id="gdrive-feedback" class="text-sm mt-1"></div>
+                <p class="text-gray-400 text-xs mt-2">Salve e recupere todos os seus dados em um arquivo seguro na sua conta Google Drive.</p>
+            </div>
+            <div class="divider"></div>
+            <div>
+                <div class="section-title text-red-400"><i class="fas fa-trash"></i> Apagar Conta</div>
+                <p class="text-gray-400 text-sm mb-4">Esta ação é <span class="text-red-400 font-bold">irreversível</span>. Todos os seus dados serão apagados.</p>
+                <button id="delete-account" class="danger text-white px-6 py-3 rounded-lg font-bold shadow hover:scale-105 transition flex items-center gap-2"><i class="fas fa-trash"></i> Apagar minha conta</button>
+            </div>
+        </div>
+    </main>
+    <script>
+    // Navegação
+    document.getElementById('back-dashboard').onclick = function() {
+        window.location.href = 'main-dashboard.html';
+    };
+    document.getElementById('back-community').onclick = function() {
+        window.location.href = 'community.html';
+    };
+    // Dados do usuário
+    let user = JSON.parse(localStorage.getItem('enemai_user'));
+    let users = JSON.parse(localStorage.getItem('enemai_users') || '[]');
+    // Nome
+    document.getElementById('input-name').value = user ? user.name : '';
+    document.getElementById('form-name').onsubmit = function(e) {
+        e.preventDefault();
+        const name = document.getElementById('input-name').value.trim();
+        if (!name) return;
+        user.name = name;
+        localStorage.setItem('enemai_user', JSON.stringify(user));
+        users = users.map(u => u.email === user.email ? {...u, name} : u);
+        localStorage.setItem('enemai_users', JSON.stringify(users));
+        document.getElementById('name-feedback').textContent = 'Nome alterado com sucesso!';
+        setTimeout(()=>document.getElementById('name-feedback').textContent='', 2000);
+    };
+    // Senha
+    document.getElementById('form-password').onsubmit = function(e) {
+        e.preventDefault();
+        const oldPass = document.getElementById('input-old-password').value;
+        const newPass = document.getElementById('input-new-password').value;
+        const newPass2 = document.getElementById('input-new-password2').value;
+        if (oldPass !== user.password) {
+            document.getElementById('password-feedback').textContent = 'Senha atual incorreta!';
+            return;
+        }
+        if (!newPass || newPass.length < 4) {
+            document.getElementById('password-feedback').textContent = 'Nova senha muito curta!';
+            return;
+        }
+        if (newPass !== newPass2) {
+            document.getElementById('password-feedback').textContent = 'As senhas não coincidem!';
+            return;
+        }
+        user.password = newPass;
+        localStorage.setItem('enemai_user', JSON.stringify(user));
+        users = users.map(u => u.email === user.email ? {...u, password: newPass} : u);
+        localStorage.setItem('enemai_users', JSON.stringify(users));
+        document.getElementById('password-feedback').textContent = 'Senha alterada com sucesso!';
+        setTimeout(()=>document.getElementById('password-feedback').textContent='', 2000);
+        document.getElementById('form-password').reset();
+    };
+    // Privacidade
+    const toggle = document.getElementById('toggle-public');
+    if (user && (user.public === undefined || user.public === true)) toggle.checked = true;
+    else toggle.checked = false;
+    toggle.onchange = function() {
+        user.public = toggle.checked;
+        localStorage.setItem('enemai_user', JSON.stringify(user));
+        users = users.map(u => u.email === user.email ? {...u, public: toggle.checked} : u);
+        localStorage.setItem('enemai_users', JSON.stringify(users));
+    };
+    // Exportar dados
+    document.getElementById('export-data').onclick = function() {
+        const notes = JSON.parse(localStorage.getItem('enemai_notes_' + user.email) || '[]');
+        const stats = JSON.parse(localStorage.getItem('enemai_stats_' + user.email) || '{}');
+        const chats = Object.keys(localStorage).filter(k => k.startsWith('enemai_chat_') && k.includes(user.email)).map(k => ({key: k, value: JSON.parse(localStorage.getItem(k))}));
+        const data = { user, notes, stats, chats };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `enemai_dados_${user.email}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById('export-feedback').textContent = 'Dados exportados!';
+        setTimeout(()=>document.getElementById('export-feedback').textContent='', 2000);
+    };
+    // Resetar progresso
+    document.getElementById('reset-progress').onclick = function() {
+        if (!confirm('Tem certeza? Isso apagará todas as suas anotações e conquistas, mas não sua conta.')) return;
+        localStorage.removeItem('enemai_notes_' + user.email);
+        localStorage.removeItem('enemai_stats_' + user.email);
+        document.getElementById('reset-feedback').textContent = 'Progresso resetado!';
+        setTimeout(()=>document.getElementById('reset-feedback').textContent='', 2000);
+    };
+    // Notificações (simulado)
+    const notify = document.getElementById('toggle-notify');
+    notify.checked = localStorage.getItem('enemai_notify_' + user.email) === 'on';
+    notify.onchange = function() {
+        localStorage.setItem('enemai_notify_' + user.email, notify.checked ? 'on' : 'off');
+    };
+    // Modo escuro (simulado)
+    const dark = document.getElementById('toggle-dark');
+    dark.checked = true;
+    dark.onchange = function() {
+        if (dark.checked) {
+            document.body.style.background = 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)';
+        } else {
+            document.body.style.background = 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)';
+        }
+    };
+    // Apagar conta
+    document.getElementById('delete-account').onclick = function() {
+        if (!confirm('Tem certeza? Esta ação é irreversível!')) return;
+        users = users.filter(u => u.email !== user.email);
+        localStorage.setItem('enemai_users', JSON.stringify(users));
+        localStorage.removeItem('enemai_user');
+        localStorage.removeItem('enemai_notes_' + user.email);
+        localStorage.removeItem('enemai_stats_' + user.email);
+        Object.keys(localStorage).forEach(key => {
+            if (key.startsWith('enemai_chat_') && key.includes(user.email)) {
+                localStorage.removeItem(key);
+            }
+        });
+        alert('Conta apagada com sucesso!');
+        window.location.href = 'login.html';
+    };
+    // === Google Drive Backup ===
+    const gdriveBackupBtn = document.getElementById('gdrive-backup');
+    const gdriveRestoreBtn = document.getElementById('gdrive-restore');
+    const gdriveFeedback = document.getElementById('gdrive-feedback');
+
+    // Config Google API
+    const CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'; // Substitua pelo seu Client ID
+    const API_KEY = '';
+    const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+    let gapiInited = false;
+    let tokenClient;
+
+    function showGDriveFeedback(msg, ok=true) {
+        gdriveFeedback.textContent = msg;
+        gdriveFeedback.style.color = ok ? '#22c55e' : '#ef4444';
+        setTimeout(()=>gdriveFeedback.textContent='', 4000);
+    }
+
+    function gapiLoaded() {
+        gapiInited = true;
+    }
+
+    function gisLoaded() {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: CLIENT_ID,
+            scope: SCOPES,
+            callback: ''
+        });
+    }
+
+    function ensureGapiAuth(callback) {
+        if (!gapiInited) {
+            showGDriveFeedback('Carregando Google API...', false);
+            gapi.load('client', async () => {
+                await gapi.client.init({ apiKey: API_KEY, discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"] });
+                gapiInited = true;
+                callback();
+            });
+        } else {
+            callback();
+        }
+    }
+
+    function ensureGisAuth(callback) {
+        if (!tokenClient) {
+            window.google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                callback: (tokenResponse) => {
+                    gapi.client.setToken(tokenResponse);
+                    callback();
+                }
+            });
+        } else {
+            tokenClient.callback = (tokenResponse) => {
+                gapi.client.setToken(tokenResponse);
+                callback();
+            };
+            tokenClient.requestAccessToken();
+        }
+    }
+
+    // Backup para Google Drive
+    async function backupToDrive() {
+        showGDriveFeedback('Iniciando backup...');
+        ensureGapiAuth(() => {
+            ensureGisAuth(async () => {
+                try {
+                    // Coletar dados
+                    const notes = JSON.parse(localStorage.getItem('enemai_notes_' + user.email) || '[]');
+                    const stats = JSON.parse(localStorage.getItem('enemai_stats_' + user.email) || '{}');
+                    const chats = Object.keys(localStorage).filter(k => k.startsWith('enemai_chat_') && k.includes(user.email)).map(k => ({key: k, value: JSON.parse(localStorage.getItem(k))}));
+                    const data = { user, notes, stats, chats };
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const metadata = {
+                        name: `enemai_backup_${user.email}.json`,
+                        mimeType: 'application/json'
+                    };
+                    const form = new FormData();
+                    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+                    form.append('file', blob);
+                    // Upload
+                    const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + gapi.client.getToken().access_token },
+                        body: form
+                    });
+                    if (res.ok) {
+                        showGDriveFeedback('Backup enviado para o Google Drive!');
+                    } else {
+                        showGDriveFeedback('Erro ao enviar backup: ' + res.statusText, false);
+                    }
+                } catch (e) {
+                    showGDriveFeedback('Erro: ' + e.message, false);
+                }
+            });
+        });
+    }
+
+    // Restaurar do Google Drive
+    async function restoreFromDrive() {
+        showGDriveFeedback('Buscando backups no Google Drive...');
+        ensureGapiAuth(() => {
+            ensureGisAuth(async () => {
+                try {
+                    // Procurar arquivo
+                    const res = await gapi.client.drive.files.list({
+                        q: `name contains 'enemai_backup_${user.email}.json' and trashed = false`,
+                        fields: 'files(id, name, modifiedTime)',
+                        orderBy: 'modifiedTime desc',
+                        pageSize: 1
+                    });
+                    if (!res.result.files.length) {
+                        showGDriveFeedback('Nenhum backup encontrado.', false);
+                        return;
+                    }
+                    const fileId = res.result.files[0].id;
+                    // Baixar conteúdo
+                    const fileRes = await gapi.client.drive.files.get({ fileId, alt: 'media' });
+                    const data = JSON.parse(fileRes.body);
+                    // Restaurar dados
+                    if (data.user && data.user.email === user.email) {
+                        localStorage.setItem('enemai_user', JSON.stringify(data.user));
+                        localStorage.setItem('enemai_notes_' + user.email, JSON.stringify(data.notes || []));
+                        localStorage.setItem('enemai_stats_' + user.email, JSON.stringify(data.stats || {}));
+                        (data.chats || []).forEach(chat => {
+                            localStorage.setItem(chat.key, JSON.stringify(chat.value));
+                        });
+                        showGDriveFeedback('Backup restaurado com sucesso! Recarregue a página.');
+                    } else {
+                        showGDriveFeedback('Backup inválido ou de outro usuário.', false);
+                    }
+                } catch (e) {
+                    showGDriveFeedback('Erro: ' + e.message, false);
+                }
+            });
+        });
+    }
+
+    gdriveBackupBtn.onclick = backupToDrive;
+    gdriveRestoreBtn.onclick = restoreFromDrive;
+    </script>
+</body>
+</html> 

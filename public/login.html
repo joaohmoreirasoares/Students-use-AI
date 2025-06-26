@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENEM AI - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            min-height: 100vh;
+            background: #181926;
+        }
+        .fade-in {
+            animation: fadeIn 1s ease;
+        }
+        .slide-in-left {
+            animation: slideInLeft 1s cubic-bezier(.68,-0.55,.27,1.55);
+        }
+        .slide-in-up {
+            animation: slideInUp 1s cubic-bezier(.68,-0.55,.27,1.55);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-60px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(60px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .input-animated:focus {
+            box-shadow: 0 0 0 3px #a78bfa66, 0 1px 2px 0 #0001;
+            transition: box-shadow 0.3s;
+        }
+        .btn-animated {
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .btn-animated:hover {
+            transform: scale(1.04);
+            box-shadow: 0 4px 24px 0 #7c3aed55;
+        }
+        .pill-animated {
+            transition: transform 0.12s, box-shadow 0.12s;
+        }
+        .pill-animated input:checked + span {
+            animation: pillBounce 0.25s;
+        }
+        @keyframes pillBounce {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.13); }
+            100% { transform: scale(1); }
+        }
+        .shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translateX(-2px); }
+            20%, 80% { transform: translateX(4px); }
+            30%, 50%, 70% { transform: translateX(-8px); }
+            40%, 60% { transform: translateX(8px); }
+        }
+        .checkmark {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #22c55e;
+            color: #fff;
+            text-align: center;
+            line-height: 24px;
+            font-size: 18px;
+            margin-left: 8px;
+            animation: popCheck 0.5s;
+        }
+        @keyframes popCheck {
+            0% { transform: scale(0.5); opacity: 0; }
+            80% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .icon-glow:hover {
+            filter: drop-shadow(0 0 8px #fff) drop-shadow(0 0 16px #a78bfa);
+            transition: filter 0.2s;
+        }
+        @media (min-width: 1024px) {
+            #desc-fixa {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                width: 370px;
+                z-index: 20;
+                border-radius: 0 2rem 2rem 0;
+                box-shadow: 2px 0 24px 0 rgba(0,0,0,0.12);
+            }
+            #main-content {
+                margin-left: 370px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 min-h-screen relative overflow-x-hidden">
+    <!-- Canvas para animação de fundo -->
+    <canvas id="dot-grid-bg" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;"></canvas>
+    <!-- Descrição fixa -->
+    <aside id="desc-fixa" class="bg-gradient-to-br from-purple-600 to-indigo-700 text-white flex flex-col justify-center items-center p-8 w-full max-w-lg mx-auto mb-8 lg:mb-0 lg:items-start lg:justify-start slide-in-left">
+        <h2 class="text-3xl font-bold mb-6 text-center lg:text-left">ENEM AI</h2>
+        <ul class="space-y-5 w-full">
+            <li class="flex items-start gap-3">
+                <i class="fas fa-robot text-white text-2xl mt-1 icon-glow"></i>
+                <div>
+                    <h3 class="font-semibold text-lg">O que é?</h3>
+                    <p class="text-white/90">Uma plataforma gratuita que usa inteligência artificial para ajudar estudantes e professores a se prepararem para o ENEM.</p>
+                </div>
+            </li>
+            <li class="flex items-start gap-3">
+                <i class="fas fa-user-graduate text-white text-2xl mt-1 icon-glow"></i>
+                <div>
+                    <h3 class="font-semibold text-lg">Para quem serve?</h3>
+                    <p class="text-white/90">Estudantes do ensino médio, pré-vestibular e professores que querem potencializar o aprendizado e o ensino.</p>
+                </div>
+            </li>
+            <li class="flex items-start gap-3">
+                <i class="fas fa-lightbulb text-yellow-300 text-2xl mt-1 icon-glow"></i>
+                <div>
+                    <h3 class="font-semibold text-lg">Principais recursos</h3>
+                    <ul class="list-disc pl-5 text-white/90 text-base">
+                        <li>Tutores de IA para todas as áreas do ENEM</li>
+                        <li>Anotações inteligentes e automáticas</li>
+                        <li>Ferramentas exclusivas para professores</li>
+                        <li>Ambiente seguro, moderno e fácil de usar</li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </aside>
+    <!-- Conteúdo principal -->
+    <div id="main-content" class="flex items-center justify-center min-h-screen relative z-10">
+        <div class="w-full max-w-2xl bg-gray-800 rounded-xl shadow-2xl p-0 flex flex-col fade-in mt-12 relative z-10 slide-in-up">
+            <div class="flex items-center justify-center mb-8 mt-8">
+                <i class="fas fa-brain text-3xl text-purple-400 mr-2 animate-pulse"></i>
+                <span class="text-2xl font-bold text-gray-100">ENEM AI</span>
+            </div>
+            <div id="login-form" class="px-6 pb-8">
+                <h2 class="text-xl font-bold mb-4 text-gray-100">Entrar</h2>
+                <form class="space-y-4" id="form-login">
+                    <div>
+                        <label class="block text-gray-300">E-mail</label>
+                        <input type="email" id="login-email" class="w-full px-4 py-2 border border-gray-700 rounded-lg bg-gray-900 text-gray-100 focus:outline-none input-animated" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-300">Senha</label>
+                        <input type="password" id="login-password" class="w-full px-4 py-2 border border-gray-700 rounded-lg bg-gray-900 text-gray-100 focus:outline-none input-animated" required>
+                    </div>
+                    <button type="submit" class="w-full bg-purple-700 text-white py-2 rounded-lg font-bold btn-animated">Entrar</button>
+                </form>
+                <p class="mt-4 text-center text-gray-400">Não tem uma conta? <a href="#" id="show-register" class="text-purple-400 hover:underline font-medium">Cadastre-se</a></p>
+                <div id="login-message" class="mt-2 text-center text-sm"></div>
+            </div>
+            <div id="register-form" class="hidden px-6 pb-8">
+                <h2 class="text-xl font-bold mb-4 text-gray-100">Cadastro</h2>
+                <form class="space-y-4" id="form-register">
+                    <div>
+                        <label class="block text-gray-300">Nome</label>
+                        <input type="text" id="register-name" class="w-full px-4 py-2 border border-gray-700 rounded-lg bg-gray-900 text-gray-100 focus:outline-none input-animated" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-300">E-mail</label>
+                        <input type="email" id="register-email" class="w-full px-4 py-2 border border-gray-700 rounded-lg bg-gray-900 text-gray-100 focus:outline-none input-animated" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-300">Senha</label>
+                        <input type="password" id="register-password" class="w-full px-4 py-2 border border-gray-700 rounded-lg bg-gray-900 text-gray-100 focus:outline-none input-animated" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-300">Confirmar Senha</label>
+                        <input type="password" id="register-password2" class="w-full px-4 py-2 border border-gray-700 rounded-lg bg-gray-900 text-gray-100 focus:outline-none input-animated" required>
+                    </div>
+                    <div class="flex items-center space-x-6 mb-2">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="tipo-usuario" id="register-professor" class="peer sr-only">
+                            <span class="px-4 py-2 rounded-full border-2 border-purple-600 text-purple-300 font-semibold peer-checked:bg-purple-700 peer-checked:text-white transition-all">Sou professor</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="tipo-usuario" id="register-estudante" class="peer sr-only">
+                            <span class="px-4 py-2 rounded-full border-2 border-blue-600 text-blue-300 font-semibold peer-checked:bg-blue-700 peer-checked:text-white transition-all">Sou estudante</span>
+                        </label>
+                    </div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <input type="checkbox" id="register-public" class="accent-pink-600" checked>
+                        <label for="register-public" class="text-gray-300">Perfil público na comunidade</label>
+                    </div>
+                    <!-- Professor -->
+                    <div id="professor-fields" class="space-y-4 hidden fade-in">
+                        <div>
+                            <label class="block text-gray-300">Turmas em que trabalha <span class="text-red-500">*</span></label>
+                            <div id="professor-turmas" class="flex flex-wrap gap-2"></div>
+                            <span class="text-xs text-gray-400">Selecione uma ou mais turmas.</span>
+                        </div>
+                        <div>
+                            <label class="block text-gray-300">Matéria(s) que ministra <span class="text-red-500">*</span></label>
+                            <div id="professor-materias" class="flex flex-wrap gap-2"></div>
+                            <span class="text-xs text-gray-400">Selecione uma ou mais matérias.</span>
+                        </div>
+                    </div>
+                    <!-- Estudante -->
+                    <div id="estudante-fields" class="space-y-4 hidden fade-in">
+                        <div>
+                            <label class="block text-gray-300">Turmas que participa</label>
+                            <div id="estudante-turmas" class="flex flex-wrap gap-2"></div>
+                            <span class="text-xs text-gray-400">Selecione uma ou mais turmas.</span>
+                        </div>
+                        <div>
+                            <label class="block text-gray-300">Matérias que gosta <span class="text-gray-400">(opcional)</span></label>
+                            <div id="estudante-materias-gosta" class="flex flex-wrap gap-2"></div>
+                            <span class="text-xs text-gray-400">Selecione uma ou mais matérias.</span>
+                        </div>
+                        <div>
+                            <label class="block text-gray-300">Em que gostaria de se formar <span class="text-gray-400">(opcional)</span></label>
+                            <select id="estudante-formar" class="w-full px-4 py-2 border border-gray-700 rounded-lg bg-gray-900 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Selecione...</option>
+                                <option value="Medicina">Medicina</option>
+                                <option value="Engenharia">Engenharia</option>
+                                <option value="Direito">Direito</option>
+                                <option value="Psicologia">Psicologia</option>
+                                <option value="Administração">Administração</option>
+                                <option value="Pedagogia">Pedagogia</option>
+                                <option value="Arquitetura">Arquitetura</option>
+                                <option value="Computação">Computação</option>
+                                <option value="Letras">Letras</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-purple-700 text-white py-2 rounded-lg font-bold btn-animated">Registrar</button>
+                </form>
+                <p class="mt-4 text-center text-gray-400">Já tem uma conta? <a href="#" id="show-login" class="text-purple-400 hover:underline font-medium">Entrar</a></p>
+                <div id="register-message" class="mt-2 text-center text-sm"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Geração dinâmica de turmas e matérias (pills)
+        document.addEventListener('DOMContentLoaded', function() {
+            const turmas = [
+                '1ºA','1ºB','1ºC','1ºD','1ºE',
+                '2ºA','2ºB','2ºC','2ºD','2ºE',
+                '3ºA','3ºB','3ºC','3ºD','3ºE',
+                'Pré-ENEM','EJA'
+            ];
+            const materias = [
+                'Matemática','Física','Química','Biologia','Português','Literatura','Inglês','Espanhol','História','Geografia','Filosofia','Sociologia','Artes','Educação Física','Redação'
+            ];
+            function renderPills(containerId, className, color) {
+                const container = document.getElementById(containerId);
+                if (container) {
+                    container.innerHTML = '';
+                    (containerId.includes('turmas') ? turmas : materias).forEach(item => {
+                        const label = document.createElement('label');
+                        label.className = `pill-animated cursor-pointer px-3 py-1 rounded-full border border-${color}-400 text-${color}-300 bg-${color}-900 hover:bg-${color}-700 transition flex items-center relative mb-1`;
+                        label.innerHTML = `<input type="checkbox" value="${item}" class="${className} absolute opacity-0 w-0 h-0 peer"><span class="peer-checked:bg-${color}-400 peer-checked:text-white px-2 py-1 rounded-full transition">${item}</span>`;
+                        container.appendChild(label);
+                    });
+                }
+            }
+            renderPills('professor-turmas', 'turma-checkbox-p', 'purple');
+            renderPills('professor-materias', 'materia-checkbox-p', 'purple');
+            renderPills('estudante-turmas', 'turma-checkbox-e', 'blue');
+            renderPills('estudante-materias-gosta', 'materia-checkbox-e', 'blue');
+        });
+        // Alternar entre login e registro
+        document.getElementById('show-register').onclick = function(e) {
+            e.preventDefault();
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.remove('hidden');
+        };
+        document.getElementById('show-login').onclick = function(e) {
+            e.preventDefault();
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
+        };
+        // Exibir campos dinâmicos conforme seleção
+        const profRadio = document.getElementById('register-professor');
+        const estuRadio = document.getElementById('register-estudante');
+        const profFields = document.getElementById('professor-fields');
+        const estuFields = document.getElementById('estudante-fields');
+        profRadio.addEventListener('change', () => {
+            if (profRadio.checked) {
+                profFields.classList.remove('hidden');
+                estuFields.classList.add('hidden');
+                profFields.classList.add('slide-in-up');
+                estuFields.classList.remove('slide-in-up');
+            }
+        });
+        estuRadio.addEventListener('change', () => {
+            if (estuRadio.checked) {
+                estuFields.classList.remove('hidden');
+                profFields.classList.add('hidden');
+                estuFields.classList.add('slide-in-up');
+                profFields.classList.remove('slide-in-up');
+            }
+        });
+        if (window.location.search.includes('professor=1')) {
+            profRadio.checked = true;
+            profFields.classList.remove('hidden');
+            estuFields.classList.add('hidden');
+        }
+        // Microinteração nas pills
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.matches('.pill-animated input[type="checkbox"]')) {
+                const span = e.target.nextElementSibling;
+                if (span) {
+                    span.style.animation = 'pillBounce 0.25s';
+                    setTimeout(() => { span.style.animation = ''; }, 250);
+                }
+            }
+        });
+        // Registro
+        document.getElementById('form-register').onsubmit = function(e) {
+            e.preventDefault();
+            const name = document.getElementById('register-name').value.trim();
+            const email = document.getElementById('register-email').value.trim().toLowerCase();
+            const password = document.getElementById('register-password').value;
+            const password2 = document.getElementById('register-password2').value;
+            const isProfessor = profRadio.checked;
+            const isEstudante = estuRadio.checked;
+            const msg = document.getElementById('register-message');
+            const form = document.getElementById('form-register');
+            msg.innerHTML = '';
+            form.classList.remove('shake');
+            if (!name || !email || !password || !password2) {
+                msg.textContent = 'Preencha todos os campos.';
+                msg.className = 'text-red-500 mt-2 text-center text-sm';
+                form.classList.add('shake');
+                return;
+            }
+            if (!isProfessor && !isEstudante) {
+                msg.textContent = 'Selecione se você é professor ou estudante.';
+                msg.className = 'text-red-500 mt-2 text-center text-sm';
+                form.classList.add('shake');
+                return;
+            }
+            if (password !== password2) {
+                msg.textContent = 'As senhas não coincidem.';
+                msg.className = 'text-red-500 mt-2 text-center text-sm';
+                form.classList.add('shake');
+                return;
+            }
+            let users = JSON.parse(localStorage.getItem('enemai_users') || '[]');
+            if (users.find(u => u.email === email)) {
+                msg.textContent = 'E-mail já cadastrado.';
+                msg.className = 'text-red-500 mt-2 text-center text-sm';
+                form.classList.add('shake');
+                return;
+            }
+            let user = { name, email, password };
+            user.public = document.getElementById('register-public').checked;
+            if (isProfessor) {
+                user.type = 'professor';
+                const turmas = Array.from(document.querySelectorAll('.turma-checkbox-p:checked')).map(cb => cb.value);
+                const materias = Array.from(document.querySelectorAll('.materia-checkbox-p:checked')).map(cb => cb.value);
+                if (!turmas.length || !materias.length) {
+                    msg.textContent = 'Preencha as turmas e matérias que você ministra.';
+                    msg.className = 'text-red-500 mt-2 text-center text-sm';
+                    form.classList.add('shake');
+                    return;
+                }
+                user.turmas = turmas;
+                user.materias = materias;
+            } else if (isEstudante) {
+                user.type = 'estudante';
+                const turmas = Array.from(document.querySelectorAll('.turma-checkbox-e:checked')).map(cb => cb.value);
+                const materiasGosta = Array.from(document.querySelectorAll('.materia-checkbox-e:checked')).map(cb => cb.value);
+                const formarSel = document.getElementById('estudante-formar');
+                user.turmas = turmas;
+                user.materiasGosta = materiasGosta;
+                user.formacao = formarSel.value;
+            }
+            users.push(user);
+            localStorage.setItem('enemai_users', JSON.stringify(users));
+            localStorage.setItem('enemai_user', JSON.stringify(user));
+            msg.innerHTML = 'Cadastro realizado com sucesso! <span class="checkmark"><i class="fas fa-check"></i></span>';
+            msg.className = 'text-green-400 mt-2 text-center text-sm';
+            setTimeout(() => window.location.href = 'main-dashboard.html', 1200);
+        };
+        // Login
+        document.getElementById('form-login').onsubmit = function(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim().toLowerCase();
+            const password = document.getElementById('login-password').value;
+            const msg = document.getElementById('login-message');
+            const form = document.getElementById('form-login');
+            msg.innerHTML = '';
+            form.classList.remove('shake');
+            let users = JSON.parse(localStorage.getItem('enemai_users') || '[]');
+            const user = users.find(u => u.email === email && u.password === password);
+            if (!user) {
+                msg.textContent = 'E-mail ou senha inválidos.';
+                msg.className = 'text-red-500 mt-2 text-center text-sm';
+                form.classList.add('shake');
+                return;
+            }
+            localStorage.setItem('enemai_user', JSON.stringify(user));
+            msg.innerHTML = 'Login realizado! <span class="checkmark"><i class="fas fa-check"></i></span>';
+            msg.className = 'text-green-400 mt-2 text-center text-sm';
+            setTimeout(() => window.location.href = 'main-dashboard.html', 1000);
+        };
+        // Animação de grid de pontos no fundo (dark)
+        (function() {
+            const canvas = document.getElementById('dot-grid-bg');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let width = window.innerWidth;
+            let height = window.innerHeight;
+            let dpr = window.devicePixelRatio || 1;
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+                canvas.style.width = width + 'px';
+                canvas.style.height = height + 'px';
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.scale(dpr, dpr);
+            }
+            resize();
+            window.addEventListener('resize', resize);
+            const dotSize = 7;
+            const gap = 32;
+            const baseColor = '#232946';
+            const activeColor = '#a78bfa';
+            const shockRadius = 120;
+            const shockStrength = 5;
+            let mouse = {x: -1000, y: -1000};
+            canvas.addEventListener('mousemove', e => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+            });
+            canvas.addEventListener('mouseleave', () => {
+                mouse.x = -1000;
+                mouse.y = -1000;
+            });
+            function draw() {
+                ctx.clearRect(0, 0, width, height);
+                for (let y = gap/2; y < height; y += gap) {
+                    for (let x = gap/2; x < width; x += gap) {
+                        let dx = x - mouse.x;
+                        let dy = y - mouse.y;
+                        let dist = Math.sqrt(dx*dx + dy*dy);
+                        let size = dotSize;
+                        let color = baseColor;
+                        if (dist < shockRadius) {
+                            size = dotSize + (shockRadius-dist)/shockStrength;
+                            color = activeColor;
+                        }
+                        ctx.beginPath();
+                        ctx.arc(x, y, size, 0, 2*Math.PI);
+                        ctx.fillStyle = color + '22';
+                        ctx.shadowColor = color;
+                        ctx.shadowBlur = dist < shockRadius ? 8 : 0;
+                        ctx.fill();
+                        ctx.shadowBlur = 0;
+                    }
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+    </script>
+</body>
+</html> 

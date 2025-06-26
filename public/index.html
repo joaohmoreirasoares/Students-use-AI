@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENEM AI - Seu Assistente Inteligente para o ENEM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #9333ea 100%);
+        }
+        .note-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .ai-card:hover {
+            transform: scale(1.03);
+        }
+        .floating-button {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+        }
+        .note-editor {
+            min-height: 300px;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50">
+    <!-- Header/Navigation -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-brain text-3xl"></i>
+                    <h1 class="text-2xl font-bold">ENEM AI</h1>
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#home" class="hover:text-purple-200 font-medium">Início</a>
+                    <a href="#ai-tutors" class="hover:text-purple-200 font-medium">Tutores AI</a>
+                    <a href="#notes" class="hover:text-purple-200 font-medium">Anotações</a>
+                    <a href="#teachers" class="hover:text-purple-200 font-medium">Professores</a>
+                    <a href="#about" class="hover:text-purple-200 font-medium">Sobre</a>
+                </nav>
+                <div class="flex items-center space-x-4">
+                    <a href="login.html" class="bg-white text-purple-600 px-4 py-2 rounded-full font-medium hover:bg-purple-100 transition">Login</a>
+                    <button class="md:hidden text-2xl" id="mobile-menu-button">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Mobile Menu -->
+            <div class="md:hidden hidden mt-4" id="mobile-menu">
+                <div class="flex flex-col space-y-3">
+                    <a href="#home" class="hover:text-purple-200 font-medium">Início</a>
+                    <a href="#ai-tutors" class="hover:text-purple-200 font-medium">Tutores AI</a>
+                    <a href="#notes" class="hover:text-purple-200 font-medium">Anotações</a>
+                    <a href="#teachers" class="hover:text-purple-200 font-medium">Professores</a>
+                    <a href="#about" class="hover:text-purple-200 font-medium">Sobre</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- O RESTANTE DO SEU HOMEPAGE ORIGINAL VAI AQUI (igual ao homepage.html) -->
+    <!-- ... -->
+</body>
+</html> 
