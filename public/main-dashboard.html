@@ -4,1503 +4,729 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ENEM AI - Dashboard Principal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="description" content="Dashboard Principal ENEM AI: acompanhe seu progresso, conquistas, missões e organize seus estudos com inteligência artificial.">
+    <meta name="keywords" content="ENEM, dashboard, inteligência artificial, estudo, conquistas, missões, educação, tecnologia">
     <style>
+        :root {
+            --cor-primaria: #7F00FF;
+            --cor-secundaria: #00C3FF;
+            --cor-destaque: #FF61A6;
+            --cor-fundo: #1A1A2E;
+            --cor-branco: #FFFFFF;
+            --fonte-titulo: 'Montserrat', sans-serif;
+            --fonte-texto: 'Poppins', sans-serif;
+            --sidebar: #35355a;
+            --sidebar-foreground: #f8f8fa;
+            --sidebar-primary: #6c4cff;
+            --sidebar-primary-foreground: #f8f8fa;
+            --sidebar-accent: #444444;
+            --sidebar-accent-foreground: #f8f8fa;
+            --sidebar-border: rgba(255,255,255,0.1);
+            --sidebar-btn-bg: var(--cor-primaria);
+            --sidebar-btn-hover: var(--cor-secundaria);
+            --sidebar-btn-active: var(--cor-destaque);
+            --sidebar-btn-border: #fff;
+            --sidebar-btn-shadow: var(--cor-primaria);
+        }
         body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            font-family: var(--fonte-texto);
+            background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-fundo) 100%);
             min-height: 100vh;
-            color: #e2e8f0;
+            color: var(--cor-branco);
+            margin-left: 60px;
+            transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1);
         }
-        .glass-card {
-            background: rgba(30, 41, 59, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            color: #e2e8f0;
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--fonte-titulo);
         }
-        .stat-card {
-            transition: all 0.3s ease;
+        /* Sidebar moderna */
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            width: 60px;
+            background: var(--sidebar);
+            color: var(--sidebar-foreground);
+            border-right: 1px solid var(--sidebar-border);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
         }
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        .sidebar:hover, .sidebar:focus-within {
+            width: 220px;
         }
-        .achievement-badge {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        .counter {
-            animation: countUp 2s ease-out;
-        }
-        @keyframes countUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .focus-mode {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-        }
-        .pomodoro-timer {
-            font-family: 'Courier New', monospace;
-        }
-        .progress-ring {
-            transform: rotate(-90deg);
-        }
-        .progress-ring-circle {
-            transition: stroke-dashoffset 0.35s;
-            transform-origin: 50% 50%;
-        }
-        
-        /* Estilos específicos para modo escuro */
-        .dark-text { color: #e2e8f0; }
-        .dark-bg { background-color: #1e293b; }
-        .dark-border { border-color: #475569; }
-        .dark-input {
-            background-color: #374151;
-            border-color: #475569;
-            color: #e2e8f0;
-        }
-        .dark-input:focus {
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-        }
-        .dark-placeholder::placeholder {
-            color: #94a3b8;
-        }
-        .ripple {
+        .sidebar-site-logo {
+            width: 100%;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex-direction: row;
+            gap: 0.7em;
+            margin-bottom: 0.5em;
             position: relative;
+            transition: justify-content 0.4s;
+        }
+        .sidebar-site-logo i {
+            font-size: 2.2em;
+            color: #fff;
+            transition: font-size 0.4s;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar-logo-text {
+            color: #fff;
+            font-family: var(--fonte-titulo);
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-left: 0.3em;
+            white-space: nowrap;
+            letter-spacing: 1px;
+            opacity: 0;
+            max-width: 0;
+            width: 0;
+            padding: 0;
             overflow: hidden;
-        }
-        .ripple:after {
-            content: '';
-            display: block;
-            position: absolute;
-            border-radius: 50%;
-            width: 100px;
-            height: 100px;
-            left: 50%;
-            top: 50%;
-            pointer-events: none;
-            background: rgba(255,255,255,0.2);
-            transform: translate(-50%, -50%) scale(0);
-            animation: ripple-effect 0.5s linear;
-        }
-        @keyframes ripple-effect {
-            to { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
-        }
-        .input-animated:focus {
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-            transition: box-shadow 0.2s, border-color 0.2s;
-        }
-        .shake {
-            animation: shake 0.3s linear;
-        }
-        @keyframes shake {
-            10%, 90% { transform: translateX(-2px); }
-            20%, 80% { transform: translateX(4px); }
-            30%, 50%, 70% { transform: translateX(-8px); }
-            40%, 60% { transform: translateX(8px); }
-        }
-        .spinner {
-            border: 3px solid #e2e8f0;
-            border-top: 3px solid #8b5cf6;
-            border-radius: 50%;
-            width: 1.2em;
-            height: 1.2em;
-            animation: spin 0.7s linear infinite;
+            transition: opacity 0.4s, max-width 0.4s, width 0.4s, margin 0.4s, padding 0.4s;
             display: inline-block;
             vertical-align: middle;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .sidebar:not(:hover):not(:focus-within) .sidebar-site-logo {
+            justify-content: center;
         }
+        .sidebar:not(:hover):not(:focus-within) .sidebar-logo-text {
+            opacity: 0;
+            max-width: 0;
+            width: 0;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar:hover .sidebar-site-logo,
+        .sidebar:focus-within .sidebar-site-logo {
+            justify-content: flex-start;
+        }
+        .sidebar:hover .sidebar-logo-text,
+        .sidebar:focus-within .sidebar-logo-text {
+            opacity: 1;
+            max-width: 90px;
+            width: auto;
+            margin-left: 0.3em;
+            padding: 0;
+        }
+        .sidebar-header {
+            max-height: 70px;
+            min-height: 70px;
+            border-bottom: 1px solid var(--sidebar-border);
+        }
+        .sidebar-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            padding: 1.2rem 1.3rem 0.5rem 0.5rem;
+            align-items: flex-start;
+        }
+        .sidebar-btn, .sidebar-label {
+            text-decoration: none !important;
+        }
+        .sidebar-btn {
+            width: 100%;
+            background: none;
+            border: none;
+            outline: none;
+            margin: 0;
+            padding: 0.25em 0.3em;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            position: relative;
+            border-radius: 7px;
+            box-shadow: 0 1px 0 1px var(--sidebar-btn-shadow);
+            border: 1.2px solid var(--sidebar-btn-border);
+            font-size: 10px;
+            color: #fff;
+            font-weight: 600;
+            background-color: var(--sidebar-btn-bg);
+            overflow: hidden;
+            min-height: 32px;
+            height: 32px;
+            transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+        }
+        .sidebar-btn .circle-icon {
+            width: 18px;
+            height: 18px;
+            font-size: 0.9em;
+            color: #fff !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            transition: color 0.2s, margin 0.2s, left 0.2s;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar-btn .sidebar-label {
+            display: none;
+            margin-left: 0.5em;
+            font-size: 0.90em;
+            color: #fff;
+            font-weight: 500;
+            z-index: 2;
+        }
+        .sidebar:hover .sidebar-btn .sidebar-label,
+        .sidebar:focus-within .sidebar-btn .sidebar-label {
+            display: inline;
+        }
+        /* Centralizar ícone quando sidebar retraída */
+        .sidebar:not(:hover):not(:focus-within) .sidebar-btn {
+            justify-content: center;
+        }
+        .sidebar:not(:hover):not(:focus-within) .sidebar-btn .circle-icon {
+            margin: 0;
+        }
+        .sidebar:not(:hover):not(:focus-within) .sidebar-btn .sidebar-label {
+            display: none !important;
+        }
+        .sidebar-btn:before {
+            content: "";
+            position: absolute;
+            width: 70px;
+            height: 120%;
+            background-color: var(--sidebar-btn-active);
+            top: 50%;
+            left: 0;
+            transform: skewX(30deg) translate(-150%, -50%);
+            transition: all 0.5s;
+            z-index: 1;
+        }
+        .sidebar-btn:hover, .sidebar-btn:focus {
+            background-color: var(--sidebar-btn-hover);
+            color: #fff;
+            box-shadow: 0 2px 0 2px var(--cor-secundaria);
+        }
+        .sidebar-btn:hover:before, .sidebar-btn:focus:before {
+            transform: skewX(30deg) translate(150%, -50%);
+            transition-delay: 0.1s;
+        }
+        .sidebar-btn:active {
+            transform: scale(0.95);
+        }
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1.2rem 1rem 1.2rem 1.1em;
+            border-top: 1px solid var(--sidebar-border);
+            transition: opacity 0.3s;
+            margin-top: auto;
+        }
+        .sidebar-avatar {
+            max-width: 32px;
+            min-width: 32px;
+            min-height: 32px;
+            max-height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--sidebar-primary);
+            background: #fff;
+            color: var(--sidebar-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1em;
+        }
+        .sidebar-username {
+            font-size: 1em;
+            font-weight: 500;
+            color: var(--sidebar-foreground);
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .sidebar:hover .sidebar-username, .sidebar:focus-within .sidebar-username {
+            opacity: 1;
+        }
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 60px !important;
+            }
+            .sidebar:hover, .sidebar:focus-within {
+                width: 180px !important;
+            }
+        }
+        /* Dashboard layout */
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem 2rem 1rem;
+        }
+        .dashboard-header {
+            margin-bottom: 2rem;
+        }
+        .dashboard-header h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .dashboard-header p {
+            color: #e0e0e0;
+            font-size: 1.1rem;
+        }
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: rgba(40, 20, 60, 0.7);
+            border-radius: 1.2rem;
+            padding: 1.5rem 1.2rem;
+            box-shadow: 0 4px 24px rgba(127,0,255,0.10);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.7rem;
+        }
+        .stat-card .stat-title {
+            color: #e0e0e0;
+            font-size: 1rem;
+        }
+        .stat-card .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .stat-card .stat-icon {
+            font-size: 2rem;
+            margin-left: auto;
+            color: var(--cor-secundaria);
+        }
+        .level-xp-panel {
+            background: rgba(60, 30, 90, 0.8);
+            border-radius: 1.2rem;
+            padding: 1.5rem 1.2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        .level-xp-panel .level {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #FFD700;
+        }
+        .level-xp-panel .xp-bar-container {
+            flex: 1;
+            background: #2d1a3a;
+            border-radius: 1rem;
+            height: 18px;
+            overflow: hidden;
+            margin: 0 1rem;
+        }
+        .level-xp-panel .xp-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD700 0%, #00C3FF 100%);
+            border-radius: 1rem;
+            transition: width 0.5s;
+        }
+        .level-xp-panel .xp-label {
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .dashboard-charts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .dashboard-card {
+            background: rgba(40, 20, 60, 0.7);
+            border-radius: 1.2rem;
+            padding: 1.5rem 1.2rem;
+            box-shadow: 0 4px 24px rgba(127,0,255,0.10);
+        }
+        .dashboard-card canvas {
+            width: 100% !important;
+            max-width: 400px;
+            height: 220px !important;
+            max-height: 220px;
+            display: block;
+            margin: 0 auto;
+            background: #1A1A2E;
+            border-radius: 1rem;
+        }
+        .achievements-list {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        .achievement-badge {
+            background: #6c4cff;
+            color: #fff;
+            border-radius: 2rem;
+            padding: 0.5rem 1.2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 8px rgba(127,0,255,0.10);
+        }
+        .profile-card {
+            background: rgba(40, 20, 60, 0.7);
+            border-radius: 1.2rem;
+            padding: 2rem 1.5rem;
+            box-shadow: 0 4px 24px rgba(127,0,255,0.10);
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 3px solid var(--cor-primaria);
+            object-fit: cover;
+        }
+        .profile-info {
+            flex: 1;
+        }
+        .profile-info h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+        .profile-info p {
+            color: #e0e0e0;
+            margin-bottom: 0.2rem;
+        }
+        .profile-tags {
+            display: flex;
+            gap: 0.6rem;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .profile-tag {
+            background: #7F00FF;
+            color: #fff;
+            border-radius: 1rem;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .quick-action-btn {
+            background: var(--cor-primaria);
+            color: #fff;
+            border: none;
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            box-shadow: 0 2px 8px rgba(127,0,255,0.10);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .quick-action-btn:hover {
+            background: var(--cor-secundaria);
+        }
+        @media (max-width: 900px) {
+            .dashboard-charts {
+                grid-template-columns: 1fr;
+            }
+            .profile-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        
     </style>
 </head>
-<body class="font-sans">
-    <!-- Header -->
-    <header class="glass-card shadow-sm border-b border-gray-600">
-        <div class="container mx-auto px-6 py-4">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-3">
-                    <i class="fas fa-brain text-2xl text-purple-400"></i>
-                    <h1 class="text-xl font-bold text-gray-100">ENEM AI</h1>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center space-x-2">
-                        <div class="w-8 h-8 rounded-full bg-purple-900 flex items-center justify-center">
-                            <i class="fas fa-user text-purple-300 text-sm"></i>
-                        </div>
-                        <span id="user-name" class="font-medium text-gray-200"></span>
-                    </div>
-                    <button id="focus-mode-btn" class="bg-purple-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-purple-700 transition" title="Modo Foco">
-                        <i class="fas fa-moon"></i>
-                    </button>
-                    <button id="community-btn" class="bg-pink-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-pink-700 transition" title="Comunidade">
-                        <i class="fas fa-users"></i> Comunidade
-                    </button>
-                    <button id="settings-btn" class="bg-gray-700 text-white px-3 py-2 rounded-lg text-sm hover:bg-gray-800 transition" title="Configurações">
-                        <i class="fas fa-cog"></i>
-                    </button>
-                    <button id="logout-btn" class="text-gray-400 hover:text-gray-200 transition">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </button>
-                </div>
+<body>
+    <!-- Sidebar moderna -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-site-logo">
+            <i class="fas fa-brain" style="display:grid; place-items: center;"></i>
+            <span class="sidebar-logo-text">EnemAI</span>
+        </div>
+        <div class="sidebar-header"></div>
+        <nav class="sidebar-content">
+            <a href="main-dashboard.html" class="sidebar-btn active">
+                <div class="circle-icon active"><i class="fas fa-tachometer-alt"></i></div>
+                <span class="sidebar-label">Dashboard</span>
+            </a>
+            <a href="ai-chat.html" class="sidebar-btn">
+                <div class="circle-icon"><i class="fas fa-robot"></i></div>
+                <span class="sidebar-label">Chat IA</span>
+            </a>
+            <a href="settings.html" class="sidebar-btn">
+                <div class="circle-icon"><i class="fas fa-cog"></i></div>
+                <span class="sidebar-label">Configurações</span>
+            </a>
+            <a href="community.html" class="sidebar-btn">
+                <div class="circle-icon"><i class="fas fa-users"></i></div>
+                <span class="sidebar-label">Comunidade</span>
+            </a>
+            <a href="dashboard.html" class="sidebar-btn" id="sidebar-new-note-btn">
+                <div class="circle-icon"><i class="fas fa-plus"></i></div>
+                <span class="sidebar-label">Nova Nota</span>
+            </a>
+        </nav>
+        <div class="sidebar-user">
+            <div class="sidebar-avatar" id="sidebar-avatar">US</div>
+            <span class="sidebar-username" id="sidebar-username">Usuário</span>
+        </div>
+    </aside>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h2 id="welcome-title">Bem-vindo de volta!</h2>
+            <p id="welcome-desc">Continue sua jornada de estudos com foco e determinação.</p>
+        </div>
+        <div class="stats-cards">
+            <div class="stat-card">
+                <span class="stat-title">Total de Anotações</span>
+                <span class="stat-value" id="total-notes">0</span>
+                <i class="fas fa-sticky-note stat-icon"></i>
+            </div>
+            <div class="stat-card">
+                <span class="stat-title">Tempo Hoje</span>
+                <span class="stat-value" id="study-time">0h 0m</span>
+                <i class="fas fa-clock stat-icon"></i>
+            </div>
+            <div class="stat-card">
+                <span class="stat-title">Favoritos</span>
+                <span class="stat-value" id="favorites">0</span>
+                <i class="fas fa-star stat-icon"></i>
+            </div>
+            <div class="stat-card">
+                <span class="stat-title">Streak</span>
+                <span class="stat-value" id="streak">0 dias</span>
+                <i class="fas fa-fire stat-icon"></i>
             </div>
         </div>
-    </header>
-
-    <!-- Modo Foco Overlay -->
-    <div id="focus-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="focus-mode rounded-2xl p-8 max-w-md w-full text-white text-center">
-                <h2 class="text-2xl font-bold mb-6">Modo Foco</h2>
-                <div class="pomodoro-timer text-4xl font-bold mb-6" id="timer">25:00</div>
-                <div class="flex justify-center space-x-4 mb-6">
-                    <button id="start-timer" class="bg-green-600 px-6 py-2 rounded-lg hover:bg-green-700 transition">
-                        <i class="fas fa-play mr-2"></i>Iniciar
-                    </button>
-                    <button id="pause-timer" class="bg-yellow-600 px-6 py-2 rounded-lg hover:bg-yellow-700 transition hidden">
-                        <i class="fas fa-pause mr-2"></i>Pausar
-                    </button>
-                    <button id="reset-timer" class="bg-red-600 px-6 py-2 rounded-lg hover:bg-red-700 transition">
-                        <i class="fas fa-redo mr-2"></i>Reset
-                    </button>
-                </div>
-                <button id="exit-focus" class="text-gray-300 hover:text-white transition">
-                    <i class="fas fa-times mr-2"></i>Sair do Modo Foco
-                </button>
+        <div class="level-xp-panel">
+            <span class="level" id="user-level">1</span>
+            <div class="xp-bar-container">
+                <div class="xp-bar" id="xp-bar" style="width: 0%"></div>
             </div>
+            <span class="xp-label">XP: <span id="user-xp">0</span></span>
+        </div>
+        <div class="dashboard-charts">
+            <div class="dashboard-card">
+                <h3>Atividade Semanal</h3>
+                <canvas id="activityChart" height="180"></canvas>
+            </div>
+            <div class="dashboard-card">
+                <h3>Distribuição por Matérias</h3>
+                <canvas id="subjectChart" height="180"></canvas>
+            </div>
+        </div>
+        <div class="achievements-list" id="achievements-list">
+            <!-- Conquistas recentes -->
+        </div>
+        <div class="profile-card">
+            <img id="profile-avatar" class="profile-avatar" src="https://ui-avatars.com/api/?name=ENEM+AI" alt="Avatar"/>
+            <div class="profile-info">
+                <h3 id="profile-name">Usuário</h3>
+                <p id="profile-email">email@email.com</p>
+                <div class="profile-tags" id="profile-turmas"></div>
+                <div class="profile-tags" id="profile-materias"></div>
+                <div id="profile-extra"></div>
+            </div>
+            <div>
+                <span id="profile-type" class="profile-tag">Estudante</span>
+                <span id="profile-privacy" class="profile-tag" title="Seu perfil está público na comunidade">Público</span>
+            </div>
+        </div>
+        <div class="quick-actions">
+            <button class="quick-action-btn" id="new-note-btn"><i class="fas fa-plus"></i>Nova Anotação</button>
+            <button class="quick-action-btn" id="ai-chat-btn"><i class="fas fa-comments"></i>Chat com IA</button>
+            <button class="quick-action-btn" id="editor-btn"><i class="fas fa-edit"></i>Editor</button>
+            <button class="quick-action-btn" id="export-btn"><i class="fas fa-download"></i>Exportar Dados</button>
+            <button class="quick-action-btn" id="reset-btn" style="background:#ef4444"><i class="fas fa-trash"></i>Resetar Gráficos</button>
         </div>
     </div>
-
-    <!-- Main Content -->
-    <main class="container mx-auto px-6 py-8">
-        <!-- Painel de Missões e Gamificação (TOPO) -->
-        <div class="glass-card rounded-2xl p-6 mb-8" id="missions-panel">
-            <h3 class="text-lg font-bold text-gray-100 mb-4 flex items-center gap-2"><i class="fas fa-bolt text-yellow-400"></i> Missões & Gamificação</h3>
-            <div class="flex flex-col md:flex-row gap-6">
-                <div class="flex-1">
-                    <div class="mb-2 flex items-center gap-2">
-                        <span class="font-bold text-purple-200">Nível:</span>
-                        <span id="user-level" class="text-lg font-extrabold text-yellow-300">1</span>
-                        <span class="ml-4 font-bold text-purple-200">XP:</span>
-                        <span id="user-xp" class="text-lg font-extrabold text-green-300">0</span>
-                    </div>
-                    <div class="w-full h-4 bg-gray-700 rounded-full overflow-hidden mb-4">
-                        <div id="xp-bar" class="h-4 bg-gradient-to-r from-yellow-400 to-green-400 transition-all duration-500" style="width: 0%"></div>
-                    </div>
-                    <div id="missions-list" class="flex flex-col gap-2"></div>
-                </div>
-                <div class="flex-1">
-                    <h4 class="font-bold text-gray-200 mb-2">Conquistas Dinâmicas</h4>
-                    <div id="dynamic-achievements-list" class="flex flex-wrap gap-2"></div>
-                </div>
-            </div>
-            <div id="mission-feedback" class="text-sm mt-2"></div>
-        </div>
-        <!-- Perfil do Usuário -->
-        <section id="profile-card-section" class="mb-8">
-          <div class="w-full max-w-3xl mx-auto glass-card rounded-3xl p-8 flex flex-col md:flex-row items-center md:items-start gap-8 shadow-2xl border-2 border-purple-800/40 animate__animated animate__fadeInDown relative overflow-hidden bg-gradient-to-br from-purple-900/80 to-indigo-900/80">
-            <div class="flex flex-col items-center gap-3 md:gap-6">
-              <div class="w-32 h-32 rounded-full bg-gradient-to-br from-purple-700 to-indigo-700 flex items-center justify-center shadow-xl border-4 border-purple-900 overflow-hidden animate__animated animate__pulse animate__infinite">
-                <img id="profile-avatar" src="https://ui-avatars.com/api/?name=ENEM+AI" alt="Avatar" class="w-full h-full object-cover"/>
-              </div>
-              <span id="profile-type" class="px-4 py-1 rounded-full text-sm font-bold bg-purple-800 text-purple-200 shadow-md tracking-wide uppercase">Estudante</span>
-              <span id="profile-privacy" class="ml-2 px-3 py-1 rounded-full text-xs font-semibold bg-pink-800 text-pink-200 shadow-md tracking-wide uppercase" title="Seu perfil está público na comunidade">Público</span>
-            </div>
-            <div class="flex-1 flex flex-col gap-2 md:gap-4">
-              <h2 id="profile-name" class="text-3xl font-extrabold text-gray-100 tracking-tight mb-1">Usuário</h2>
-              <p id="profile-email" class="text-purple-300 text-lg mb-2">email@email.com</p>
-              <div class="flex flex-wrap gap-2 items-center mb-2">
-                <span class="text-xs text-gray-400 font-semibold">Turmas:</span>
-                <div id="profile-turmas" class="flex flex-wrap gap-1"></div>
-              </div>
-              <div class="flex flex-wrap gap-2 items-center mb-2">
-                <span class="text-xs text-gray-400 font-semibold">Matérias:</span>
-                <div id="profile-materias" class="flex flex-wrap gap-1"></div>
-              </div>
-              <div id="profile-extra" class="flex flex-col gap-1"></div>
-              <div class="flex flex-wrap gap-2 mt-3" id="profile-badges">
-                <!-- Badges de conquistas -->
-              </div>
-            </div>
-            <div class="absolute top-4 right-4">
-              <button id="logout-btn-profile" class="bg-gray-800 hover:bg-gray-900 text-gray-200 px-4 py-2 rounded-lg font-semibold shadow transition flex items-center gap-2"><i class="fas fa-sign-out-alt"></i> Sair</button>
-            </div>
-          </div>
-        </section>
-        <!-- Fim do Card de Perfil -->
-
-        <!-- Welcome Section -->
-        <div class="mb-8">
-            <h2 class="text-3xl font-bold text-gray-100 mb-2">Bem-vindo de volta!</h2>
-            <p class="text-gray-300">Continue sua jornada de estudos com foco e determinação.</p>
-        </div>
-
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="stat-card glass-card rounded-xl p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-300 text-sm">Total de Anotações</p>
-                        <p class="text-3xl font-bold text-gray-100 counter" id="total-notes">0</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-full bg-purple-900 flex items-center justify-center">
-                        <i class="fas fa-sticky-note text-purple-300"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="stat-card glass-card rounded-xl p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-300 text-sm">Tempo Hoje</p>
-                        <p class="text-3xl font-bold text-gray-100 counter" id="study-time">0h 0m</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-full bg-blue-900 flex items-center justify-center">
-                        <i class="fas fa-clock text-blue-300"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="stat-card glass-card rounded-xl p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-300 text-sm">Favoritos</p>
-                        <p class="text-3xl font-bold text-gray-100 counter" id="favorites">0</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-full bg-yellow-900 flex items-center justify-center">
-                        <i class="fas fa-star text-yellow-300"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="stat-card glass-card rounded-xl p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-300 text-sm">Streak</p>
-                        <p class="text-3xl font-bold text-gray-100 counter" id="streak">0 dias</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-full bg-green-900 flex items-center justify-center">
-                        <i class="fas fa-fire text-green-300"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <!-- Activity Chart -->
-            <div class="glass-card rounded-xl p-6">
-                <h3 class="text-lg font-bold text-gray-100 mb-4">Atividade Semanal</h3>
-                <div style="height: 300px;">
-                    <canvas id="activityChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Subject Distribution -->
-            <div class="glass-card rounded-xl p-6">
-                <h3 class="text-lg font-bold text-gray-100 mb-4">Distribuição por Matérias</h3>
-                <div style="height: 300px;">
-                    <canvas id="subjectChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Progress and Goals -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            <!-- Daily Goal Progress -->
-            <div class="glass-card rounded-xl p-6">
-                <h3 class="text-lg font-bold text-gray-100 mb-4">Meta Diária</h3>
-                <div class="flex items-center justify-center mb-4 relative">
-                    <svg class="w-24 h-24 progress-ring">
-                        <circle cx="48" cy="48" r="40" stroke="#475569" stroke-width="8" fill="transparent"/>
-                        <circle cx="48" cy="48" r="40" stroke="#8b5cf6" stroke-width="8" fill="transparent" 
-                                stroke-dasharray="251.2" stroke-dashoffset="125.6" class="progress-ring-circle" id="progress-circle"/>
-                    </svg>
-                    <div class="absolute text-center">
-                        <p class="text-2xl font-bold text-gray-100" id="progress-percent">50%</p>
-                        <p class="text-sm text-gray-300">2h / 4h</p>
-                    </div>
-                </div>
-                <div class="text-center">
-                    <p class="text-sm text-gray-600">Meta: <span id="daily-goal">4 horas</span></p>
-                </div>
-            </div>
-
-            <!-- Recent Achievements -->
-            <div class="glass-card rounded-xl p-6">
-                <h3 class="text-lg font-bold text-gray-800 mb-4">Conquistas Recentes</h3>
-                <div id="achievements-list" class="space-y-3">
-                    <!-- Achievements will be populated here -->
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="glass-card rounded-xl p-6">
-                <h3 class="text-lg font-bold text-gray-800 mb-4">Ações Rápidas</h3>
-                <div class="space-y-3">
-                    <button id="new-note-btn" class="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition flex items-center justify-center">
-                        <i class="fas fa-plus mr-2"></i>Nova Anotação
-                    </button>
-                    <button id="ai-chat-btn" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition flex items-center justify-center">
-                        <i class="fas fa-comments mr-2"></i>Chat com IA
-                    </button>
-                    <button id="editor-btn" class="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition flex items-center justify-center">
-                        <i class="fas fa-edit mr-2"></i>Editor de Anotações
-                    </button>
-                    <button id="export-btn" class="w-full bg-orange-600 text-white py-3 px-4 rounded-lg hover:bg-orange-700 transition flex items-center justify-center">
-                        <i class="fas fa-download mr-2"></i>Exportar Dados
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recent Notes and Tags -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Recent Notes -->
-            <div class="glass-card rounded-xl p-6">
-                <h3 class="text-lg font-bold text-gray-800 mb-4">Anotações Recentes</h3>
-                <div id="recent-notes" class="space-y-3">
-                    <!-- Recent notes will be populated here -->
-                </div>
-            </div>
-
-            <!-- Popular Tags -->
-            <div class="glass-card rounded-xl p-6">
-                <h3 class="text-lg font-bold text-gray-800 mb-4">Tags Populares</h3>
-                <div id="popular-tags" class="flex flex-wrap gap-2">
-                    <!-- Tags will be populated here -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Estatísticas Avançadas -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <!-- Evolução Mensal -->
-          <div class="glass-card rounded-xl p-6">
-            <h3 class="text-lg font-bold text-gray-100 mb-4">Evolução Mensal de Anotações</h3>
-            <div style="height: 300px;">
-              <canvas id="monthlyChart"></canvas>
-            </div>
-          </div>
-          <!-- Ranking de Usuários -->
-          <div class="glass-card rounded-xl p-6">
-            <h3 class="text-lg font-bold text-gray-100 mb-4">Ranking dos Mais Ativos</h3>
-            <ol id="ranking-list" class="space-y-2"></ol>
-            <div id="user-ranking-feedback" class="text-sm text-gray-400 mt-2"></div>
-          </div>
-        </div>
-        <!-- Comparativo com a Comunidade -->
-        <div class="glass-card rounded-xl p-6 mb-8">
-          <h3 class="text-lg font-bold text-gray-100 mb-4">Comparativo com a Comunidade</h3>
-          <div id="community-comparison" class="text-gray-200 text-lg"></div>
-        </div>
-
-        <!-- Painel de Lembretes de Estudo -->
-        <div class="glass-card rounded-2xl p-6 mb-8" id="reminders-panel">
-          <h3 class="text-lg font-bold text-gray-100 mb-4 flex items-center gap-2"><i class="fas fa-bell text-pink-400"></i> Lembretes de Estudo</h3>
-          <form id="reminder-form" class="flex flex-col md:flex-row gap-4 mb-4">
-            <input id="reminder-title" type="text" placeholder="Título do lembrete" class="dark-input px-4 py-2 rounded-lg flex-1" required />
-            <input id="reminder-datetime" type="datetime-local" class="dark-input px-4 py-2 rounded-lg" required />
-            <button type="submit" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg font-bold shadow flex items-center gap-2"><i class="fas fa-plus"></i> Agendar</button>
-          </form>
-          <div id="reminders-list" class="flex flex-col gap-3"></div>
-          <div id="reminder-feedback" class="text-sm mt-2"></div>
-        </div>
-    </main>
-
-    <!-- Toast Notifications -->
-    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
-
-    <!-- Modal de Edição de Perfil -->
-    <div id="profile-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 hidden">
-      <div class="bg-gray-900 rounded-2xl p-8 w-full max-w-lg shadow-2xl relative animate__animated animate__fadeInUp">
-        <button id="close-profile-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-100 text-xl"><i class="fas fa-times"></i></button>
-        <h3 class="text-2xl font-bold text-purple-300 mb-4">Editar Perfil</h3>
-        <form id="profile-edit-form" class="flex flex-col gap-4">
-          <div class="flex flex-col md:flex-row gap-4 items-center">
-            <div class="flex flex-col items-center gap-2">
-              <img id="edit-avatar-preview" src="" alt="Preview Avatar" class="w-24 h-24 rounded-full object-cover border-4 border-purple-900 shadow-lg"/>
-              <input type="file" id="edit-avatar-file" accept="image/*" class="block text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-800 file:text-purple-200 hover:file:bg-purple-900" />
-              <button type="button" id="remove-avatar-btn" class="text-xs text-gray-400 hover:text-red-400 mt-1">Remover foto</button>
-            </div>
-            <div class="flex-1 flex flex-col gap-2">
-              <label class="block text-gray-300 mb-1" for="edit-name">Nome</label>
-              <input id="edit-name" name="name" type="text" class="dark-input w-full px-4 py-2 rounded-lg" required />
-              <label class="block text-gray-300 mb-1" for="edit-email">E-mail</label>
-              <input id="edit-email" name="email" type="email" class="dark-input w-full px-4 py-2 rounded-lg" required disabled />
-              <div>
-                <label class="block text-gray-300 mb-1">Tipo de Usuário</label>
-                <div class="flex gap-4">
-                  <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="radio" name="type" value="estudante" class="accent-purple-600" id="type-estudante" />
-                    <span>Estudante</span>
-                  </label>
-                  <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="radio" name="type" value="professor" class="accent-purple-600" id="type-professor" />
-                    <span>Professor</span>
-                  </label>
-                </div>
-              </div>
-              <div id="edit-turmas-group" class="hidden">
-                <label class="block text-gray-300 mb-1">Turmas</label>
-                <div id="edit-turmas" class="flex flex-wrap gap-2"></div>
-              </div>
-              <div id="edit-materias-group" class="hidden">
-                <label class="block text-gray-300 mb-1">Matérias</label>
-                <div id="edit-materias" class="flex flex-wrap gap-2"></div>
-              </div>
-              <div id="edit-materias-gosta-group" class="hidden">
-                <label class="block text-gray-300 mb-1">Matérias que gosta</label>
-                <div id="edit-materias-gosta" class="flex flex-wrap gap-2"></div>
-              </div>
-              <div id="edit-formacao-group" class="hidden">
-                <label class="block text-gray-300 mb-1">Em que gostaria de se formar?</label>
-                <input id="edit-formacao" name="formacao" type="text" class="dark-input w-full px-4 py-2 rounded-lg" />
-              </div>
-            </div>
-          </div>
-          <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold shadow transition flex items-center gap-2"><i class="fas fa-save"></i> Salvar</button>
-        </form>
-        <div id="profile-modal-feedback" class="mt-4"></div>
-      </div>
-    </div>
-
     <script>
-        // ===== DASHBOARD APPLICATION =====
+        // Sidebar dinâmica: avatar e nome
         (function() {
-            'use strict';
-            
-            // Global variables
-            let currentUser = null;
-            let charts = {
-                activity: null,
-                subject: null
-            };
-            let timer = {
-                interval: null,
-                timeLeft: 25 * 60,
-                isRunning: false
-            };
-            
-            // ===== AUTHENTICATION =====
-            function initAuth() {
+            const sidebarAvatar = document.getElementById('sidebar-avatar');
+            const sidebarUsername = document.getElementById('sidebar-username');
+            function updateSidebarUser() {
                 const user = JSON.parse(localStorage.getItem('enemai_user'));
-                if (!user) {
-                    window.location.href = 'login.html';
-                    return;
+                if (!user) return;
+                sidebarUsername.textContent = user.name || 'Usuário';
+                if (user.avatar) {
+                    sidebarAvatar.innerHTML = `<img src="${user.avatar}" alt="Avatar" style="width:100%;height:100%;border-radius:50%">`;
+                } else {
+                    const initials = (user.name||'Usuário').split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+                    sidebarAvatar.textContent = initials;
                 }
-                currentUser = user;
-                document.getElementById('user-name').textContent = user.name || user.email;
             }
-            
-            function logout() {
-                localStorage.removeItem('enemai_user');
-                window.location.href = 'login.html';
+            updateSidebarUser();
+        })();
+        // Dashboard dinâmico
+        (function() {
+            // Dados e elementos
+            const user = JSON.parse(localStorage.getItem('enemai_user')) || {name:'Usuário',email:'email@email.com',type:'estudante'};
+            document.getElementById('welcome-title').textContent = `Bem-vindo de volta, ${user.name || 'Usuário'}!`;
+            document.getElementById('profile-name').textContent = user.name || 'Usuário';
+            document.getElementById('profile-email').textContent = user.email || '';
+            document.getElementById('profile-type').textContent = user.type === 'professor' ? 'Professor' : 'Estudante';
+            document.getElementById('profile-type').className = 'profile-tag ' + (user.type === 'professor' ? 'bg-blue-800' : 'bg-purple-800');
+            if (user.avatar) {
+                document.getElementById('profile-avatar').src = user.avatar;
+            } else {
+                document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name||'ENEM AI')}`;
             }
-            
-            // ===== DATA MANAGEMENT =====
-            function getNotes() {
-                return JSON.parse(localStorage.getItem('enemai_notes_' + currentUser.email)) || [];
+            // Turmas
+            const turmas = user.turmas || [];
+            const turmasDiv = document.getElementById('profile-turmas');
+            turmasDiv.innerHTML = '';
+            turmas.forEach(turma => {
+                const span = document.createElement('span');
+                span.className = 'profile-tag';
+                span.textContent = turma;
+                turmasDiv.appendChild(span);
+            });
+            // Matérias
+            const materias = user.type === 'professor' ? (user.materias||[]) : (user.materiasGosta||[]);
+            const materiasDiv = document.getElementById('profile-materias');
+            materiasDiv.innerHTML = '';
+            materias.forEach(materia => {
+                const span = document.createElement('span');
+                span.className = 'profile-tag';
+                span.textContent = materia;
+                materiasDiv.appendChild(span);
+            });
+            // Extras
+            const extraDiv = document.getElementById('profile-extra');
+            extraDiv.innerHTML = '';
+            if (user.type === 'estudante' && user.formacao) {
+                const span = document.createElement('span');
+                span.className = 'profile-tag';
+                span.textContent = `Quer se formar em: ${user.formacao}`;
+                extraDiv.appendChild(span);
             }
-            
-            function getStats() {
-                return JSON.parse(localStorage.getItem('enemai_stats_' + currentUser.email)) || {
-                    totalNotes: 0,
-                    studyTime: 0,
-                    favorites: 0,
-                    streak: 0,
-                    dailyGoal: 4,
-                    achievements: [],
-                    activity: [],
-                    subjects: {}
-                };
-            }
-            
-            function saveStats(stats) {
-                localStorage.setItem('enemai_stats_' + currentUser.email, JSON.stringify(stats));
-            }
-            
-            // ===== STATISTICS CALCULATION =====
-            function calculateStats() {
-                const notes = getNotes();
-                const stats = getStats();
-                
-                // Basic stats
-                stats.totalNotes = notes.length;
-                stats.favorites = notes.filter(note => note.favorite).length;
-                
-                // Study time calculation
-                const today = new Date().toDateString();
-                const todayNotes = notes.filter(note => 
-                    new Date(note.updatedAt).toDateString() === today
-                );
-                stats.studyTime = Math.min(todayNotes.length * 30, 480);
-                
-                // Activity data
-                const weekData = [];
-                for (let i = 6; i >= 0; i--) {
-                    const date = new Date();
-                    date.setDate(date.getDate() - i);
-                    const dayNotes = notes.filter(note => 
-                        new Date(note.updatedAt).toDateString() === date.toDateString()
-                    );
-                    weekData.push({
-                        date: date.toLocaleDateString('pt-BR', { weekday: 'short' }),
-                        count: dayNotes.length
-                    });
-                }
-                stats.activity = weekData;
-                
-                // Subject distribution
-                const subjects = {};
-                notes.forEach(note => {
-                    if (note.tags) {
-                        note.tags.forEach(tag => {
-                            subjects[tag.name] = (subjects[tag.name] || 0) + 1;
-                        });
+            // Privacidade
+            const privacy = user.public === false ? 'Privado' : 'Público';
+            document.getElementById('profile-privacy').textContent = privacy;
+            document.getElementById('profile-privacy').className = 'profile-tag ' + (privacy==='Privado'?'bg-gray-700':'bg-pink-800');
+            // Estatísticas
+            const stats = JSON.parse(localStorage.getItem('enemai_stats_' + user.email)) || {totalNotes:0,studyTime:0,favorites:0,streak:0,xp:0,level:1,activity:[],subjects:{},achievements:[]};
+            document.getElementById('total-notes').textContent = stats.totalNotes || 0;
+            const hours = Math.floor((stats.studyTime||0)/60);
+            const minutes = (stats.studyTime||0)%60;
+            document.getElementById('study-time').textContent = `${hours}h ${minutes}m`;
+            document.getElementById('favorites').textContent = stats.favorites || 0;
+            document.getElementById('streak').textContent = `${stats.streak||0} dias`;
+            document.getElementById('user-level').textContent = stats.level || 1;
+            document.getElementById('user-xp').textContent = stats.xp || 0;
+            // XP bar
+            const LEVEL_XP = lvl => 100 + (lvl-1)*50;
+            const percent = Math.round(((stats.xp||0)/LEVEL_XP(stats.level||1))*100);
+            document.getElementById('xp-bar').style.width = percent+'%';
+            // Gráficos
+            setTimeout(()=>{
+                // Depuração: logs
+                console.log('Canvas Atividade:', document.querySelectorAll('#activityChart').length);
+                console.log('Canvas Matérias:', document.querySelectorAll('#subjectChart').length);
+                console.log('Instância activityChartInstance:', window.activityChartInstance);
+                console.log('Instância subjectChartInstance:', window.subjectChartInstance);
+                // Atividade semanal (limitar a 7 dias)
+                const activityCanvas = document.getElementById('activityChart');
+                if (activityCanvas) {
+                    const ctx1 = activityCanvas.getContext('2d');
+                    if (window.activityChartInstance) {
+                        window.activityChartInstance.destroy();
                     }
-                });
-                stats.subjects = subjects;
-                
-                saveStats(stats);
-                return stats;
-            }
-            
-            // ===== CHARTS MANAGEMENT =====
-            function createCharts() {
-                const stats = getStats();
-                
-                // Activity Chart
-                const activityCtx = document.getElementById('activityChart');
-                if (activityCtx && stats.activity.length > 0) {
-                    if (charts.activity) {
-                        charts.activity.destroy();
-                    }
-                    
-                    charts.activity = new Chart(activityCtx, {
+                    const activityData = (stats.activity||[]).slice(-7);
+                    window.activityChartInstance = new Chart(ctx1, {
                         type: 'line',
                         data: {
-                            labels: stats.activity.map(d => d.date),
+                            labels: activityData.map(d=>d.date||''),
                             datasets: [{
                                 label: 'Anotações',
-                                data: stats.activity.map(d => d.count),
+                                data: activityData.map(d=>d.count||0),
                                 borderColor: '#8b5cf6',
                                 backgroundColor: 'rgba(139, 92, 246, 0.1)',
                                 tension: 0.4,
                                 fill: true
                             }]
                         },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { display: false }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: { stepSize: 1 }
-                                }
-                            }
-                        }
+                        options: {responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
                     });
                 }
-                
-                // Subject Chart
-                const subjectCtx = document.getElementById('subjectChart');
-                if (subjectCtx && Object.keys(stats.subjects).length > 0) {
-                    if (charts.subject) {
-                        charts.subject.destroy();
+                // Distribuição por matérias (limitar a 6 mais frequentes)
+                const subjectCanvas = document.getElementById('subjectChart');
+                if (subjectCanvas) {
+                    const ctx2 = subjectCanvas.getContext('2d');
+                    if (window.subjectChartInstance) {
+                        window.subjectChartInstance.destroy();
                     }
-                    
-                    const colors = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5a2b'];
-                    
-                    charts.subject = new Chart(subjectCtx, {
+                    const subjectsEntries = Object.entries(stats.subjects||{}).sort((a,b)=>b[1]-a[1]).slice(0,6);
+                    window.subjectChartInstance = new Chart(ctx2, {
                         type: 'doughnut',
                         data: {
-                            labels: Object.keys(stats.subjects),
+                            labels: subjectsEntries.map(([k])=>k),
                             datasets: [{
-                                data: Object.values(stats.subjects),
-                                backgroundColor: colors.slice(0, Object.keys(stats.subjects).length),
+                                data: subjectsEntries.map(([,v])=>v),
+                                backgroundColor: ['#8b5cf6','#3b82f6','#10b981','#f59e0b','#ef4444','#8b5a2b'],
                                 borderWidth: 0
                             }]
                         },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { position: 'bottom' }
-                            }
-                        }
+                        options: {responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}
                     });
                 }
-            }
-            
-            function destroyCharts() {
-                if (charts.activity) {
-                    charts.activity.destroy();
-                    charts.activity = null;
-                }
-                if (charts.subject) {
-                    charts.subject.destroy();
-                    charts.subject = null;
-                }
-            }
-            
-            // ===== ACHIEVEMENTS SYSTEM =====
-            const achievements = [
-                { id: 'first_note', title: 'Primeira Anotação', icon: 'fas fa-star', description: 'Criou sua primeira anotação' },
-                { id: 'week_streak', title: 'Semana Produtiva', icon: 'fas fa-fire', description: '7 dias seguidos estudando' },
-                { id: 'hundred_notes', title: 'Centenário', icon: 'fas fa-trophy', description: '100 anotações criadas' },
-                { id: 'all_subjects', title: 'Polímata', icon: 'fas fa-brain', description: 'Anotou sobre todas as matérias' },
-                { id: 'favorite_notes', title: 'Organizado', icon: 'fas fa-bookmark', description: '10 anotações favoritadas' }
-            ];
-            
-            function checkAchievements() {
-                const stats = getStats();
-                const notes = getNotes();
-                const newAchievements = [];
-                
-                if (notes.length >= 1 && !stats.achievements.includes('first_note')) {
-                    newAchievements.push('first_note');
-                }
-                if (stats.streak >= 7 && !stats.achievements.includes('week_streak')) {
-                    newAchievements.push('week_streak');
-                }
-                if (notes.length >= 100 && !stats.achievements.includes('hundred_notes')) {
-                    newAchievements.push('hundred_notes');
-                }
-                if (Object.keys(stats.subjects).length >= 5 && !stats.achievements.includes('all_subjects')) {
-                    newAchievements.push('all_subjects');
-                }
-                if (stats.favorites >= 10 && !stats.achievements.includes('favorite_notes')) {
-                    newAchievements.push('favorite_notes');
-                }
-                
-                newAchievements.forEach(achievementId => {
-                    stats.achievements.push(achievementId);
-                    showToast(`🏆 Nova conquista: ${achievements.find(a => a.id === achievementId).title}!`, 'success');
-                });
-                
-                saveStats(stats);
-                renderAchievements();
-            }
-            
-            function renderAchievements() {
-                const stats = getStats();
-                const container = document.getElementById('achievements-list');
-                container.innerHTML = '';
-                
-                const recentAchievements = stats.achievements.slice(-3).reverse();
-                recentAchievements.forEach(achievementId => {
-                    const achievement = achievements.find(a => a.id === achievementId);
-                    if (achievement) {
-                        const div = document.createElement('div');
-                        div.className = 'flex items-center space-x-3 p-3 bg-gray-800 rounded-lg';
-                        div.innerHTML = `
-                            <div class="w-8 h-8 rounded-full bg-purple-900 flex items-center justify-center">
-                                <i class="${achievement.icon} text-purple-200"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-gray-200">${achievement.title}</p>
-                                <p class="text-sm text-gray-400">${achievement.description}</p>
-                            </div>
-                        `;
-                        container.appendChild(div);
+                // Botão de reset
+                document.getElementById('reset-btn').onclick = ()=>{
+                    if(confirm('Tem certeza que deseja limpar os dados dos gráficos?')){
+                        Object.keys(localStorage).forEach(k=>{if(k.startsWith('enemai_stats_')||k.startsWith('enemai_notes_'))localStorage.removeItem(k);});
+                        location.reload();
                     }
-                });
-                
-                if (recentAchievements.length === 0) {
-                    container.innerHTML = '<p class="text-gray-500 text-center py-4">Nenhuma conquista ainda. Continue estudando!</p>';
-                }
-            }
-            
-            // ===== POMODORO TIMER =====
-            function updateTimer() {
-                const minutes = Math.floor(timer.timeLeft / 60);
-                const seconds = timer.timeLeft % 60;
-                document.getElementById('timer').textContent = 
-                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            }
-            
-            function startTimer() {
-                if (!timer.isRunning) {
-                    timer.isRunning = true;
-                    timer.interval = setInterval(() => {
-                        timer.timeLeft--;
-                        updateTimer();
-                        if (timer.timeLeft <= 0) {
-                            clearInterval(timer.interval);
-                            timer.isRunning = false;
-                            showToast('🎉 Sessão de foco concluída!', 'success');
-                            timer.timeLeft = 25 * 60;
-                            updateTimer();
-                        }
-                    }, 1000);
-                    
-                    document.getElementById('start-timer').classList.add('hidden');
-                    document.getElementById('pause-timer').classList.remove('hidden');
-                }
-            }
-            
-            function pauseTimer() {
-                if (timer.isRunning) {
-                    clearInterval(timer.interval);
-                    timer.isRunning = false;
-                    document.getElementById('start-timer').classList.remove('hidden');
-                    document.getElementById('pause-timer').classList.add('hidden');
-                }
-            }
-            
-            function resetTimer() {
-                clearInterval(timer.interval);
-                timer.isRunning = false;
-                timer.timeLeft = 25 * 60;
-                updateTimer();
-                document.getElementById('start-timer').classList.remove('hidden');
-                document.getElementById('pause-timer').classList.add('hidden');
-            }
-            
-            // ===== UI UPDATES =====
-            function updateStats() {
-                const stats = calculateStats();
-                
-                document.getElementById('total-notes').textContent = stats.totalNotes;
-                document.getElementById('favorites').textContent = stats.favorites;
-                
-                const hours = Math.floor(stats.studyTime / 60);
-                const minutes = stats.studyTime % 60;
-                document.getElementById('study-time').textContent = `${hours}h ${minutes}m`;
-                
-                document.getElementById('streak').textContent = `${stats.streak} dias`;
-                
-                // Progress circle
-                const progress = (stats.studyTime / (stats.dailyGoal * 60)) * 100;
-                const circle = document.getElementById('progress-circle');
-                const circumference = 2 * Math.PI * 40;
-                const offset = circumference - (progress / 100) * circumference;
-                circle.style.strokeDashoffset = offset;
-                document.getElementById('progress-percent').textContent = `${Math.round(progress)}%`;
-                document.getElementById('daily-goal').textContent = `${stats.dailyGoal} horas`;
-            }
-            
-            function renderRecentNotes() {
-                const notes = getNotes();
-                const container = document.getElementById('recent-notes');
-                container.innerHTML = '';
-                
-                const recentNotes = notes.slice(-5).reverse();
-                recentNotes.forEach(note => {
-                    const div = document.createElement('div');
-                    div.className = 'p-3 border border-gray-600 rounded-lg hover:bg-gray-700 cursor-pointer transition';
-                    div.onclick = () => window.location.href = 'dashboard.html';
-                    
-                    const title = note.content.replace(/<[^>]*>/g, '').substring(0, 30) + '...';
-                    const date = new Date(note.updatedAt).toLocaleDateString();
-                    
-                    div.innerHTML = `
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="font-medium text-gray-100">${title}</p>
-                                <p class="text-sm text-gray-300">${date}</p>
-                            </div>
-                            ${note.favorite ? '<i class="fas fa-star text-yellow-400"></i>' : ''}
-                        </div>
-                    `;
-                    container.appendChild(div);
-                });
-                
-                if (recentNotes.length === 0) {
-                    container.innerHTML = '<p class="text-gray-400 text-center py-4">Nenhuma anotação ainda. Comece criando uma!</p>';
-                }
-            }
-            
-            function renderPopularTags() {
-                const stats = getStats();
-                const container = document.getElementById('popular-tags');
-                container.innerHTML = '';
-                
-                const sortedTags = Object.entries(stats.subjects)
-                    .sort(([,a], [,b]) => b - a)
-                    .slice(0, 8);
-                
-                sortedTags.forEach(([tag, count]) => {
-                    const span = document.createElement('span');
-                    span.className = 'px-3 py-1 bg-purple-900 text-purple-200 rounded-full text-sm';
-                    span.textContent = `${tag} (${count})`;
-                    container.appendChild(span);
-                });
-                
-                if (sortedTags.length === 0) {
-                    container.innerHTML = '<p class="text-gray-400 text-center py-4">Nenhuma tag ainda.</p>';
-                }
-            }
-            
-            // ===== TOAST NOTIFICATIONS =====
-            function showToast(message, type = 'success') {
-                const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
-                
-                const colors = {
-                    success: 'bg-green-500',
-                    error: 'bg-red-500',
-                    warning: 'bg-yellow-500',
-                    info: 'bg-blue-500'
                 };
-                
-                toast.className = `${colors[type]} text-white px-4 py-2 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300`;
-                toast.textContent = message;
-                
-                container.appendChild(toast);
-                
-                setTimeout(() => toast.classList.remove('translate-x-full'), 100);
-                setTimeout(() => {
-                    toast.classList.add('translate-x-full');
-                    setTimeout(() => container.removeChild(toast), 300);
-                }, 3000);
-            }
-            
-            // ===== EVENT LISTENERS =====
-            function setupEventListeners() {
-                // Focus mode
-                document.getElementById('focus-mode-btn').onclick = () => {
-                    document.getElementById('focus-overlay').classList.remove('hidden');
-                };
-                
-                document.getElementById('exit-focus').onclick = () => {
-                    document.getElementById('focus-overlay').classList.add('hidden');
-                    pauseTimer();
-                };
-                
-                // Timer controls
-                document.getElementById('start-timer').onclick = startTimer;
-                document.getElementById('pause-timer').onclick = pauseTimer;
-                document.getElementById('reset-timer').onclick = resetTimer;
-                
-                // Navigation
-                document.getElementById('new-note-btn').onclick = () => {
-                    destroyCharts();
-                    window.location.href = 'dashboard.html';
-                };
-                
-                document.getElementById('ai-chat-btn').onclick = () => {
-                    destroyCharts();
-                    window.location.href = 'ai-chat.html';
-                };
-                
-                document.getElementById('editor-btn').onclick = () => {
-                    destroyCharts();
-                    window.location.href = 'dashboard.html';
-                };
-                
-                // Logout
-                document.getElementById('logout-btn').onclick = logout;
-                
-                // Cleanup on page unload
-                window.addEventListener('beforeunload', destroyCharts);
-                window.addEventListener('pagehide', destroyCharts);
-            }
-            
-            // ===== INITIALIZATION =====
-            function init() {
-                initAuth();
-                updateStats();
-                checkAchievements();
-                renderRecentNotes();
-                renderPopularTags();
-                updateTimer();
-                setupEventListeners();
-                
-                // Initialize charts after DOM is ready
-                setTimeout(createCharts, 100);
-            }
-            
-            // Start the application
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', init);
-            } else {
-                init();
-            }
-            
-        })();
-
-        // ===== PERFIL DO USUÁRIO (DASHBOARD) =====
-        (function() {
-          // Listas pré-definidas
-          const TURMAS = [
-            '1º Ano', '2º Ano', '3º Ano', 'Pré-vestibular', 'EJA', 'Outros'
-          ];
-          const MATERIAS = [
-            'Matemática', 'Português', 'Física', 'Química', 'Biologia', 'História', 'Geografia', 'Inglês', 'Espanhol', 'Redação', 'Filosofia', 'Sociologia', 'Artes', 'Educação Física', 'Outros'
-          ];
-          // Elementos
-          const profileName = document.getElementById('profile-name');
-          const profileEmail = document.getElementById('profile-email');
-          const profileType = document.getElementById('profile-type');
-          const profileAvatar = document.getElementById('profile-avatar');
-          const profileTurmas = document.getElementById('profile-turmas');
-          const profileMaterias = document.getElementById('profile-materias');
-          const profileBadges = document.getElementById('profile-badges');
-          const profileExtra = document.getElementById('profile-extra');
-          const logoutBtnProfile = document.getElementById('logout-btn-profile');
-          const privacy = document.getElementById('profile-privacy');
-
-          function getUser() {
-            let user = JSON.parse(localStorage.getItem('enemai_user'));
-            if (!user) return null;
-            // Compatibilidade com versões antigas
-            if (!user.type) user.type = user.professor ? 'professor' : 'estudante';
-            if (!user.materiasGosta && user.materias_gosta) user.materiasGosta = user.materias_gosta;
-            if (!user.formacao && user.deseja_formar) user.formacao = user.deseja_formar;
-            if (!user.materias && user.type === 'professor' && user.materias_gosta) user.materias = user.materias_gosta;
-            return user;
-          }
-          function renderProfile() {
-            const user = getUser();
-            if (!user) return;
-            profileName.textContent = user.name || 'Usuário';
-            profileEmail.textContent = user.email || '';
-            profileType.textContent = user.type === 'professor' ? 'Professor' : 'Estudante';
-            profileType.className = user.type === 'professor'
-              ? 'px-4 py-1 rounded-full text-sm font-bold bg-blue-800 text-blue-200 shadow-md tracking-wide uppercase'
-              : 'px-4 py-1 rounded-full text-sm font-bold bg-purple-800 text-purple-200 shadow-md tracking-wide uppercase';
-            // Avatar
-            if (user.avatar) {
-              profileAvatar.src = user.avatar;
-            } else {
-              profileAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name||'ENEM AI')}`;
-            }
-            // Turmas
-            profileTurmas.innerHTML = '';
-            (user.turmas||[]).forEach(turma => {
-              const span = document.createElement('span');
-              span.className = 'px-3 py-1 bg-purple-900 text-purple-200 rounded-full text-xs animate__animated animate__fadeIn';
-              span.textContent = turma;
-              profileTurmas.appendChild(span);
-            });
-            // Matérias
-            profileMaterias.innerHTML = '';
-            let materias = user.type === 'professor' ? user.materias : (user.materiasGosta || []);
-            (materias||[]).forEach(materia => {
-              const span = document.createElement('span');
-              span.className = 'px-3 py-1 bg-blue-900 text-blue-200 rounded-full text-xs animate__animated animate__fadeIn';
-              span.textContent = materia;
-              profileMaterias.appendChild(span);
-            });
-            // Informações extras
-            profileExtra.innerHTML = '';
-            if (user.type === 'estudante') {
-              if (user.materiasGosta && user.materiasGosta.length > 0) {
-                const div = document.createElement('div');
-                div.innerHTML = `<span class='text-xs text-gray-400 font-semibold'>Matérias que gosta:</span> ` + user.materiasGosta.map(m => `<span class='px-2 py-1 bg-green-900 text-green-200 rounded-full text-xs ml-1'>${m}</span>`).join(' ');
-                profileExtra.appendChild(div);
-              }
-              if (user.formacao) {
-                const div = document.createElement('div');
-                div.innerHTML = `<span class='text-xs text-gray-400 font-semibold'>Quer se formar em:</span> <span class='px-2 py-1 bg-indigo-900 text-indigo-200 rounded-full text-xs ml-1'>${user.formacao}</span>`;
-                profileExtra.appendChild(div);
-              }
-            }
-            // Badges (conquistas)
-            profileBadges.innerHTML = '';
-            const stats = JSON.parse(localStorage.getItem('enemai_stats_' + user.email)) || {};
-            const badgeList = (stats.achievements||[]).slice(-3).reverse();
+            }, 200);
+            // Conquistas recentes
+            const achievementsDiv = document.getElementById('achievements-list');
+            achievementsDiv.innerHTML = '';
             const badgeIcons = {
-              'first_note': ['fas fa-star', 'Primeira Anotação'],
-              'week_streak': ['fas fa-fire', 'Semana Produtiva'],
-              'hundred_notes': ['fas fa-trophy', 'Centenário'],
-              'all_subjects': ['fas fa-brain', 'Polímata'],
-              'favorite_notes': ['fas fa-bookmark', 'Organizado']
+                'first_note': ['fas fa-star', 'Primeira Anotação'],
+                'week_streak': ['fas fa-fire', 'Semana Produtiva'],
+                'hundred_notes': ['fas fa-trophy', 'Centenário'],
+                'all_subjects': ['fas fa-brain', 'Polímata'],
+                'favorite_notes': ['fas fa-bookmark', 'Organizado']
             };
-            badgeList.forEach(badge => {
-              const [icon, label] = badgeIcons[badge] || ['fas fa-award', 'Conquista'];
-              const div = document.createElement('div');
-              div.className = 'achievement-badge flex items-center gap-1 px-2 py-1 bg-gray-800 text-purple-200 rounded-full text-xs shadow animate__animated animate__pulse';
-              div.innerHTML = `<i class="${icon}"></i> ${label}`;
-              profileBadges.appendChild(div);
+            (stats.achievements||[]).slice(-3).reverse().forEach(badge => {
+                const [icon, label] = badgeIcons[badge] || ['fas fa-award', 'Conquista'];
+                const div = document.createElement('div');
+                div.className = 'achievement-badge';
+                div.innerHTML = `<i class="${icon}"></i> ${label}`;
+                achievementsDiv.appendChild(div);
             });
-            // Privacy
-            if (privacy) {
-                if (user.public === false) {
-                    privacy.textContent = 'Privado';
-                    privacy.className = 'ml-2 px-3 py-1 rounded-full text-xs font-semibold bg-gray-700 text-gray-300 shadow-md tracking-wide uppercase';
-                    privacy.title = 'Seu perfil está oculto na comunidade';
-                } else {
-                    privacy.textContent = 'Público';
-                    privacy.className = 'ml-2 px-3 py-1 rounded-full text-xs font-semibold bg-pink-800 text-pink-200 shadow-md tracking-wide uppercase';
-                    privacy.title = 'Seu perfil está público na comunidade';
-                }
+            if ((stats.achievements||[]).length === 0) {
+                achievementsDiv.innerHTML = '<span class="achievement-badge">Nenhuma conquista ainda</span>';
             }
-          }
-          // Logout
-          logoutBtnProfile.onclick = function() {
-            localStorage.removeItem('enemai_user');
-            window.location.href = 'login.html';
-          };
-          renderProfile();
+            // Ações rápidas
+            document.getElementById('new-note-btn').onclick = ()=>alert('Nova anotação!');
+            document.getElementById('ai-chat-btn').onclick = ()=>window.location.href='ai-chat.html';
+            document.getElementById('editor-btn').onclick = ()=>alert('Editor de anotações!');
+            document.getElementById('export-btn').onclick = ()=>alert('Exportar dados!');
         })();
-
-        document.getElementById('community-btn').onclick = function() {
-            window.location.href = 'community.html';
-        };
-
-        document.getElementById('settings-btn').onclick = function() {
-            window.location.href = 'settings.html';
-        };
-
-        // ===== ESTATÍSTICAS AVANÇADAS =====
-        function getAllUsers() {
-          return JSON.parse(localStorage.getItem('enemai_users') || '[]');
-        }
-        function getAllStats() {
-          const users = getAllUsers();
-          return users.map(u => {
-            const stats = JSON.parse(localStorage.getItem('enemai_stats_' + u.email) || '{}');
-            return { email: u.email, name: u.name, stats };
-          });
-        }
-        // Gráfico de evolução mensal
-        function renderMonthlyChart() {
-          const notes = getNotes();
-          const months = [];
-          const counts = [];
-          const now = new Date();
-          for (let i = 11; i >= 0; i--) {
-            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-            const label = d.toLocaleString('pt-BR', { month: 'short', year: '2-digit' });
-            months.push(label);
-            const count = notes.filter(n => {
-              const nd = new Date(n.updatedAt);
-              return nd.getMonth() === d.getMonth() && nd.getFullYear() === d.getFullYear();
-            }).length;
-            counts.push(count);
-          }
-          const ctx = document.getElementById('monthlyChart');
-          if (window.monthlyChartInstance) window.monthlyChartInstance.destroy();
-          window.monthlyChartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-              labels: months,
-              datasets: [{
-                label: 'Anotações',
-                data: counts,
-                backgroundColor: '#8b5cf6',
-                borderRadius: 8
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: { legend: { display: false } },
-              scales: {
-                y: { beginAtZero: true, ticks: { stepSize: 1, color: '#e2e8f0' }, grid: { color: '#334155' } },
-                x: { ticks: { color: '#e2e8f0' }, grid: { color: '#334155' } }
-              }
-            }
-          });
-        }
-        // Ranking dos usuários mais ativos
-        function renderRanking() {
-          const allStats = getAllStats().filter(u => u.stats && u.stats.totalNotes !== undefined);
-          allStats.sort((a, b) => (b.stats.totalNotes || 0) - (a.stats.totalNotes || 0));
-          const list = document.getElementById('ranking-list');
-          list.innerHTML = '';
-          allStats.slice(0, 5).forEach((u, idx) => {
-            const li = document.createElement('li');
-            li.className = 'flex items-center gap-3 p-2 rounded-lg' + (u.email === currentUser.email ? ' bg-purple-900/60' : '');
-            li.innerHTML = `<span class='font-bold text-xl text-purple-300'>${idx+1}º</span>
-              <span class='font-semibold text-gray-100'>${u.name || u.email}</span>
-              <span class='ml-auto text-sm text-gray-400'>${u.stats.totalNotes || 0} anotações</span>`;
-            list.appendChild(li);
-          });
-          // Feedback do usuário
-          const pos = allStats.findIndex(u => u.email === currentUser.email);
-          const feedback = document.getElementById('user-ranking-feedback');
-          if (pos >= 0) {
-            feedback.textContent = `Você está em ${pos+1}º lugar no ranking de anotações!`;
-          } else {
-            feedback.textContent = '';
-          }
-        }
-        // Comparativo com a média da comunidade
-        function renderCommunityComparison() {
-          const allStats = getAllStats().filter(u => u.stats && u.stats.totalNotes !== undefined);
-          if (!allStats.length) return;
-          const media = Math.round(allStats.reduce((sum, u) => sum + (u.stats.totalNotes || 0), 0) / allStats.length);
-          const userStats = getStats();
-          const diff = userStats.totalNotes - media;
-          const el = document.getElementById('community-comparison');
-          if (diff > 0) {
-            el.innerHTML = `<span class='text-green-400 font-bold'>Parabéns!</span> Você está <span class='font-bold'>${diff} anotações acima</span> da média da comunidade (${media}).`;
-          } else if (diff < 0) {
-            el.innerHTML = `<span class='text-yellow-400 font-bold'>Atenção!</span> Você está <span class='font-bold'>${-diff} anotações abaixo</span> da média da comunidade (${media}).`;
-          } else {
-            el.innerHTML = `<span class='text-blue-400 font-bold'>Você está na média</span> da comunidade (${media} anotações).`;
-          }
-        }
-        // Atualizar tudo junto
-        function renderAdvancedStats() {
-          renderMonthlyChart();
-          renderRanking();
-          renderCommunityComparison();
-        }
-        // Chamar ao iniciar e ao atualizar stats
-        setTimeout(renderAdvancedStats, 500);
-
-        // Avatar upload no modal de edição
-        const editAvatarPreview = document.getElementById('edit-avatar-preview');
-        const editAvatarFile = document.getElementById('edit-avatar-file');
-        const removeAvatarBtn = document.getElementById('remove-avatar-btn');
-        const profileEditForm = document.getElementById('profile-edit-form');
-        let currentAvatar = null;
-        // Ao abrir modal, mostrar avatar atual
-        function showEditProfileModal() {
-          const user = JSON.parse(localStorage.getItem('enemai_user'));
-          editAvatarPreview.src = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name||'ENEM AI')}`;
-          currentAvatar = user.avatar || '';
-          // ... preencher outros campos ...
-        }
-        // Preview ao selecionar arquivo
-        editAvatarFile.onchange = function(e) {
-          const file = e.target.files[0];
-          if (!file) return;
-          const reader = new FileReader();
-          reader.onload = function(ev) {
-            editAvatarPreview.src = ev.target.result;
-            currentAvatar = ev.target.result;
-          };
-          reader.readAsDataURL(file);
-        };
-        // Remover foto
-        removeAvatarBtn.onclick = function() {
-          editAvatarPreview.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(document.getElementById('edit-name').value||'ENEM AI')}`;
-          currentAvatar = '';
-        };
-        // Salvar avatar ao salvar perfil
-        profileEditForm.onsubmit = function(e) {
-          e.preventDefault();
-          let user = JSON.parse(localStorage.getItem('enemai_user'));
-          user.avatar = currentAvatar;
-          // ... salvar outros campos ...
-          localStorage.setItem('enemai_user', JSON.stringify(user));
-          // Atualizar na lista de usuários
-          let users = JSON.parse(localStorage.getItem('enemai_users') || '[]');
-          users = users.map(u => u.email === user.email ? {...u, avatar: currentAvatar} : u);
-          localStorage.setItem('enemai_users', JSON.stringify(users));
-          // Atualizar avatar no card
-          document.getElementById('profile-avatar').src = currentAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name||'ENEM AI')}`;
-          document.getElementById('profile-modal-feedback').textContent = 'Perfil atualizado com sucesso!';
-          setTimeout(()=>document.getElementById('profile-modal-feedback').textContent='', 2000);
-        };
-
-        // === Lembretes de Estudo ===
-        const remindersKey = () => `enemai_reminders_${currentUser.email}`;
-        function getReminders() {
-          return JSON.parse(localStorage.getItem(remindersKey()) || '[]');
-        }
-        function saveReminders(reminders) {
-          localStorage.setItem(remindersKey(), JSON.stringify(reminders));
-        }
-        function renderReminders() {
-          const list = document.getElementById('reminders-list');
-          const reminders = getReminders().sort((a,b)=>new Date(a.datetime)-new Date(b.datetime));
-          list.innerHTML = reminders.length ? '' : '<div class="text-gray-400 text-center">Nenhum lembrete agendado.</div>';
-          reminders.forEach((rem, idx) => {
-            const div = document.createElement('div');
-            div.className = 'flex items-center justify-between bg-gray-800 rounded-lg px-4 py-3 shadow';
-            div.innerHTML = `
-              <div>
-                <div class='font-semibold text-pink-200'>${rem.title}</div>
-                <div class='text-xs text-gray-400'>${new Date(rem.datetime).toLocaleString()}</div>
-              </div>
-              <div class='flex gap-2'>
-                <button class='snooze-btn bg-yellow-700 hover:bg-yellow-800 text-yellow-200 px-2 py-1 rounded text-xs' data-idx='${idx}' title='Adiar 10 min'><i class='fas fa-clock'></i> Snooze</button>
-                <button class='delete-btn bg-red-700 hover:bg-red-800 text-red-200 px-2 py-1 rounded text-xs' data-idx='${idx}'><i class='fas fa-trash'></i></button>
-              </div>
-            `;
-            list.appendChild(div);
-          });
-          // Eventos de excluir
-          list.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.onclick = function() {
-              const idx = +this.getAttribute('data-idx');
-              let reminders = getReminders();
-              reminders.splice(idx,1);
-              saveReminders(reminders);
-              renderReminders();
-              showToast('Lembrete excluído!', 'info');
-            };
-          });
-          // Eventos de snooze
-          list.querySelectorAll('.snooze-btn').forEach(btn => {
-            btn.onclick = function() {
-              const idx = +this.getAttribute('data-idx');
-              let reminders = getReminders();
-              const rem = reminders[idx];
-              rem.datetime = new Date(new Date(rem.datetime).getTime() + 10*60000).toISOString();
-              saveReminders(reminders);
-              renderReminders();
-              showToast('Lembrete adiado por 10 minutos!', 'success');
-              scheduleReminder(rem, idx);
-            };
-          });
-        }
-        // Formulário de novo lembrete
-        const reminderForm = document.getElementById('reminder-form');
-        const reminderTitle = document.getElementById('reminder-title');
-        const reminderDatetime = document.getElementById('reminder-datetime');
-        const reminderFeedback = document.getElementById('reminder-feedback');
-        reminderForm.onsubmit = function(e) {
-          e.preventDefault();
-          const title = reminderTitle.value.trim();
-          const datetime = reminderDatetime.value;
-          if (!title || !datetime) return;
-          let reminders = getReminders();
-          reminders.push({ title, datetime: new Date(datetime).toISOString(), notified: false });
-          saveReminders(reminders);
-          renderReminders();
-          reminderTitle.value = '';
-          reminderDatetime.value = '';
-          showToast('Lembrete agendado!', 'success');
-          scheduleAllReminders();
-        };
-        // Agendamento de notificações
-        function canNotifyReminders() {
-          return (Notification && Notification.permission === 'granted') && (localStorage.getItem('enemai_notify_' + currentUser.email) === 'on');
-        }
-        function requestNotificationPermissionReminders() {
-          if (Notification && Notification.permission !== 'granted') {
-            Notification.requestPermission();
-          }
-        }
-        requestNotificationPermissionReminders();
-        let reminderTimeouts = [];
-        function clearReminderTimeouts() {
-          reminderTimeouts.forEach(t => clearTimeout(t));
-          reminderTimeouts = [];
-        }
-        function scheduleReminder(rem, idx) {
-          const now = Date.now();
-          const time = new Date(rem.datetime).getTime();
-          if (time <= now || rem.notified) return;
-          const timeout = setTimeout(() => {
-            if (canNotifyReminders()) {
-              new Notification('Lembrete de Estudo', {
-                body: rem.title,
-                icon: 'https://cdn-icons-png.flaticon.com/512/1827/1827379.png'
-              });
-            }
-            showToast('⏰ Lembrete: ' + rem.title, 'info');
-            // Marcar como notificado
-            let reminders = getReminders();
-            if (reminders[idx]) reminders[idx].notified = true;
-            saveReminders(reminders);
-            renderReminders();
-          }, time - now);
-          reminderTimeouts.push(timeout);
-        }
-        function scheduleAllReminders() {
-          clearReminderTimeouts();
-          getReminders().forEach((rem, idx) => {
-            if (!rem.notified) scheduleReminder(rem, idx);
-          });
-        }
-        // Inicializar lembretes ao carregar
-        setTimeout(()=>{
-          renderReminders();
-          scheduleAllReminders();
-        }, 800);
-
-        // === Gamificação: XP, Nível, Missões, Conquistas Dinâmicas ===
-        const XP_PER_NOTE = 10;
-        const XP_PER_MISSION = 30;
-        const XP_PER_DAILY_GOAL = 20;
-        const LEVEL_XP = lvl => 100 + (lvl-1)*50;
-        const missionsKey = () => `enemai_missions_${currentUser.email}`;
-        const dynamicAchievementsKey = () => `enemai_dyn_achievements_${currentUser.email}`;
-        function getGamification() {
-          let stats = getStats();
-          if (!stats.xp) stats.xp = 0;
-          if (!stats.level) stats.level = 1;
-          return stats;
-        }
-        function saveGamification(stats) {
-          saveStats(stats);
-        }
-        function addXP(amount) {
-          let stats = getGamification();
-          stats.xp += amount;
-          let up = false;
-          while (stats.xp >= LEVEL_XP(stats.level)) {
-            stats.xp -= LEVEL_XP(stats.level);
-            stats.level++;
-            up = true;
-          }
-          saveGamification(stats);
-          renderGamification();
-          if (up) showToast('🎉 Você subiu de nível!', 'success');
-        }
-        function renderGamification() {
-          const stats = getGamification();
-          document.getElementById('user-level').textContent = stats.level;
-          document.getElementById('user-xp').textContent = stats.xp;
-          const percent = Math.round((stats.xp/LEVEL_XP(stats.level))*100);
-          document.getElementById('xp-bar').style.width = percent+'%';
-          // Conquistas dinâmicas
-          const dyn = JSON.parse(localStorage.getItem(dynamicAchievementsKey())||'[]');
-          const list = document.getElementById('dynamic-achievements-list');
-          list.innerHTML = '';
-          dyn.forEach(a => {
-            const div = document.createElement('div');
-            div.className = 'achievement-badge flex items-center gap-1 px-2 py-1 bg-yellow-900 text-yellow-200 rounded-full text-xs shadow animate__animated animate__pulse';
-            div.innerHTML = `<i class="fas fa-medal"></i> ${a.title}`;
-            list.appendChild(div);
-          });
-          // Missões
-          renderMissions();
-        }
-        // Missões diárias/semanais
-        const missionTemplates = [
-          { id: 'notes3', title: 'Crie 3 anotações hoje', type: 'daily', goal: 3, action: 'note', reward: XP_PER_MISSION },
-          { id: 'study2h', title: 'Estude 2h esta semana', type: 'weekly', goal: 120, action: 'study', reward: XP_PER_MISSION },
-          { id: 'fav5', title: 'Favorite 5 anotações', type: 'daily', goal: 5, action: 'favorite', reward: XP_PER_MISSION },
-          { id: 'streak3', title: 'Mantenha streak de 3 dias', type: 'weekly', goal: 3, action: 'streak', reward: XP_PER_MISSION }
-        ];
-        function getMissions() {
-          let missions = JSON.parse(localStorage.getItem(missionsKey())||'[]');
-          // Se não houver missões ou for novo dia/semana, gerar novas
-          const today = new Date().toDateString();
-          const week = new Date().getWeekNumber();
-          if (!missions.length || missions.some(m=>m.type==='daily'&&m.lastDate!==today)||missions.some(m=>m.type==='weekly'&&m.lastWeek!==week)) {
-            missions = missionTemplates.map(m=>({ ...m, progress: 0, completed: false, lastDate: m.type==='daily'?today:undefined, lastWeek: m.type==='weekly'?week:undefined }));
-            localStorage.setItem(missionsKey(), JSON.stringify(missions));
-          }
-          return missions;
-        }
-        function saveMissions(missions) {
-          localStorage.setItem(missionsKey(), JSON.stringify(missions));
-        }
-        function renderMissions() {
-          const missions = getMissions();
-          const list = document.getElementById('missions-list');
-          list.innerHTML = '';
-          missions.forEach((m, idx) => {
-            const percent = Math.min(100, Math.round((m.progress/m.goal)*100));
-            const div = document.createElement('div');
-            div.className = 'flex items-center gap-3 p-2 rounded-lg bg-gray-800';
-            div.innerHTML = `
-              <div class='flex-1'>
-                <div class='font-semibold text-yellow-200'>${m.title}</div>
-                <div class='w-full h-2 bg-gray-700 rounded-full mt-1 mb-1'>
-                  <div class='h-2 bg-gradient-to-r from-yellow-400 to-green-400 rounded-full' style='width:${percent}%;'></div>
-                </div>
-                <div class='text-xs text-gray-400'>${m.progress}/${m.goal} - ${m.type==='daily'?'Diária':'Semanal'}</div>
-              </div>
-              <div class='ml-2'>${m.completed?'<span class="text-green-400 font-bold">✔️</span>':''}</div>
-            `;
-            list.appendChild(div);
-          });
-        }
-        // Atualizar progresso das missões ao criar/favoritar anotações, estudar, etc.
-        function updateMissions(action, value=1) {
-          let missions = getMissions();
-          let changed = false;
-          missions.forEach(m => {
-            if (!m.completed && m.action === action) {
-              m.progress += value;
-              if (m.progress >= m.goal) {
-                m.completed = true;
-                addXP(m.reward);
-                showToast('Missão concluída: '+m.title+'! +'+m.reward+' XP', 'success');
-                // Conquista dinâmica
-                let dyn = JSON.parse(localStorage.getItem(dynamicAchievementsKey())||'[]');
-                dyn.push({ title: 'Missão: '+m.title });
-                localStorage.setItem(dynamicAchievementsKey(), JSON.stringify(dyn));
-              }
-              changed = true;
-            }
-          });
-          if (changed) saveMissions(missions);
-          renderGamification();
-        }
-        // Helpers para semana
-        Date.prototype.getWeekNumber = function(){
-          var d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
-          var dayNum = d.getUTCDay() || 7;
-          d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-          var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-          return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
-        };
-        // Integrar com ações do usuário
-        const oldCreateNote = createNote;
-        createNote = function() { oldCreateNote(); addXP(XP_PER_NOTE); updateMissions('note'); };
-        const oldSaveCurrentNote = saveCurrentNote;
-        saveCurrentNote = function() { oldSaveCurrentNote(); updateMissions('favorite'); };
-        function onDailyGoalReached() { addXP(XP_PER_DAILY_GOAL); updateMissions('study', 60); }
-        // Chamar renderGamification ao iniciar
-        setTimeout(renderGamification, 1000);
-
-        // Microinterações em botões principais
-        function addRippleEffect(btn) {
-          btn.classList.add('ripple');
-          btn.addEventListener('click', function(e) {
-            const ripple = document.createElement('span');
-            ripple.className = 'ripple';
-            btn.appendChild(ripple);
-            setTimeout(()=>btn.removeChild(ripple), 500);
-          });
-        }
-        document.querySelectorAll('button, .comuni-btn, .invite-btn').forEach(addRippleEffect);
-        // Inputs animados
-        function animateInputs() {
-          document.querySelectorAll('input, select, textarea').forEach(inp => {
-            inp.classList.add('input-animated');
-            inp.addEventListener('invalid', function() {
-              inp.classList.add('shake');
-              setTimeout(()=>inp.classList.remove('shake'), 400);
-            });
-          });
-        }
-        animateInputs();
-        // Spinner em ações assíncronas
-        function showLoading(btn) {
-          if (!btn) return;
-          btn.disabled = true;
-          const old = btn.innerHTML;
-          btn.innerHTML = '<span class="spinner"></span> Aguarde...';
-          return () => { btn.innerHTML = old; btn.disabled = false; };
-        }
-        // Exemplo: exportar dados
-        const exportBtn = document.getElementById('export-btn');
-        if (exportBtn) {
-          exportBtn.onclick = function() {
-            const restore = showLoading(exportBtn);
-            setTimeout(()=>{
-              // ... lógica de exportação ...
-              restore();
-              showToast('Dados exportados com sucesso!', 'success');
-            }, 1200);
-          };
-        }
-        // Feedback animado ao completar lembrete/meta/missão
-        function feedbackAnimado(msg, tipo='success') {
-          showToast(msg, tipo);
-          const el = document.createElement('div');
-          el.className = 'fixed top-1/2 left-1/2 z-50 text-3xl font-bold px-8 py-4 rounded-2xl shadow-xl animate__animated animate__bounceIn bg-gradient-to-br from-purple-700 to-pink-700 text-white';
-          el.textContent = msg;
-          document.body.appendChild(el);
-          setTimeout(()=>el.classList.add('animate__fadeOutUp'), 1200);
-          setTimeout(()=>el.remove(), 1800);
-        }
-        // Integrar feedback animado em lembretes, metas, missões
-        window.feedbackAnimado = feedbackAnimado;
-        // Exemplo de uso: feedbackAnimado('Missão concluída!');
     </script>
 </body>
 </html> 

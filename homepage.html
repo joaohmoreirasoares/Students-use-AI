@@ -6,9 +6,85 @@
     <title>ENEM AI - Seu Assistente Inteligente para o ENEM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&family=Roboto:wght@400;500&family=Canter&display=swap" rel="stylesheet">
+    <meta name="description" content="Plataforma ENEM AI: tutores inteligentes, anotações e ferramentas para estudantes e professores do ENEM.">
+    <meta name="keywords" content="ENEM, inteligência artificial, estudo, tutores, anotações, professores, educação, tecnologia">
     <style>
+        :root {
+            --cor-primaria: #7F00FF;
+            --cor-secundaria: #00C3FF;
+            --cor-destaque: #FF61A6;
+            --cor-fundo: #1A1A2E;
+            --cor-branco: #FFFFFF;
+            --fonte-titulo: 'Inter', sans-serif;
+            --fonte-texto: 'Roboto', sans-serif;
+        }
+        html, body {
+            min-height: 100vh;
+        }
+        body {
+            font-family: var(--fonte-texto);
+            background: var(--cor-fundo);
+            color: #222;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1 0 auto;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--fonte-titulo);
+            color: #18181b !important;
+        }
+        .font-bodoni {
+            font-family: 'Bodoni Moda', serif !important;
+            letter-spacing: -0.5px;
+        }
+        .header-btn {
+            background: linear-gradient(90deg, #2563eb 0%, #06b6d4 100%);
+            color: #fff !important;
+            border: none;
+            border-radius: 9999px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            margin: 0 0.25rem;
+            transition: background 0.3s, box-shadow 0.3s, color 0.3s;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+            cursor: pointer;
+            outline: none;
+            display: inline-block;
+        }
+        .header-btn:hover, .header-btn:focus {
+            background: linear-gradient(90deg, #1e40af 0%, #22d3ee 100%);
+            color: #fff !important;
+            box-shadow: 0 4px 16px rgba(6,182,212,0.18);
+        }
+        .header-btn:active {
+            filter: brightness(0.95);
+        }
+        .header-btn:focus-visible {
+            box-shadow: 0 0 0 3px #06b6d4, 0 0 0 6px #fff;
+            border: 2px solid #06b6d4;
+        }
+        .hero-gradient-bg {
+            background: linear-gradient(135deg, #8A00FF 0%, #4B0082 40%, #2E003E 80%, #000000 100%);
+        }
+        /* Exemplo de aplicação de cor primária em botões */
+        .btn-primaria {
+            background: var(--cor-primaria);
+            color: var(--cor-branco);
+        }
+        .btn-primaria:hover {
+            background: var(--cor-secundaria);
+        }
+        /* Gradiente de fundo para seções principais */
         .gradient-bg {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #9333ea 100%);
+            background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-secundaria) 100%);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 2px 12px rgba(127,0,255,0.10);
         }
         .note-card:hover {
             transform: translateY(-5px);
@@ -37,26 +113,240 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+        /* Cards modernos */
+        .ai-card, .note-card, .galeria-imagem, .bg-white.rounded-xl.shadow-lg {
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px rgba(127,0,255,0.10), 0 1.5px 4px rgba(0,0,0,0.04);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .ai-card:hover, .note-card:hover, .galeria-imagem:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 16px 48px rgba(127,0,255,0.18), 0 3px 12px rgba(0,0,0,0.08);
+        }
+        /* Botões modernos */
+        .btn-primaria, .bg-purple-600, .bg-white.rounded-xl.shadow-lg button {
+            border-radius: 9999px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(127,0,255,0.10);
+            transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+        }
+        .btn-primaria:hover, .bg-purple-600:hover {
+            background: var(--cor-secundaria);
+            color: var(--cor-branco);
+            box-shadow: 0 4px 16px rgba(127,0,255,0.18);
+        }
+        /* Menu fixo com transparência */
+        header.gradient-bg {
+            background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-secundaria) 100%);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 2px 12px rgba(127,0,255,0.10);
+        }
+        /* Shapes decorativos SVG */
+        .shape-bg {
+            position: absolute;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .shape1 {
+            top: -60px; left: -60px; width: 180px; opacity: 0.18;
+        }
+        .shape2 {
+            bottom: -80px; right: -80px; width: 220px; opacity: 0.13;
+        }
+        .shape3 {
+            top: 40%; left: 80%; width: 120px; opacity: 0.10;
+        }
+        /* Responsividade avançada */
+        @media (max-width: 1024px) {
+            .shape1 { width: 120px; top: -40px; left: -40px; }
+            .shape2 { width: 140px; bottom: -40px; right: -40px; }
+            .shape3 { width: 80px; top: 60%; left: 70%; }
+        }
+        @media (max-width: 768px) {
+            .container, .mx-auto { padding-left: 1rem; padding-right: 1rem; }
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.3rem; }
+            .ai-card, .note-card, .galeria-imagem, .bg-white.rounded-xl.shadow-lg {
+                border-radius: 1rem;
+            }
+            .grid-cols-3, .md\:grid-cols-3 { grid-template-columns: 1fr !important; }
+            .grid-cols-2, .md\:grid-cols-2 { grid-template-columns: 1fr !important; }
+            .h-64 { height: 200px !important; }
+            .py-16 { padding-top: 2rem !important; padding-bottom: 2rem !important; }
+            .mb-16, .mb-12 { margin-bottom: 1.5rem !important; }
+        }
+        @media (max-width: 480px) {
+            h1 { font-size: 1.3rem; }
+            h2 { font-size: 1.1rem; }
+            .h-64 { height: 120px !important; }
+            .shape1, .shape2, .shape3 { display: none; }
+            .rounded-xl { border-radius: 0.7rem !important; }
+            .py-16 { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+        }
+        /* Microinterações e acessibilidade */
+        a, button {
+            outline: none;
+            transition: box-shadow 0.2s, border 0.2s, background 0.2s, color 0.2s;
+        }
+        a:focus-visible, button:focus-visible {
+            box-shadow: 0 0 0 3px var(--cor-secundaria), 0 0 0 6px var(--cor-branco);
+            border: 2px solid var(--cor-secundaria);
+        }
+        .btn-primaria, .bg-purple-600 {
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.10);
+        }
+        .btn-primaria:active, .bg-purple-600:active {
+            filter: brightness(0.95);
+        }
+        /* Contraste ideal para textos */
+        /* Textos claros em fundos escuros */
+        .gradient-bg, .bg-gray-900, .bg-purple-600, .bg-blue-600, .bg-green-600, .bg-red-600, .bg-black, .footer-dark {
+            color: #fff !important;
+        }
+        .gradient-bg a, .bg-gray-900 a, .bg-purple-600 a, .bg-blue-600 a, .bg-green-600 a, .bg-red-600 a, .bg-black a, .footer-dark a {
+            color: #fff !important;
+        }
+        /* Textos escuros em fundos claros */
+        .bg-white, .bg-gray-50, .bg-purple-50, .bg-blue-50, .bg-green-50, .bg-red-50 {
+            color: #111 !important;
+        }
+        .bg-white a, .bg-gray-50 a, .bg-purple-50 a, .bg-blue-50 a, .bg-green-50 a, .bg-red-50 a {
+            color: #111 !important;
+        }
+        /* Ajuste para títulos e textos importantes */
+        h1, h2, h3, h4, h5, h6, .font-bold, .text-gray-900 {
+            color: #111 !important;
+        }
+        .text-gray-600, .text-gray-500 {
+            color: #444 !important;
+        }
+        /* Imagens com alt obrigatório */
+        img:not([alt]) {
+            outline: 2px solid red;
+        }
+        /* Títulos claros em fundos escuros */
+        .gradient-bg h1, .gradient-bg h2, .gradient-bg h3, .gradient-bg h4, .gradient-bg h5, .gradient-bg h6,
+        .bg-gray-900 h1, .bg-gray-900 h2, .bg-gray-900 h3, .bg-gray-900 h4, .bg-gray-900 h5, .bg-gray-900 h6,
+        .bg-purple-600 h1, .bg-purple-600 h2, .bg-purple-600 h3, .bg-purple-600 h4, .bg-purple-600 h5, .bg-purple-600 h6,
+        .bg-blue-600 h1, .bg-blue-600 h2, .bg-blue-600 h3, .bg-blue-600 h4, .bg-blue-600 h5, .bg-blue-600 h6,
+        .bg-green-600 h1, .bg-green-600 h2, .bg-green-600 h3, .bg-green-600 h4, .bg-green-600 h5, .bg-green-600 h6,
+        .bg-red-600 h1, .bg-red-600 h2, .bg-red-600 h3, .bg-red-600 h4, .bg-red-600 h5, .bg-red-600 h6,
+        .bg-black h1, .bg-black h2, .bg-black h3, .bg-black h4, .bg-black h5, .bg-black h6,
+        .footer-dark h1, .footer-dark h2, .footer-dark h3, .footer-dark h4, .footer-dark h5, .footer-dark h6 {
+            color: #fff !important;
+        }
+        /* Revisão rigorosa das cores das fontes */
+        body, .bg-gray-50, .bg-white, .bg-purple-50, .bg-blue-50, .bg-green-50 {
+            color: #222 !important;
+        }
+        h1, h2, h3, h4, h5, h6, .font-bold, .text-gray-900 {
+            color: #18181b !important;
+        }
+        .gradient-bg, .bg-gray-900, .bg-purple-600, .bg-blue-600, .bg-green-600, .bg-red-600, .bg-black, .footer-dark {
+            color: #fff !important;
+        }
+        .gradient-bg h1, .gradient-bg h2, .gradient-bg h3, .gradient-bg h4, .gradient-bg h5, .gradient-bg h6,
+        .bg-gray-900 h1, .bg-gray-900 h2, .bg-gray-900 h3, .bg-gray-900 h4, .bg-gray-900 h5, .bg-gray-900 h6,
+        .bg-purple-600 h1, .bg-purple-600 h2, .bg-purple-600 h3, .bg-purple-600 h4, .bg-purple-600 h5, .bg-purple-600 h6,
+        .bg-blue-600 h1, .bg-blue-600 h2, .bg-blue-600 h3, .bg-blue-600 h4, .bg-blue-600 h5, .bg-blue-600 h6,
+        .bg-green-600 h1, .bg-green-600 h2, .bg-green-600 h3, .bg-green-600 h4, .bg-green-600 h5, .bg-green-600 h6,
+        .bg-red-600 h1, .bg-red-600 h2, .bg-red-600 h3, .bg-red-600 h4, .bg-red-600 h5, .bg-red-600 h6,
+        .bg-black h1, .bg-black h2, .bg-black h3, .bg-black h4, .bg-black h5, .bg-black h6,
+        .footer-dark h1, .footer-dark h2, .footer-dark h3, .footer-dark h4, .footer-dark h5, .footer-dark h6 {
+            color: #fff !important;
+        }
+        a, a:visited, a:active {
+            color: #6d28d9;
+        }
+        a:hover {
+            color: #4c1d95;
+        }
+        .text-gray-600, .text-gray-500 {
+            color: #52525b !important;
+        }
+        /* Névoa decorativa no topo e base */
+        .fog-top, .fog-bottom {
+            position: fixed;
+            left: 0;
+            width: 100vw;
+            pointer-events: none;
+            z-index: 30;
+        }
+        .fog-top {
+            top: 0;
+            height: 120px;
+            background: url('https://static.vecteezy.com/system/resources/previews/022/832/993/original/white-smoke-or-fog-transparent-effect-png.png') repeat-x top center;
+            background-size: cover;
+            opacity: 0.45;
+        }
+        .fog-bottom {
+            bottom: 0;
+            height: 120px;
+            background: url('https://static.vecteezy.com/system/resources/previews/022/832/993/original/white-smoke-or-fog-transparent-effect-png.png') repeat-x bottom center;
+            background-size: cover;
+            opacity: 0.45;
+            transform: scaleY(-1);
+        }
+        /* Scroll Reveal Effect */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: none;
+        }
+        .font-white {
+            color: #fff !important;
+        }
+        .font-canter {
+            font-family: 'Canter', sans-serif !important;
+            letter-spacing: 1px;
+        }
+        .login-btn-gradient {
+            background: linear-gradient(90deg, #2563eb 0%, #06b6d4 100%);
+            color: #fff !important;
+            border: none;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+            cursor: pointer;
+            outline: none;
+            display: inline-block;
+        }
+        .login-btn-gradient:hover, .login-btn-gradient:focus {
+            background: linear-gradient(90deg, #1e40af 0%, #22d3ee 100%);
+            color: #fff !important;
+            box-shadow: 0 4px 16px rgba(6,182,212,0.18);
+        }
+        .login-btn-gradient:active {
+            filter: brightness(0.95);
+        }
+        .login-btn-gradient:focus-visible {
+            box-shadow: 0 0 0 3px #06b6d4, 0 0 0 6px #fff;
+            border: 2px solid #06b6d4;
+        }
     </style>
 </head>
-<body class="font-sans bg-gray-50">
+<body class="font-sans bg-gray-50 min-h-screen flex flex-col">
     <!-- Header/Navigation -->
     <header class="gradient-bg text-white shadow-lg">
-        <div class="container mx-auto px-4 py-6">
-            <div class="flex justify-between items-center">
+        <div class="container mx-auto px-4 py-6 flex justify-between items-center">
                 <div class="flex items-center space-x-2">
                     <i class="fas fa-brain text-3xl"></i>
                     <h1 class="text-2xl font-bold">ENEM AI</h1>
                 </div>
-                <nav class="hidden md:flex space-x-8">
-                    <a href="#home" class="hover:text-purple-200 font-medium">Início</a>
-                    <a href="#ai-tutors" class="hover:text-purple-200 font-medium">Tutores AI</a>
-                    <a href="#notes" class="hover:text-purple-200 font-medium">Anotações</a>
-                    <a href="#teachers" class="hover:text-purple-200 font-medium">Professores</a>
-                    <a href="#about" class="hover:text-purple-200 font-medium">Sobre</a>
+            <nav class="hidden md:flex space-x-2">
+                <button class="header-btn" data-scrollto="#home">Início</button>
+                <button class="header-btn" data-scrollto="#ai-tutors">Tutores AI</button>
+                <button class="header-btn" data-scrollto="#notes">Anotações</button>
+                <button class="header-btn" data-scrollto="#teachers">Professores</button>
                 </nav>
                 <div class="flex items-center space-x-4">
-                    <button id="login-btn" class="bg-white text-purple-600 px-4 py-2 rounded-full font-medium hover:bg-purple-100 transition">Login</button>
+                    <button id="login-btn" class="login-btn-gradient px-4 py-2 rounded-full font-medium transition" aria-label="Fazer login">Login</button>
                     <button class="md:hidden text-2xl" id="mobile-menu-button">
                         <i class="fas fa-bars"></i>
                     </button>
@@ -65,26 +355,26 @@
             <!-- Mobile Menu -->
             <div class="md:hidden hidden mt-4" id="mobile-menu">
                 <div class="flex flex-col space-y-3">
-                    <a href="#home" class="hover:text-purple-200 font-medium">Início</a>
-                    <a href="#ai-tutors" class="hover:text-purple-200 font-medium">Tutores AI</a>
-                    <a href="#notes" class="hover:text-purple-200 font-medium">Anotações</a>
-                    <a href="#teachers" class="hover:text-purple-200 font-medium">Professores</a>
-                    <a href="#about" class="hover:text-purple-200 font-medium">Sobre</a>
-                </div>
+                <button class="header-btn w-full text-left" data-scrollto="#home">Início</button>
+                <button class="header-btn w-full text-left" data-scrollto="#ai-tutors">Tutores AI</button>
+                <button class="header-btn w-full text-left" data-scrollto="#notes">Anotações</button>
+                <button class="header-btn w-full text-left" data-scrollto="#teachers">Professores</button>
             </div>
         </div>
     </header>
 
+    <!-- Névoa decorativa -->
+    <div class="fog-top"></div>
+    <div class="fog-bottom"></div>
+    <main>
     <!-- Hero Section -->
-    <section id="home" class="gradient-bg text-white py-16 md:py-24">
-        <div class="container mx-auto px-4">
-            <div class="flex flex-col md:flex-row items-center">
+    <section id="home" class="hero-gradient-bg text-white py-16 md:py-24 reveal">
+            <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
                 <div class="md:w-1/2 mb-10 md:mb-0">
-                    <h1 class="text-4xl md:text-5xl font-bold mb-6">Domine o ENEM com a ajuda da Inteligência Artificial</h1>
-                    <p class="text-xl mb-8 text-purple-100">Quatro tutores especializados, anotações inteligentes e suporte para professores - tudo em uma plataforma.</p>
+                <h1 class="text-3xl md:text-4xl font-white font-canter font-bold mb-6">Domine o ENEM com IA</h1>
+                    <p class="text-xl mb-8 text-purple-100">Cinco tutores especializados, anotações inteligentes, suporte para professores e muito mais - tudo em uma plataforma.</p>
                     <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                        <button class="bg-white text-purple-600 px-6 py-3 rounded-full font-bold hover:bg-purple-100 transition">Comece Agora</button>
-                        <button class="border-2 border-white px-6 py-3 rounded-full font-bold hover:bg-white hover:text-purple-600 transition">Assista a Demonstração</button>
+                        <button class="bg-white text-purple-600 px-6 py-3 rounded-full font-bold hover:bg-purple-100 transition">Participe Agora</button>
                     </div>
                 </div>
                 <div class="md:w-1/2 flex justify-center">
@@ -105,7 +395,6 @@
                                 <button class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">Interpretação de Texto</button>
                                 <button class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">Gramática</button>
                                 <button class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">Literatura</button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -114,14 +403,14 @@
     </section>
 
     <!-- AI Tutors Section -->
-    <section id="ai-tutors" class="py-16 bg-white">
+    <section id="ai-tutors" class="py-16 bg-white reveal">
         <div class="container mx-auto px-4">
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-bold text-gray-900 mb-4">Tutores Especializados por Área</h2>
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto">Nossas IAs foram treinadas especificamente para cada área do ENEM, oferecendo ajuda personalizada para suas necessidades.</p>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
                 <!-- Linguagens Card -->
                 <div class="ai-card bg-purple-50 rounded-xl p-6 transition duration-300 cursor-pointer">
                     <div class="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mb-4">
@@ -189,12 +478,28 @@
                         Experimentar <i class="fas fa-arrow-right ml-2"></i>
                     </button>
                 </div>
+                <!-- Carreiras Card -->
+                <div class="ai-card bg-cyan-50 rounded-xl p-6 transition duration-300 cursor-pointer">
+                    <div class="w-16 h-16 rounded-full bg-cyan-100 flex items-center justify-center mb-4">
+                        <i class="fas fa-briefcase text-cyan-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Tutor de Carreiras</h3>
+                    <p class="text-gray-600 mb-4">Descubra profissões, tire dúvidas sobre cursos, mercado de trabalho e receba orientações para planejar sua carreira com inteligência artificial.</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="bg-cyan-100 text-cyan-800 px-2 py-1 rounded-full text-xs">Profissões</span>
+                        <span class="bg-cyan-100 text-cyan-800 px-2 py-1 rounded-full text-xs">Mercado</span>
+                        <span class="bg-cyan-100 text-cyan-800 px-2 py-1 rounded-full text-xs">Orientação</span>
+                    </div>
+                    <button class="text-cyan-600 font-medium flex items-center" onclick="window.location.href='public/login.html'">
+                        Experimentar <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Smart Notes Section -->
-    <section id="notes" class="py-16 bg-gray-50">
+    <section id="notes" class="py-16 bg-gray-50 reveal">
         <div class="container mx-auto px-4">
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-bold text-gray-900 mb-4">Anotações Inteligentes</h2>
@@ -230,7 +535,7 @@
                             </div>
                             <h3 class="text-xl font-bold text-gray-900">Treine sua IA Pessoal</h3>
                         </div>
-                        <p class="text-gray-600 ml-14">Quanto mais você usa suas anotações com nossos tutores, mais eles aprendem sobre seu estilo de estudo e podem oferecer ajuda personalizada.</p>
+                        <p class="text-gray-600 ml-14">Você pode treinar e personalizar a sua própria IA, para</p>
                     </div>
                 </div>
                 
@@ -275,7 +580,7 @@
     </section>
 
     <!-- Teacher Support Section -->
-    <section id="teachers" class="py-16 bg-white">
+    <section id="teachers" class="py-16 bg-white reveal">
         <div class="container mx-auto px-4">
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-bold text-gray-900 mb-4">Ferramentas para Professores</h2>
@@ -316,31 +621,11 @@
                     </button>
                 </div>
             </div>
-            
-            <div class="mt-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-8 text-white">
-                <div class="flex flex-col md:flex-row items-center">
-                    <div class="md:w-2/3 mb-6 md:mb-0">
-                        <h3 class="text-2xl font-bold mb-4">Cadastro Especial para Professores</h3>
-                        <p class="mb-6">Professores têm acesso gratuito a todas as ferramentas premium e podem acompanhar o progresso de seus alunos.</p>
-                        <button class="bg-white text-purple-600 px-6 py-3 rounded-full font-bold hover:bg-purple-100 transition" onclick="window.location.href='public/login.html?professor=1'">
-                            Cadastre-se como Professor
-                        </button>
-                    </div>
-                    <div class="md:w-1/3 flex justify-center">
-                        <i class="fas fa-user-tie text-6xl opacity-30"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="mt-8 text-center">
-                <button class="bg-purple-600 text-white px-6 py-3 rounded-full font-bold hover:bg-purple-700 transition" onclick="window.location.href='public/login.html?professor=1'">
-                    Quero me cadastrar como Professor
-                </button>
-            </div>
         </div>
     </section>
 
     <!-- Testimonials Section -->
-    <section class="py-16 bg-gray-50">
+    <section class="py-16 bg-gray-50 reveal">
         <div class="container mx-auto px-4">
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-bold text-gray-900 mb-4">O que dizem nossos usuários</h2>
@@ -412,7 +697,7 @@
     </section>
 
     <!-- FAQ Section -->
-    <section id="about" class="py-16 bg-gray-50">
+    <section id="about" class="py-16 bg-gray-50 reveal">
         <div class="container mx-auto px-4">
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-bold text-gray-900 mb-4">Perguntas Frequentes</h2>
@@ -453,45 +738,159 @@
                         </ul>
                     </div>
                 </div>
-                
-                <div class="mb-6 border-b pb-4">
-                    <button class="faq-question flex justify-between items-center w-full text-left font-medium text-lg text-gray-900">
-                        <span>Professores realmente têm acesso gratuito?</span>
-                        <i class="fas fa-chevron-down text-purple-600 transition-transform"></i>
-                    </button>
-                    <div class="faq-answer mt-4 text-gray-600 hidden">
-                        <p>Sim! Acreditamos que professores são fundamentais na educação e queremos apoiá-los. Professores cadastrados com comprovação de vínculo escolar têm acesso completo a:</p>
-                        <ul class="list-disc pl-5 mt-2 space-y-1">
-                            <li>Ferramentas de planejamento de aulas</li>
-                            <li>Criação de exercícios personalizados</li>
-                            <li>Acompanhamento do progresso de alunos (quando vinculados)</li>
-                            <li>Relatórios de desempenho da turma</li>
-                            <li>Biblioteca de recursos educacionais</li>
-                        </ul>
-                    </div>
                 </div>
-                
-                <div class="mb-6 border-b pb-4">
-                    <button class="faq-question flex justify-between items-center w-full text-left font-medium text-lg text-gray-900">
-                        <span>Posso testar antes de assinar?</span>
-                        <i class="fas fa-chevron-down text-purple-600 transition-transform"></i>
-                    </button>
-                    <div class="faq-answer mt-4 text-gray-600 hidden">
-                        <p>Claro! Oferecemos um período de teste de 7 dias com acesso a todas as funcionalidades da plataforma. Não é necessário cadastrar cartão de crédito para o teste.</p>
-                    </div>
+            </div>
+        </section>
+
+    <!-- Shapes SVG decorativos -->
+    <svg class="shape-bg shape1" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="100" cy="100" rx="100" ry="100" fill="url(#paint0_radial)"/></svg>
+    <svg class="shape-bg shape2" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="110" cy="110" rx="110" ry="110" fill="url(#paint1_radial)"/></svg>
+    <svg class="shape-bg shape3" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="60" cy="60" rx="60" ry="60" fill="url(#paint2_radial)"/></svg>
+    <defs>
+      <radialGradient id="paint0_radial" cx="0.5" cy="0.5" r="0.5" gradientUnits="objectBoundingBox">
+        <stop stop-color="#7F00FF"/>
+        <stop offset="1" stop-color="#00C3FF"/>
+      </radialGradient>
+      <radialGradient id="paint1_radial" cx="0.5" cy="0.5" r="0.5" gradientUnits="objectBoundingBox">
+        <stop stop-color="#FF61A6"/>
+        <stop offset="1" stop-color="#7F00FF"/>
+      </radialGradient>
+      <radialGradient id="paint2_radial" cx="0.5" cy="0.5" r="0.5" gradientUnits="objectBoundingBox">
+        <stop stop-color="#00C3FF"/>
+        <stop offset="1" stop-color="#FF61A6"/>
+      </radialGradient>
+    </defs>
+
+    <!-- Ferramentas Interativas -->
+    <section id="ferramentas" class="py-16 bg-white reveal">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Ferramentas Interativas</h2>
+                <p class="text-xl text-gray-600">Conheça as funcionalidades que você realmente encontra na plataforma:</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="ai-card bg-purple-50 rounded-xl p-6 flex flex-col items-center">
+                    <i class="fas fa-file-alt text-4xl text-purple-600 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Editor de Anotações</h3>
+                    <p class="text-gray-600 mb-4 text-center">Crie, edite e organize suas anotações de estudo de forma simples e intuitiva, com suporte a formatação e organização por assunto.</p>
+                </div>
+                <div class="ai-card bg-blue-50 rounded-xl p-6 flex flex-col items-center">
+                    <i class="fas fa-magic text-4xl text-blue-600 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Organização Automática</h3>
+                    <p class="text-gray-600 mb-4 text-center">Suas anotações são automaticamente aprimorados com títulos, parágrafos e melhor linguagem para melhorar a leitura e compreensão.</p>
+                </div>
+                <div class="ai-card bg-green-50 rounded-xl p-6 flex flex-col items-center">
+                    <i class="fas fa-question-circle text-4xl text-green-600 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">FAQ Interativo</h3>
+                    <p class="text-gray-600 mb-4 text-center">Tire dúvidas frequentes sobre o ENEM e a plataforma, com respostas rápidas e exemplos práticos.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA Section -->
+    <!-- Dicas Rápidas para o ENEM -->
+    <section id="dicas" class="py-16 bg-gray-50 reveal">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Dicas Rápidas para o ENEM</h2>
+                <p class="text-xl text-gray-600">Confira dicas práticas e motivacionais para potencializar sua preparação!</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="ai-card bg-white rounded-xl p-6 flex flex-col items-center">
+                    <i class="fas fa-lightbulb text-3xl text-yellow-500 mb-3"></i>
+                    <h3 class="font-bold mb-2">Faça revisões periódicas</h3>
+                    <p class="text-gray-600 text-center">Revisar o conteúdo regularmente ajuda a fixar melhor o aprendizado e identificar pontos fracos.</p>
+                </div>
+                <div class="ai-card bg-white rounded-xl p-6 flex flex-col items-center">
+                    <i class="fas fa-clock text-3xl text-blue-500 mb-3"></i>
+                    <h3 class="font-bold mb-2">Gerencie seu tempo</h3>
+                    <p class="text-gray-600 text-center">Monte um cronograma de estudos realista e respeite seus horários de descanso.</p>
+                    </div>
+                <div class="ai-card bg-white rounded-xl p-6 flex flex-col items-center">
+                    <i class="fas fa-heart text-3xl text-pink-500 mb-3"></i>
+                    <h3 class="font-bold mb-2">Cuide da sua saúde</h3>
+                    <p class="text-gray-600 text-center">Alimentação equilibrada, sono de qualidade e lazer são essenciais para um bom desempenho.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chat de IA Section -->
+    <section id="ai-chat" class="py-16 bg-white reveal">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Chat de IA Interativo</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Converse com uma inteligência artificial treinada para responder dúvidas, explicar conteúdos, resolver exercícios e dar dicas personalizadas para o ENEM. Atendimento instantâneo, 24h por dia!</p>
+            </div>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-8">
+                <div class="ai-card bg-purple-50 rounded-xl p-8 flex-1 flex flex-col items-center shadow-lg">
+                    <i class="fas fa-comments text-4xl text-purple-600 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Tire suas dúvidas na hora</h3>
+                    <p class="text-gray-600 text-center mb-4">Receba explicações detalhadas, exemplos e sugestões de estudo em tempo real. Ideal para revisar conteúdos e se preparar para as provas.</p>
+                    <button class="bg-purple-600 text-white px-6 py-3 rounded-full font-bold hover:bg-purple-700 transition" onclick="window.location.href='public/ai-chat.html'">Acessar Chat de IA</button>
+                </div>
+                    </div>
+                </div>
+    </section>
+    <!-- Comunidade Section -->
+    <section id="comunidade" class="py-16 bg-gray-50 reveal">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Comunidade ENEM AI</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Participe de fóruns, troque experiências, compartilhe materiais e tire dúvidas com outros estudantes e professores.</p>
+            </div>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-8">
+                <div class="ai-card bg-blue-50 rounded-xl p-8 flex-1 flex flex-col items-center shadow-lg">
+                    <i class="fas fa-users text-4xl text-blue-600 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Fórum de Discussão</h3>
+                    <p class="text-gray-600 text-center mb-4">Aprenda com a comunidade, compartilhe dicas, resumos e resolva dúvidas em grupo.</p>
+                    <button class="bg-blue-600 text-white px-6 py-3 rounded-full font-bold hover:bg-blue-700 transition" onclick="window.location.href='public/community.html'">Acessar Comunidade</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Dashboards Section -->
+    <section id="dashboard" class="py-16 bg-white reveal">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Seu Desempenho em Tempo Real</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Acompanhe seu progresso, visualize estatísticas e receba recomendações personalizadas para potencializar seus estudos.</p>
+            </div>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-8">
+                <div class="ai-card bg-green-50 rounded-xl p-8 flex-1 flex flex-col items-center shadow-lg">
+                    <i class="fas fa-chart-bar text-4xl text-green-600 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Dashboards Interativos</h3>
+                    <p class="text-gray-600 text-center mb-4">Veja gráficos de desempenho, identifique pontos fortes e áreas para melhorar, e planeje seus estudos de forma eficiente.</p>
+                    <button class="bg-green-600 text-white px-6 py-3 rounded-full font-bold hover:bg-green-700 transition" onclick="window.location.href='public/dashboard.html'">Ver Meu Dashboard</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Demonstração de Anotações Inteligentes Section -->
+    <section id="demo-notes" class="py-16 bg-gray-50 reveal">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Teste as Anotações Inteligentes</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Experimente gratuitamente o editor de anotações inteligente e veja como a IA pode organizar e aprimorar seus estudos.</p>
+            </div>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-8">
+                <div class="ai-card bg-white rounded-xl p-8 flex-1 flex flex-col items-center shadow-lg">
+                    <i class="fas fa-sticky-note text-4xl text-purple-600 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Editor Inteligente</h3>
+                    <p class="text-gray-600 text-center mb-4">Crie, edite e organize suas anotações com sugestões automáticas e categorização inteligente.</p>
+                    <button class="bg-purple-600 text-white px-6 py-3 rounded-full font-bold hover:bg-purple-700 transition" onclick="window.location.href='public/demo-notes.html'">Experimentar Agora</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="gradient-bg text-white py-16">
         <div class="container mx-auto px-4 text-center">
             <h2 class="text-3xl md:text-4xl font-bold mb-6">Pronto para transformar seus estudos?</h2>
             <p class="text-xl mb-8 max-w-3xl mx-auto text-purple-100">Junte-se a milhares de estudantes que estão usando a inteligência artificial para dominar o ENEM.</p>
             <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
                 <button class="bg-white text-purple-600 px-8 py-4 rounded-full font-bold hover:bg-purple-100 transition text-lg" onclick="window.location.href='public/login.html'">
-                    Comece Seu Teste Grátis
+                        Comece Agora
                 </button>
                 <button class="border-2 border-white px-8 py-4 rounded-full font-bold hover:bg-white hover:text-purple-600 transition text-lg">
                     Fale com Nossa Equipe
@@ -500,8 +899,7 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-12">
+    <footer class="bg-gray-900 text-white py-12 mt-auto">
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                 <div>
@@ -518,7 +916,6 @@
                         <li><a href="public/login.html" class="text-gray-400 hover:text-white">Tutores AI</a></li>
                         <li><a href="public/login.html" class="text-gray-400 hover:text-white">Anotações Inteligentes</a></li>
                         <li><a href="public/login.html" class="text-gray-400 hover:text-white">Para Professores</a></li>
-                        <li><a href="public/login.html" class="text-gray-400 hover:text-white">Planos</a></li>
                     </ul>
                 </div>
                 
@@ -527,7 +924,6 @@
                     <ul class="space-y-2">
                         <li><a href="public/login.html" class="text-gray-400 hover:text-white">Blog</a></li>
                         <li><a href="public/login.html" class="text-gray-400 hover:text-white">Dicas ENEM</a></li>
-                        <li><a href="public/login.html" class="text-gray-400 hover:text-white">Materiais Gratuitos</a></li>
                         <li><a href="public/login.html" class="text-gray-400 hover:text-white">Ajuda</a></li>
                     </ul>
                 </div>
@@ -562,19 +958,10 @@
         </div>
     </footer>
 
-    <!-- Floating Action Button -->
-    <div class="fixed bottom-8 right-8">
-        <button class="floating-button w-14 h-14 rounded-full bg-purple-600 text-white flex items-center justify-center text-2xl hover:bg-purple-700 transition">
-            <i class="fas fa-robot"></i>
-        </button>
-    </div>
-
     <script>
-        // Redirecionamento do botão Login
         document.getElementById('login-btn').onclick = function() {
             window.location.href = 'public/login.html';
         };
-        // Mobile menu toggle
         document.getElementById('mobile-menu-button').addEventListener('click', function() {
             const menu = document.getElementById('mobile-menu');
             menu.classList.toggle('hidden');
@@ -608,6 +995,42 @@
                     }
                 }
             });
+        });
+        // Scroll Reveal Effect
+        function revealOnScroll() {
+            const reveals = document.querySelectorAll('.reveal');
+            for (const el of reveals) {
+                const windowHeight = window.innerHeight;
+                const elementTop = el.getBoundingClientRect().top;
+                const elementVisible = 80;
+                if (elementTop < windowHeight - elementVisible) {
+                    el.classList.add('active');
+                } else {
+                    el.classList.remove('active');
+                    }
+            }
+        }
+        window.addEventListener('scroll', revealOnScroll);
+        window.addEventListener('resize', revealOnScroll);
+        window.addEventListener('DOMContentLoaded', revealOnScroll);
+        // Header navigation smooth scroll
+        function scrollToSection(e) {
+            const target = e.target.closest('[data-scrollto]');
+            if (target) {
+                e.preventDefault();
+                const section = document.querySelector(target.getAttribute('data-scrollto'));
+                if (section) {
+                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    // Fecha menu mobile se aberto
+                    const mobileMenu = document.getElementById('mobile-menu');
+                    if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            }
+        }
+        document.querySelectorAll('[data-scrollto]').forEach(btn => {
+            btn.addEventListener('click', scrollToSection);
         });
     </script>
 </body>

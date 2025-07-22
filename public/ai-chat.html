@@ -9,178 +9,385 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+    <meta name="description" content="Chat ENEM AI: converse com agentes inteligentes, tire dúvidas e aprenda de forma personalizada.">
+    <meta name="keywords" content="ENEM, chat, inteligência artificial, tutores, dúvidas, educação, tecnologia">
     <style>
+        :root {
+            --cor-primaria: #7F00FF;
+            --cor-secundaria: #00C3FF;
+            --cor-destaque: #FF61A6;
+            --cor-fundo: #1A1A2E;
+            --cor-branco: #FFFFFF;
+            --fonte-titulo: 'Montserrat', sans-serif;
+            --fonte-texto: 'Poppins', sans-serif;
+            /* Sidebar moderna */
+            --sidebar: #35355a;
+            --sidebar-foreground: #f8f8fa;
+            --sidebar-primary: #6c4cff;
+            --sidebar-primary-foreground: #f8f8fa;
+            --sidebar-accent: #444444;
+            --sidebar-accent-foreground: #f8f8fa;
+            --sidebar-border: rgba(255,255,255,0.1);
+            --sidebar-ring: #707070;
+            --sidebar-btn-bg: var(--cor-primaria);
+            --sidebar-btn-hover: var(--cor-secundaria);
+            --sidebar-btn-active: var(--cor-destaque);
+            --sidebar-btn-border: #fff;
+            --sidebar-btn-shadow: var(--cor-primaria);
+        }
         body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            font-family: var(--fonte-texto);
+            background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-fundo) 100%);
             min-height: 100vh;
-            color: #e2e8f0;
+            color: var(--cor-branco);
+            margin-left: 60px;
+            transition: margin-left 0.3s;
         }
-        .glass-card {
-            background: rgba(30, 41, 59, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            color: #e2e8f0;
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--fonte-titulo);
         }
-        .agent-card {
-            transition: all 0.3s ease;
-            cursor: pointer;
+        /* Cards e botões modernos */
+        .rounded-xl, .rounded-lg, .rounded-full {
+            border-radius: 1.5rem !important;
         }
-        .agent-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        .glass-card, .shadow-2xl, .shadow-lg, .agent-card {
+            box-shadow: 0 8px 32px rgba(127,0,255,0.10), 0 1.5px 4px rgba(0,0,0,0.04) !important;
         }
-        .agent-card.selected {
-            border: 3px solid;
-            transform: scale(1.05);
+        button, .bg-purple-600, .bg-pink-600, .bg-blue-600, .bg-green-600, .bg-yellow-600, .bg-gray-700 {
+            border-radius: 9999px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(127,0,255,0.10);
+            transition: background 0.3s, color 0.3s, box-shadow 0.3s;
         }
-        .chat-message {
-            animation: fadeInUp 0.3s ease;
+        button:hover, .bg-purple-600:hover, .bg-pink-600:hover, .bg-blue-600:hover, .bg-green-600:hover, .bg-yellow-600:hover, .bg-gray-700:hover {
+            background: var(--cor-secundaria) !important;
+            color: var(--cor-branco) !important;
+            box-shadow: 0 4px 16px rgba(127,0,255,0.18);
         }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Microinterações e acessibilidade */
+        a, button, input {
+            outline: none;
+            transition: box-shadow 0.2s, border 0.2s, background 0.2s, color 0.2s;
         }
-        .typing-indicator {
-            display: inline-block;
+        a:focus-visible, button:focus-visible, input:focus-visible {
+            box-shadow: 0 0 0 3px var(--cor-secundaria), 0 0 0 6px var(--cor-branco);
+            border: 2px solid var(--cor-secundaria);
         }
-        .typing-indicator span {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #8b5cf6;
-            margin: 0 2px;
-            animation: typing 1.4s infinite ease-in-out;
+        /* Contraste aprimorado */
+        .text-gray-900, .font-bold, h1, h2, h3, h4, h5, h6 {
+            color: #fff !important;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.10);
         }
-        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes typing {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
+        .text-gray-600, .text-gray-500, .text-gray-400, .text-gray-300 {
+            color: #e0e0e0 !important;
         }
-        .conversation-item {
-            transition: all 0.2s ease;
-            color: #e2e8f0;
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .rounded-xl, .rounded-lg { border-radius: 1rem !important; }
         }
-        .conversation-item:hover {
-            background: rgba(139, 92, 246, 0.2);
+        @media (max-width: 768px) {
+            .rounded-xl, .rounded-lg { border-radius: 0.7rem !important; }
         }
-        .conversation-item.active {
-            background: rgba(139, 92, 246, 0.3);
-            border-left: 4px solid #8b5cf6;
+        /* Animação fade-in para as seções */
+        .fade-section {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.4,0,0.2,1), transform 0.8s cubic-bezier(0.4,0,0.2,1);
         }
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+        .fade-section.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
+        /* Shapes decorativos SVG */
+        .shape-bg {
+            position: absolute;
+            z-index: 0;
+            pointer-events: none;
         }
-        .quick-action-btn {
-            @apply bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-purple-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg;
+        .shape1 { top: -60px; left: -60px; width: 180px; opacity: 0.18; }
+        .shape2 { bottom: -80px; right: -80px; width: 220px; opacity: 0.13; }
+        .shape3 { top: 40%; left: 80%; width: 120px; opacity: 0.10; }
+        body.dark {
+            --sidebar: #35355a;
+            --sidebar-foreground: #f8f8fa;
+            --sidebar-primary: #6c4cff;
+            --sidebar-primary-foreground: #f8f8fa;
+            --sidebar-accent: #444444;
+            --sidebar-accent-foreground: #f8f8fa;
+            --sidebar-border: rgba(255,255,255,0.1);
+            --sidebar-ring: #707070;
         }
-        .quick-action-btn.secondary {
-            @apply bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700;
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            width: 60px;
+            background: var(--sidebar);
+            color: var(--sidebar-foreground);
+            border-right: 1px solid var(--sidebar-border);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
         }
-        .quick-action-btn.success {
-            @apply bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700;
+        .sidebar:hover, .sidebar:focus-within {
+            width: 220px;
         }
-        .quick-action-btn.warning {
-            @apply bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700;
-        }
-        .delete-conversation-btn {
-            @apply text-red-400 hover:text-red-300 transition-colors opacity-0 group-hover:opacity-100;
-        }
-        
-        /* Markdown Styles - Modo Escuro */
-        .markdown-content {
-            line-height: 1.6;
-            color: #e2e8f0;
-        }
-        .markdown-content h1, .markdown-content h2, .markdown-content h3, 
-        .markdown-content h4, .markdown-content h5, .markdown-content h6 {
-            margin-top: 1.5em;
-            margin-bottom: 0.5em;
-            font-weight: 600;
-            color: #f1f5f9;
-        }
-        .markdown-content h1 { font-size: 1.5em; color: #f8fafc; }
-        .markdown-content h2 { font-size: 1.3em; color: #f1f5f9; }
-        .markdown-content h3 { font-size: 1.1em; color: #e2e8f0; }
-        .markdown-content p { margin-bottom: 1em; color: #e2e8f0; }
-        .markdown-content ul, .markdown-content ol { 
-            margin-left: 1.5em; 
-            margin-bottom: 1em; 
-        }
-        .markdown-content li { margin-bottom: 0.25em; color: #e2e8f0; }
-        .markdown-content blockquote {
-            border-left: 4px solid #475569;
-            padding-left: 1em;
-            margin: 1em 0;
-            color: #94a3b8;
-            font-style: italic;
-            background: rgba(71, 85, 105, 0.1);
-            padding: 0.5em;
-            border-radius: 0.25rem;
-        }
-        .markdown-content code {
-            background-color: #374151;
-            padding: 0.125em 0.25em;
-            border-radius: 0.25em;
-            font-family: 'Courier New', monospace;
-            font-size: 0.875em;
-            color: #f3f4f6;
-        }
-        .markdown-content pre {
-            background-color: #1f2937;
-            color: #f9fafb;
-            padding: 1em;
-            border-radius: 0.5em;
-            overflow-x: auto;
-            margin: 1em 0;
-            border: 1px solid #374151;
-        }
-        .markdown-content pre code {
-            background-color: transparent;
-            padding: 0;
-            color: inherit;
-        }
-        .markdown-content table {
-            border-collapse: collapse;
+        .sidebar-site-logo {
             width: 100%;
-            margin: 1em 0;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex-direction: row;
+            gap: 0.7em;
+            margin-bottom: 0.5em;
+            position: relative;
+            transition: justify-content 0.4s;
         }
-        .markdown-content th, .markdown-content td {
-            border: 1px solid #475569;
-            padding: 0.5em;
-            text-align: left;
-            color: #e2e8f0;
+        .sidebar-site-logo i {
+            font-size: 2.2em;
+            color: #fff;
+            transition: font-size 0.4s;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .markdown-content th {
-            background-color: #374151;
+        .sidebar-logo-text {
+            color: #fff;
+            font-family: var(--fonte-titulo);
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-left: 0.3em;
+            white-space: nowrap;
+            letter-spacing: 1px;
+            opacity: 0;
+            max-width: 0;
+            width: 0;
+            padding: 0;
+            overflow: hidden;
+            transition: opacity 0.4s, max-width 0.4s, width 0.4s, margin 0.4s, padding 0.4s;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .sidebar:not(:hover):not(:focus-within) .sidebar-site-logo {
+            justify-content: center;
+        }
+        .sidebar:not(:hover):not(:focus-within) .sidebar-logo-text {
+            opacity: 0;
+            max-width: 0;
+            width: 0;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar:hover .sidebar-site-logo,
+        .sidebar:focus-within .sidebar-site-logo {
+            justify-content: flex-start;
+        }
+        .sidebar:hover .sidebar-logo-text,
+        .sidebar:focus-within .sidebar-logo-text {
+            opacity: 1;
+            max-width: 90px;
+            width: auto;
+            margin-left: 0.3em;
+            padding: 0;
+        }
+        .sidebar-header {
+            height: 70px;
+            border-bottom: 1px solid var(--sidebar-border);
+        }
+        .sidebar-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            padding: 1.2rem 0.8rem 0.5rem 0.5rem;
+            align-items: flex-start;
+        }
+        .sidebar-btn {
+            width: 100%;
+            background: none;
+            border: none;
+            outline: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            position: relative;
+            border-radius: 7px;
+            box-shadow: 0 1px 0 1px var(--sidebar-btn-shadow);
+            border: 1.2px solid var(--sidebar-btn-border);
+            padding: 0.25em 0.3em;
+            font-size: 10px;
+            color: #fff;
             font-weight: 600;
-            color: #f1f5f9;
+            background-color: var(--sidebar-btn-bg);
+            overflow: hidden;
+            min-height: 32px;
+            height: 36px;
+            transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
         }
-        
-        /* Estilos específicos para modo escuro */
-        .dark-text { color: #e2e8f0; }
-        .dark-bg { background-color: #1e293b; }
-        .dark-border { border-color: #475569; }
-        .dark-input {
-            background-color: #374151;
-            border-color: #475569;
-            color: #e2e8f0;
+        .sidebar-btn .circle-icon {
+            width: 18px;
+            height: 18px;
+            font-size: 0.9em;
+            color: #fff !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            transition: color 0.2s, margin 0.2s, left 0.2s;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .dark-input:focus {
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        .sidebar-btn .sidebar-label {
+            display: none;
+            margin-left: 0.5em;
+            font-size: 0.90em;
+            color: #fff;
+            font-weight: 500;
+            z-index: 2;
         }
-        .dark-placeholder::placeholder {
-            color: #94a3b8;
+        .sidebar:hover .sidebar-btn .sidebar-label,
+        .sidebar:focus-within .sidebar-btn .sidebar-label {
+            display: inline;
+        }
+        /* Centralizar ícone quando sidebar retraída */
+        .sidebar:not(:hover):not(:focus-within) .sidebar-btn {
+            justify-content: center;
+        }
+        .sidebar:not(:hover):not(:focus-within) .sidebar-btn .circle-icon {
+            margin: 0;
+        }
+        .sidebar:not(:hover):not(:focus-within) .sidebar-btn .sidebar-label {
+            display: none !important;
+        }
+        .sidebar-btn:before {
+            content: "";
+            position: absolute;
+            width: 70px;
+            height: 120%;
+            background-color: var(--sidebar-btn-active);
+            top: 50%;
+            left: 0;
+            transform: skewX(30deg) translate(-150%, -50%);
+            transition: all 0.5s;
+            z-index: 1;
+        }
+        .sidebar-btn:hover, .sidebar-btn:focus {
+            background-color: var(--sidebar-btn-hover);
+            color: #fff;
+            box-shadow: 0 2px 0 2px var(--cor-secundaria);
+        }
+        .sidebar-btn:hover:before, .sidebar-btn:focus:before {
+            transform: skewX(30deg) translate(150%, -50%);
+            transition-delay: 0.1s;
+        }
+        .sidebar-btn:active {
+            transform: scale(0.95);
+        }
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1.2rem 1rem 1.2rem 1.1em;
+            border-top: 1px solid var(--sidebar-border);
+            transition: opacity 0.3s;
+            margin-top: auto;
+        }
+        .sidebar-avatar {
+            max-width: 32px;
+            min-width: 32px;
+            min-height: 32px;
+            max-height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--sidebar-primary);
+            background: #fff;
+            color: var(--sidebar-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1em;
+        }
+        .sidebar-username {
+            font-size: 1em;
+            font-weight: 500;
+            color: var(--sidebar-foreground);
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .sidebar:hover .sidebar-username, .sidebar:focus-within .sidebar-username {
+            opacity: 1;
+        }
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 60px !important;
+            }
+            .sidebar:hover, .sidebar:focus-within {
+                width: 180px !important;
+            }
         }
     </style>
 </head>
-<body class="font-sans">
+<body class="font-sans sidebar-dark">
+    <!-- Sidebar moderna padronizada -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-site-logo">
+            <i class="fas fa-brain" style="display:grid; place-items: center;"></i>
+            <span class="sidebar-logo-text">EnemAI</span>
+        </div>
+        <div class="sidebar-header"></div>
+        <nav class="sidebar-content">
+            <a href="main-dashboard.html" class="sidebar-btn">
+                <div class="circle-icon"><i class="fas fa-tachometer-alt"></i></div>
+                <span class="sidebar-label">Dashboard</span>
+            </a>
+            <a href="ai-chat.html" class="sidebar-btn active">
+                <div class="circle-icon active"><i class="fas fa-robot"></i></div>
+                <span class="sidebar-label">Chat IA</span>
+            </a>
+            <a href="settings.html" class="sidebar-btn">
+                <div class="circle-icon"><i class="fas fa-cog"></i></div>
+                <span class="sidebar-label">Configurações</span>
+            </a>
+            <a href="community.html" class="sidebar-btn">
+                <div class="circle-icon"><i class="fas fa-users"></i></div>
+                <span class="sidebar-label">Comunidade</span>
+            </a>
+            <a href="dashboard.html" class="sidebar-btn" id="sidebar-new-note-btn">
+                <div class="circle-icon"><i class="fas fa-plus"></i></div>
+                <span class="sidebar-label">Nova Nota</span>
+            </a>
+        </nav>
+        <div class="sidebar-user">
+            <div class="sidebar-avatar" id="sidebar-avatar">US</div>
+            <span class="sidebar-username" id="sidebar-username">Usuário</span>
+        </div>
+    </aside>
+    <!-- Fim da sidebar padronizada -->
+    <!-- Shapes SVG decorativos -->
+    <svg class="shape-bg shape1" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="100" cy="100" rx="100" ry="100" fill="url(#paint0_radial)"/></svg>
+    <svg class="shape-bg shape2" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="110" cy="110" rx="110" ry="110" fill="url(#paint1_radial)"/></svg>
+    <svg class="shape-bg shape3" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="60" cy="60" rx="60" ry="60" fill="url(#paint2_radial)"/></svg>
+    <defs>
+      <radialGradient id="paint0_radial" cx="0.5" cy="0.5" r="0.5" gradientUnits="objectBoundingBox">
+        <stop stop-color="#7F00FF"/>
+        <stop offset="1" stop-color="#00C3FF"/>
+      </radialGradient>
+      <radialGradient id="paint1_radial" cx="0.5" cy="0.5" r="0.5" gradientUnits="objectBoundingBox">
+        <stop stop-color="#FF61A6"/>
+        <stop offset="1" stop-color="#7F00FF"/>
+      </radialGradient>
+      <radialGradient id="paint2_radial" cx="0.5" cy="0.5" r="0.5" gradientUnits="objectBoundingBox">
+        <stop stop-color="#00C3FF"/>
+        <stop offset="1" stop-color="#FF61A6"/>
+      </radialGradient>
+    </defs>
     <!-- Header -->
     <header class="glass-card shadow-sm border-b border-gray-600">
         <div class="container mx-auto px-6 py-4">
@@ -214,7 +421,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="container mx-auto px-6 py-8">
+    <main class="container mx-auto px-6 py-8 fade-section">
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
             <!-- Sidebar - Histórico de Conversas -->
             <div class="lg:col-span-1">
@@ -328,6 +535,9 @@
                                 <button id="clear-btn" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition flex items-center justify-center" title="Limpar conversa">
                                     <i class="fas fa-trash"></i>
                                 </button>
+                                <button id="use-note-btn" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center" title="Usar anotação">
+                                    <i class="fas fa-sticky-note"></i>
+                                </button>
                             </div>
                         </div>
 
@@ -415,6 +625,16 @@
     <!-- Toast Notifications -->
     <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
+    <!-- Modal de seleção de anotação -->
+    <div id="notes-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(10,10,30,0.75);z-index:9999;align-items:center;justify-content:center;">
+        <div style="background:#23234a;padding:2em 1.5em;border-radius:1.2em;max-width:95vw;width:400px;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px #0007;">
+            <h3 style="color:#fff;font-size:1.2em;font-weight:bold;margin-bottom:1em;">Selecione uma anotação</h3>
+            <div id="notes-list-modal" style="display:flex;flex-direction:column;gap:1em;"></div>
+            <button id="close-notes-modal" style="margin-top:1.5em;background:#7F00FF;color:#fff;padding:0.7em 1.5em;border:none;border-radius:1em;font-weight:600;cursor:pointer;width:100%;">Cancelar</button>
+        </div>
+    </div>
+
+    <script src="../src/scripts/achievements.js"></script>
     <script>
         // ===== CHAT IA APPLICATION =====
         (function() {
@@ -902,7 +1122,7 @@
             
             async function sendMessage(message) {
                 if (!currentAgent || !currentConversation) return;
-                
+                incrementAction('ask_ai');
                 // Add user message
                 addMessage({
                     type: 'user',
@@ -933,7 +1153,7 @@
                         content: response,
                         timestamp: new Date().toISOString()
                     });
-                    
+                    incrementAction('answer_ai');
                 } catch (error) {
                     removeTypingIndicator();
                     addMessage({
@@ -1126,6 +1346,44 @@ Me conte um pouco sobre você:
                 showToast('🚀 Missão iniciada! Vamos descobrir seu futuro!', 'success');
             }
             
+            // Função para buscar as anotações do localStorage
+            function getNotes() {
+                return JSON.parse(localStorage.getItem('enemai_notes')) || [];
+            }
+
+            // Função para abrir o modal de seleção de anotação
+            function openNotesModal() {
+                const notes = getNotes();
+                const list = document.getElementById('notes-list-modal');
+                list.innerHTML = '';
+                if (notes.length === 0) {
+                    list.innerHTML = '<div style="color:#bdbdbd;text-align:center;">Nenhuma anotação encontrada.</div>';
+                } else {
+                    notes.forEach(nota => {
+                        const div = document.createElement('div');
+                        div.style = 'background:#2d2d3a;color:#fff;padding:0.8em 1em;border-radius:0.8em;cursor:pointer;box-shadow:0 2px 8px #0002;';
+                        div.innerHTML = `<div style=\'font-weight:bold;\'>${nota.title || '(Sem título)'}</div><div style=\'font-size:0.95em;color:#bdbdbd;\'>${nota.content.replace(/<[^>]+>/g, '').slice(0, 60)}${nota.content.length > 60 ? '...' : ''}</div>`;
+                        div.onclick = function() {
+                            inserirNotaNoChat(nota);
+                            closeNotesModal();
+                        };
+                        list.appendChild(div);
+                    });
+                }
+                document.getElementById('notes-modal').style.display = 'flex';
+            }
+
+            function closeNotesModal() {
+                document.getElementById('notes-modal').style.display = 'none';
+            }
+
+            // Função para inserir a anotação no campo de mensagem
+            function inserirNotaNoChat(nota) {
+                const texto = `Olhe a seguinte anotação que fiz para meus estudos e me diga como posso melhorá-la:\n\nTítulo: ${nota.title}\nConteúdo: ${nota.content.replace(/<[^>]+>/g, '')}\n\nDê sugestões de melhoria, clareza, estrutura e exemplos.`;
+                document.getElementById('message-input').value = texto;
+                document.getElementById('message-input').focus();
+            }
+
             // ===== EVENT LISTENERS =====
             function setupEventListeners() {
                 // Agent selection
@@ -1218,6 +1476,9 @@ Me conte um pouco sobre você:
                 document.getElementById('settings-btn').onclick = function() {
                     window.location.href = 'settings.html';
                 };
+
+                // Use note button
+                document.getElementById('use-note-btn').addEventListener('click', openNotesModal);
             }
             
             function updateCharCount() {
@@ -1251,6 +1512,31 @@ Me conte um pouco sobre você:
             }
             
         })();
+
+        // Animação sequencial de fade-in usando Intersection Observer
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = Array.from(document.querySelectorAll('.fade-section'));
+            let delay = 0;
+            const observer = new IntersectionObserver((entries, obs) => {
+                entries.forEach((entry, idx) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.classList.add('visible');
+                        }, delay);
+                        delay += 400;
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.2 });
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+
+        document.getElementById('sidebar-toggle').onclick = function() {
+            document.body.classList.toggle('sidebar-collapsed');
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        };
     </script>
 </body>
 </html> 
