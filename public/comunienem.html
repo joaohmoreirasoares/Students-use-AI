@@ -19,6 +19,16 @@
             --cor-branco: #FFFFFF;
             --fonte-titulo: 'Montserrat', sans-serif;
             --fonte-texto: 'Poppins', sans-serif;
+            /* Cores para mensagens estilo WhatsApp com identidade do site */
+            --message-sent-bg: #6c4cff; /* Roxo escuro para mensagens enviadas */
+            --message-received-bg: #2d2d3a; /* Cinza escuro para mensagens recebidas */
+            --message-sent-text: #ffffff;
+            --message-received-text: #e0e0e0;
+            --chat-header-bg: #35355a; /* Roxo escuro para cabeçalho */
+            --chat-header-text: #ffffff;
+            --contact-list-bg: #1e1e36; /* Fundo escuro para lista de contatos */
+            --contact-list-hover: #2a2a4a; /* Hover mais claro */
+            --contact-active: #35355a; /* Contato ativo */
             /* Sidebar moderna */
             --sidebar: #35355a;
             --sidebar-foreground: #f8f8fa;
@@ -131,8 +141,69 @@
         .sidebar:hover, .sidebar:focus-within {
             width: 220px;
         }
+        .sidebar-site-logo {
+            width: 100%;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex-direction: row;
+            gap: 0.7em;
+            margin-bottom: 0.5em;
+            position: relative;
+            transition: justify-content 0.4s;
+        }
+        .sidebar-site-logo i {
+            font-size: 2.2em;
+            color: #fff;
+            transition: font-size 0.4s;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar-logo-text {
+            color: #fff;
+            font-family: var(--fonte-titulo);
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-left: 0.3em;
+            white-space: nowrap;
+            letter-spacing: 1px;
+            opacity: 0;
+            max-width: 0;
+            width: 0;
+            padding: 0;
+            overflow: hidden;
+            transition: opacity 0.4s, max-width 0.4s, width 0.4s, margin 0.4s, padding 0.4s;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .sidebar:not(:hover):not(:focus-within) .sidebar-site-logo {
+            justify-content: center;
+        }
+        .sidebar:not(:hover):not(:focus-within) .sidebar-logo-text {
+            opacity: 0;
+            max-width: 0;
+            width: 0;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar:hover .sidebar-site-logo,
+        .sidebar:focus-within .sidebar-site-logo {
+            justify-content: flex-start;
+        }
+        .sidebar:hover .sidebar-logo-text,
+        .sidebar:focus-within .sidebar-logo-text {
+            opacity: 1;
+            max-width: 90px;
+            width: auto;
+            margin-left: 0.3em;
+            padding: 0;
+        }
         .sidebar-header {
-            height: 70px;
+            max-height: 70px;
+            min-height: 70px;
             border-bottom: 1px solid var(--sidebar-border);
         }
         .sidebar-content {
@@ -140,8 +211,11 @@
             display: flex;
             flex-direction: column;
             gap: 0.7rem;
-            padding: 1.2rem 0.5rem 0.5rem 0.5rem;
+            padding: 1.2rem 1.3rem 0.5rem 0.5rem;
             align-items: flex-start;
+        }
+        .sidebar-btn, .sidebar-label {
+            text-decoration: none !important;
         }
         .sidebar-btn {
             width: 100%;
@@ -149,36 +223,40 @@
             border: none;
             outline: none;
             margin: 0;
-            padding: 0;
+            padding: 0.25em 0.3em;
             display: flex;
             align-items: center;
             justify-content: flex-start;
             position: relative;
-            border-radius: 10px;
-            box-shadow: 0 1.5px 0 1.5px var(--sidebar-btn-shadow);
-            border: 2px solid var(--sidebar-btn-border);
-            padding: 0.6em 1em;
-            font-size: 13px;
+            border-radius: 7px;
+            box-shadow: 0 1px 0 1px var(--sidebar-btn-shadow);
+            border: 1.2px solid var(--sidebar-btn-border);
+            font-size: 10px;
             color: #fff;
             font-weight: 600;
             background-color: var(--sidebar-btn-bg);
             overflow: hidden;
+            min-height: 32px;
+            height: 32px;
             transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
         }
         .sidebar-btn .circle-icon {
-            width: 28px;
-            height: 28px;
-            font-size: 1em;
+            width: 18px;
+            height: 18px;
+            font-size: 0.9em;
             color: #fff !important;
             background: transparent !important;
             box-shadow: none !important;
-            transition: color 0.2s;
+            transition: color 0.2s, margin 0.2s, left 0.2s;
             z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .sidebar-btn .sidebar-label {
             display: none;
-            margin-left: 0.7em;
-            font-size: 0.98em;
+            margin-left: 0.5em;
+            font-size: 0.90em;
             color: #fff;
             font-weight: 500;
             z-index: 2;
@@ -187,17 +265,20 @@
         .sidebar:focus-within .sidebar-btn .sidebar-label {
             display: inline;
         }
-        .sidebar:hover .sidebar-btn,
-        .sidebar:focus-within .sidebar-btn {
-            background-color: var(--sidebar-btn-bg);
-            color: #fff;
-            border-color: var(--sidebar-btn-border);
-            box-shadow: 0 2px 0 2px var(--sidebar-btn-shadow);
+        /* Centralizar ícone quando sidebar retraída */
+        .sidebar:not(:hover):not(:focus-within) .sidebar-btn {
+            justify-content: center;
+        }
+        .sidebar:not(:hover):not(:focus-within) .sidebar-btn .circle-icon {
+            margin: 0;
+        }
+        .sidebar:not(:hover):not(:focus-within) .sidebar-btn .sidebar-label {
+            display: none !important;
         }
         .sidebar-btn:before {
             content: "";
             position: absolute;
-            width: 80px;
+            width: 70px;
             height: 120%;
             background-color: var(--sidebar-btn-active);
             top: 50%;
@@ -222,14 +303,16 @@
             display: flex;
             align-items: center;
             gap: 0.8rem;
-            padding: 1.2rem 1rem 1.2rem 1.5rem;
+            padding: 1.2rem 1rem 1.2rem 1.1em;
             border-top: 1px solid var(--sidebar-border);
             transition: opacity 0.3s;
             margin-top: auto;
         }
         .sidebar-avatar {
-            width: 32px;
-            height: 32px;
+            max-width: 32px;
+            min-width: 32px;
+            min-height: 32px;
+            max-height: 32px;
             border-radius: 50%;
             border: 2px solid var(--sidebar-primary);
             background: #fff;
@@ -259,6 +342,391 @@
                 width: 180px !important;
             }
         }
+        
+        /* Novos estilos para interface de chat estilo WhatsApp com cores do site */
+        .chat-container {
+            display: flex;
+            height: calc(100vh - 120px);
+            background-color: #1a1a2e;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.06), 0 2px 2px rgba(0,0,0,0.06), 0 4px 4px rgba(0,0,0,0.06);
+            margin: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* Coluna de contatos */
+        .contacts-column {
+            width: 30%;
+            background-color: #1e1e36;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        /* Coluna de chat */
+        .chat-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #1a1a2e;
+            height: 100%;
+        }
+        
+        /* Barra de pesquisa de contatos */
+        .contacts-search {
+            padding: 10px;
+            background-color: #2a2a4a;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            outline: none;
+            background-color: #35355a;
+            color: #ffffff;
+        }
+        
+        .search-input::placeholder {
+            color: #a0a0c0;
+        }
+        
+        /* Lista de contatos */
+        .contacts-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background-color 0.2s;
+        }
+        
+        .contact-item:hover {
+            background-color: #2a2a4a;
+        }
+        
+        .contact-item.active {
+            background-color: #35355a;
+        }
+        
+        .contact-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+            border: 2px solid #6c4cff;
+        }
+        
+        .contact-info h3 {
+            font-size: 16px;
+            font-weight: 500;
+            margin: 0 0 4px 0;
+            color: #ffffff;
+        }
+        
+        .contact-info p {
+            font-size: 14px;
+            color: #c0c0e0;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .contact-meta {
+            margin-left: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        
+        .contact-time {
+            font-size: 12px;
+            color: #a0a0c0;
+            margin-bottom: 4px;
+        }
+        
+        .contact-unread {
+            background-color: #7F00FF;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        /* Cabeçalho do chat */
+        .chat-header {
+            background-color: #35355a;
+            color: white;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .chat-header-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+            border: 2px solid #6c4cff;
+        }
+        
+        .chat-header-info h3 {
+            font-size: 16px;
+            font-weight: 500;
+            margin: 0 0 4px 0;
+        }
+        
+        .chat-header-info p {
+            font-size: 13px;
+            margin: 0;
+            opacity: 0.9;
+            color: #e0e0ff;
+        }
+        
+        .chat-header-icons {
+            margin-left: auto;
+            display: flex;
+            gap: 20px;
+        }
+        
+        .chat-header-icons i {
+            cursor: pointer;
+            font-size: 18px;
+            color: #e0e0ff;
+            transition: color 0.2s;
+        }
+        
+        .chat-header-icons i:hover {
+            color: #7F00FF;
+        }
+        
+        /* Área de mensagens */
+        .messages-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            background-color: #1a1a2e;
+        }
+        
+        .message {
+            max-width: 65%;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            position: relative;
+            word-wrap: break-word;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            font-size: 15px;
+            line-height: 1.4;
+        }
+        
+        .message-sent {
+            align-self: flex-end;
+            background-color: #6c4cff;
+            color: #ffffff;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message-received {
+            align-self: flex-start;
+            background-color: #2d2d3a;
+            color: #e0e0e0;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: #a0a0c0;
+            text-align: right;
+            margin-top: 6px;
+        }
+        
+        .message-status {
+            font-size: 12px;
+            color: #a0a0c0;
+            margin-left: 5px;
+        }
+        
+        /* Área de entrada de mensagem */
+        .message-input-area {
+            background-color: #2a2a4a;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .message-input-area i {
+            color: #a0a0c0;
+            font-size: 20px;
+            cursor: pointer;
+            margin: 0 8px;
+            transition: color 0.2s;
+        }
+        
+        .message-input-area i:hover {
+            color: #7F00FF;
+        }
+        
+        .message-input {
+            flex: 1;
+            background-color: #35355a;
+            border: none;
+            border-radius: 24px;
+            padding: 10px 16px;
+            font-size: 15px;
+            outline: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            margin: 0 10px;
+            color: #ffffff;
+        }
+        
+        .message-input:focus {
+            box-shadow: 0 1px 3px rgba(127,0,255,0.3);
+            background-color: #3a3a60;
+        }
+        
+        .message-input::placeholder {
+            color: #a0a0c0;
+        }
+        
+        .send-button {
+            background-color: #6c4cff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        
+        .send-button:hover {
+            background-color: #7F00FF;
+            transform: scale(1.05);
+        }
+        
+        .send-button:active {
+            transform: scale(0.95);
+        }
+        
+        /* Mensagens de anotações */
+        .message.note-message {
+            border: 1px solid #7F00FF;
+            background: linear-gradient(135deg, #35355a 0%, #2d2d3a 100%);
+        }
+        
+        .message.note-message .message-header {
+            font-weight: bold;
+            color: #7F00FF;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .message.note-message .note-content {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .message.note-message .note-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        
+        .message.note-message .note-tag {
+            background-color: rgba(127,0,255,0.2);
+            color: #7F00FF;
+            border-radius: 12px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        /* Welcome message */
+        .welcome-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            color: #a0a0c0;
+        }
+        
+        .welcome-message i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #6c4cff;
+        }
+        
+        .welcome-message h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #ffffff;
+        }
+        
+        .welcome-message p {
+            font-size: 16px;
+            max-width: 400px;
+            line-height: 1.6;
+        }
+        
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .contacts-column {
+                width: 100%;
+            }
+            
+            .chat-column {
+                display: none;
+            }
+            
+            .chat-column.active {
+                display: flex;
+            }
+            
+            .message {
+                max-width: 80%;
+            }
+        }
     </style>
 </head>
 <body class="font-sans sidebar-dark">
@@ -282,11 +750,11 @@
                 <div class="circle-icon"><i class="fas fa-cog"></i></div>
                 <span class="sidebar-label">Configurações</span>
             </a>
-            <a href="community.html" class="sidebar-btn">
-                <div class="circle-icon"><i class="fas fa-users"></i></div>
+            <a href="community.html" class="sidebar-btn active">
+                <div class="circle-icon active"><i class="fas fa-users"></i></div>
                 <span class="sidebar-label">Comunidade</span>
             </a>
-            <a href="#" class="sidebar-btn" id="sidebar-new-note-btn">
+            <a href="dashboard.html" class="sidebar-btn" id="sidebar-new-note-btn">
                 <div class="circle-icon"><i class="fas fa-plus"></i></div>
                 <span class="sidebar-label">Nova Nota</span>
             </a>
@@ -297,6 +765,35 @@
         </div>
     </aside>
     <!-- Fim da sidebar padronizada -->
+    <script>
+    // Garante que o botão 'Nova Nota' sempre recarrega a página comunienem.html
+    document.addEventListener('DOMContentLoaded', function() {
+        var btn = document.getElementById('sidebar-new-note-btn');
+        if(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'comunienem.html';
+            });
+        }
+    });
+    // Sidebar dinâmica: avatar e nome
+    (function() {
+        const sidebarAvatar = document.getElementById('sidebar-avatar');
+        const sidebarUsername = document.getElementById('sidebar-username');
+        function updateSidebarUser() {
+            const user = JSON.parse(localStorage.getItem('enemai_user'));
+            if (!user) return;
+            sidebarUsername.textContent = user.name || 'Usuário';
+            if (user.avatar) {
+                sidebarAvatar.innerHTML = `<img src="${user.avatar}" alt="Avatar" style="width:100%;height:100%;border-radius:50%">`;
+            } else {
+                const initials = (user.name||'Usuário').split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+                sidebarAvatar.textContent = initials;
+            }
+        }
+        updateSidebarUser();
+    })();
+    </script>
     <!-- Shapes SVG decorativos -->
     <svg class="shape-bg shape1" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="100" cy="100" rx="100" ry="100" fill="url(#paint0_radial)"/></svg>
     <svg class="shape-bg shape2" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="110" cy="110" rx="110" ry="110" fill="url(#paint1_radial)"/></svg>
@@ -334,37 +831,94 @@
             </div>
         </div>
     </header>
-    <main class="container mx-auto px-2 py-6 flex flex-col md:flex-row gap-6 h-[80vh] fade-section">
+    
+    <!-- Nova estrutura de chat estilo WhatsApp -->
+    <div class="chat-container">
+        <!-- Coluna de contatos -->
+        <div class="contacts-column">
+            <div class="contacts-search">
+                <input type="text" class="search-input" placeholder="Pesquisar ou começar uma nova conversa">
+            </div>
+            <div class="contacts-list" id="chat-list">
+                <!-- Os contatos serão carregados aqui dinamicamente -->
+            </div>
+        </div>
+        
+        <!-- Coluna de chat -->
+        <div class="chat-column">
+            <!-- Cabeçalho do chat -->
+            <div class="chat-header">
+                <img id="chat-avatar-img" src="" alt="Avatar" class="chat-header-avatar">
+                <div class="chat-header-info">
+                    <h3 id="chat-name">Selecione uma conversa</h3>
+                    <p id="chat-status">online</p>
+                </div>
+                <div class="chat-header-icons">
+                    <i class="fas fa-search"></i>
+                    <i class="fas fa-paperclip"></i>
+                    <i class="fas fa-ellipsis-v"></i>
+                </div>
+            </div>
+            
+            <!-- Área de mensagens -->
+            <div class="messages-container" id="chat-messages">
+                <!-- As mensagens serão carregadas aqui dinamicamente -->
+                <div class="welcome-message">
+                    <div class="text-center text-gray-500 py-10">
+                        <i class="fas fa-comments text-4xl mb-4"></i>
+                        <h3 class="text-xl font-semibold mb-2">Bem-vindo ao ComuniEnem</h3>
+                        <p>Selecione uma conversa para começar a trocar ideias com outros estudantes</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Área de entrada de mensagem -->
+            <div class="message-input-area">
+                <i class="fas fa-smile"></i>
+                <i class="fas fa-paperclip"></i>
+                <input type="text" class="message-input" id="chat-input" placeholder="Digite sua mensagem...">
+                <button class="send-button" id="send-message-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+                <button class="send-button" id="send-note-btn" title="Enviar Anotação">
+                    <i class="fas fa-sticky-note"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Formulário original escondido (mantido para compatibilidade) -->
+    <main class="container mx-auto px-2 py-6 flex flex-col md:flex-row gap-6 h-[80vh] fade-section hidden">
         <!-- Lista de conversas -->
         <aside class="glass-card rounded-2xl p-4 w-full md:w-1/3 flex flex-col gap-2 overflow-y-auto max-h-[70vh]">
             <h2 class="text-lg font-bold mb-2 flex items-center gap-2"><i class="fas fa-user-friends text-green-400"></i> Conversas</h2>
-            <div id="chat-list" class="flex flex-col gap-1"></div>
+            <div id="old-chat-list" class="flex flex-col gap-1"></div>
         </aside>
         <!-- Chat principal -->
         <section class="glass-card rounded-2xl p-4 flex-1 flex flex-col h-full">
             <div class="flex items-center gap-3 mb-4">
-                <div id="chat-avatar" class="w-12 h-12 rounded-full bg-gradient-to-br from-pink-700 to-indigo-700 flex items-center justify-center shadow-lg border-4 border-pink-900 overflow-hidden">
-                    <img id="chat-avatar-img" src="" alt="Avatar" class="w-full h-full object-cover"/>
+                <div id="old-chat-avatar" class="w-12 h-12 rounded-full bg-gradient-to-br from-pink-700 to-indigo-700 flex items-center justify-center shadow-lg border-4 border-pink-900 overflow-hidden">
+                    <img id="old-chat-avatar-img" src="" alt="Avatar" class="w-full h-full object-cover"/>
                 </div>
                 <div>
-                    <h3 id="chat-name" class="text-xl font-bold text-gray-100">Selecione uma conversa</h3>
-                    <span id="chat-email" class="text-xs text-gray-400"></span>
+                    <h3 id="old-chat-name" class="text-xl font-bold text-gray-100">Selecione uma conversa</h3>
+                    <span id="old-chat-email" class="text-xs text-gray-400"></span>
                 </div>
             </div>
-            <div id="chat-messages" class="flex-1 flex flex-col gap-2 overflow-y-auto mb-4 bg-gray-800 rounded-lg p-4"></div>
-            <form id="chat-form" class="flex gap-2 mt-auto">
-                <input id="chat-input" type="text" placeholder="Digite sua mensagem..." class="flex-1 px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500" autocomplete="off" />
+            <div id="old-chat-messages" class="flex-1 flex flex-col gap-2 overflow-y-auto mb-4 bg-gray-800 rounded-lg p-4"></div>
+            <form id="old-chat-form" class="flex gap-2 mt-auto">
+                <input id="old-chat-input" type="text" placeholder="Digite sua mensagem..." class="flex-1 px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500" autocomplete="off" />
                 <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold shadow transition flex items-center gap-2"><i class="fas fa-paper-plane"></i></button>
-                <button type="button" id="send-note-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-bold shadow transition flex items-center gap-2" title="Enviar Anotação"><i class="fas fa-sticky-note"></i></button>
+                <button type="button" id="old-send-note-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-bold shadow transition flex items-center gap-2" title="Enviar Anotação"><i class="fas fa-sticky-note"></i></button>
             </form>
         </section>
     </main>
     <!-- Modal de envio de anotação -->
-    <div id="note-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 hidden">
-        <div class="bg-gray-900 rounded-2xl p-8 w-full max-w-lg shadow-2xl relative animate__animated animate__fadeInUp">
+    <div id="note-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-900 rounded-2xl p-8 w-full max-w-lg shadow-2xl relative animate__animated animate__fadeInUp" style="max-height: 90vh; overflow-y: auto;">
             <button id="close-note-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-100 text-xl"><i class="fas fa-times"></i></button>
-            <h3 class="text-2xl font-bold text-purple-300 mb-4">Enviar Anotação</h3>
-            <button id="new-note-btn" class="bg-pink-700 hover:bg-pink-800 text-white px-4 py-2 rounded-lg font-bold shadow transition flex items-center gap-2 mb-4"><i class="fas fa-plus"></i> Nova Anotação</button>
+            <h3 class="text-2xl font-bold text-purple-400 mb-4">Enviar Anotação</h3>
+            <button id="new-note-btn" class="bg-purple-700 hover:bg-purple-800 text-white px-4 py-2 rounded-lg font-bold shadow transition flex items-center gap-2 mb-4"><i class="fas fa-plus"></i> Nova Anotação</button>
             <form id="new-note-form" class="hidden flex flex-col gap-2 mb-4">
                 <textarea id="new-note-content" class="w-full px-3 py-2 rounded-lg bg-gray-800 border border-purple-700 text-purple-100" rows="3" placeholder="Digite sua anotação..."></textarea>
                 <input id="new-note-tags" class="w-full px-3 py-2 rounded-lg bg-gray-800 border border-pink-700 text-pink-100" placeholder="Tags separadas por vírgula (opcional)" />
@@ -378,6 +932,25 @@
             <div id="note-modal-feedback" class="mt-4"></div>
         </div>
     </div>
+    
+    <!-- Shapes SVG decorativos -->
+    <svg class="shape-bg shape1" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="100" cy="100" rx="100" ry="100" fill="url(#paint0_radial)"/></svg>
+    <svg class="shape-bg shape2" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="110" cy="110" rx="110" ry="110" fill="url(#paint1_radial)"/></svg>
+    <svg class="shape-bg shape3" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="60" cy="60" rx="60" ry="60" fill="url(#paint2_radial)"/></svg>
+    <defs>
+      <radialGradient id="paint0_radial" cx="0.5" cy="0.5" r="0.5" gradientUnits="objectBoundingBox">
+        <stop stop-color="#7F00FF"/>
+        <stop offset="1" stop-color="#00C3FF"/>
+      </radialGradient>
+      <radialGradient id="paint1_radial" cx="0.5" cy="0.5" r="0.5" gradientUnits="objectBoundingBox">
+        <stop stop-color="#FF61A6"/>
+        <stop offset="1" stop-color="#7F00FF"/>
+      </radialGradient>
+      <radialGradient id="paint2_radial" cx="0.5" cy="0.5" r="0.5" gradientUnits="objectBoundingBox">
+        <stop stop-color="#00C3FF"/>
+        <stop offset="1" stop-color="#FF61A6"/>
+      </radialGradient>
+    </defs>
     <script>
     // Navegação
     document.getElementById('back-dashboard').onclick = function() {
@@ -389,6 +962,7 @@
     document.getElementById('settings-btn').onclick = function() {
         window.location.href = 'settings.html';
     };
+    
     // Utilidades
     function chatKey(email1, email2) {
         return 'enemai_chat_' + [email1, email2].sort().join('_');
@@ -399,10 +973,22 @@
     function getAllUsers() {
         return JSON.parse(localStorage.getItem('enemai_users') || '[]');
     }
+    
     // Estado
     const currentUser = getUser();
     let conversations = [];
     let selected = null;
+    
+    // Elementos da nova interface
+    const chatList = document.getElementById('chat-list');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+    const sendMessageBtn = document.getElementById('send-message-btn');
+    const sendNoteBtn = document.getElementById('send-note-btn');
+    const chatName = document.getElementById('chat-name');
+    const chatAvatarImg = document.getElementById('chat-avatar-img');
+    const chatStatus = document.getElementById('chat-status');
+    
     // Carregar conversas
     function loadConversations() {
         const users = getAllUsers().filter(u => u.public !== false && u.email !== currentUser.email);
@@ -421,59 +1007,97 @@
             return new Date(b.lastMsg.time) - new Date(a.lastMsg.time);
         });
     }
+    
+    // Renderizar lista de contatos
     function renderChatList() {
         loadConversations();
-        const list = document.getElementById('chat-list');
-        list.innerHTML = '';
+        chatList.innerHTML = '';
         conversations.forEach(conv => {
             const div = document.createElement('div');
-            div.className = 'chat-list-item flex items-center gap-3 p-3 rounded-lg' + (selected && selected.user.email === conv.user.email ? ' active' : '');
+            div.className = 'contact-item' + (selected && selected.user.email === conv.user.email ? ' active' : '');
             div.innerHTML = `
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-pink-700 to-indigo-700 flex items-center justify-center shadow border-2 border-pink-900 overflow-hidden">
-                    <img src="${conv.user.avatar ? conv.user.avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.user.name||'ENEM AI')}`}" alt="Avatar" class="w-full h-full object-cover"/>
+                <img src="${conv.user.avatar ? conv.user.avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.user.name||'ENEM AI')}`}" alt="Avatar" class="contact-avatar"/>
+                <div class="contact-info">
+                    <h3>${conv.user.name}</h3>
+                    <p>${conv.lastMsg ? (conv.lastMsg.from === currentUser.email ? 'Você: ' : '') + conv.lastMsg.text.substring(0, 30) + (conv.lastMsg.text.length > 30 ? '...' : '') : 'Nenhuma mensagem'}</p>
                 </div>
-                <div class="flex-1">
-                    <div class="font-bold text-gray-100">${conv.user.name}</div>
-                    <div class="text-xs text-gray-400 truncate max-w-[120px]">${conv.lastMsg ? (conv.lastMsg.from === currentUser.email ? 'Você: ' : '') + conv.lastMsg.text : 'Nenhuma mensagem'}</div>
+                <div class="contact-meta">
+                    <div class="contact-time">${conv.lastMsg ? new Date(conv.lastMsg.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</div>
+                    ${conv.unread ? `<div class="contact-unread">${conv.unread}</div>` : ''}
                 </div>
-                ${conv.unread ? `<span class="unread">${conv.unread}</span>` : ''}
             `;
             div.onclick = () => {
                 selected = conv;
                 renderChatList();
                 openChat(conv.user);
             };
-            list.appendChild(div);
+            chatList.appendChild(div);
         });
     }
+    
+    // Abrir chat
     function openChat(user) {
-        document.getElementById('chat-name').textContent = user.name;
-        document.getElementById('chat-email').textContent = user.email;
-        document.getElementById('chat-avatar-img').src = user.avatar ? user.avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name||'ENEM AI')}`;
+        chatName.textContent = user.name;
+        chatAvatarImg.src = user.avatar ? user.avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name||'ENEM AI')}`;
+        chatStatus.textContent = user.online ? 'online' : 'offline';
         renderMessages(user);
         markAsRead(user);
+        
+        // Mostrar a coluna de chat em dispositivos móveis
+        document.querySelector('.chat-column').classList.add('active');
     }
+    
+    // Renderizar mensagens
     function renderMessages(user) {
+        if (!user) return;
+        
         const key = chatKey(currentUser.email, user.email);
         const msgs = JSON.parse(localStorage.getItem(key) || '[]');
-        const box = document.getElementById('chat-messages');
-        box.innerHTML = '';
+        chatMessages.innerHTML = '';
+        
+        if (msgs.length === 0) {
+            chatMessages.innerHTML = `
+                <div class="welcome-message">
+                    <div class="text-center py-10">
+                        <i class="fas fa-comments text-4xl mb-4"></i>
+                        <h3 class="text-xl font-semibold mb-2">Inicie uma conversa</h3>
+                        <p>Envie a primeira mensagem para ${user.name}</p>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+        
         msgs.forEach(msg => {
-            let div = document.createElement('div');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message fade-in ' + (msg.from === currentUser.email ? 'message-sent' : 'message-received');
+            
             if (msg.type === 'note' && msg.note) {
-                div.className = 'chat-bubble ' + (msg.from === currentUser.email ? 'me' : 'them') + ' bg-gradient-to-br from-purple-800 to-pink-800 border-2 border-purple-400 shadow-lg';
-                div.innerHTML = `<div class='font-bold text-purple-200 mb-1'><i class='fas fa-sticky-note mr-2'></i>Anotação</div>
-                    <div class='mb-1'>${msg.note.content.replace(/<[^>]*>/g, '').substring(0, 200)}</div>
-                    <div class='flex flex-wrap gap-1 mb-1'>${(msg.note.tags||[]).map(t => `<span class='px-2 py-1 bg-pink-900 text-pink-200 rounded-full text-xs'>${t.name||t}</span>`).join(' ')}</div>
-                    <div class='text-xs text-gray-300'>${new Date(msg.note.updatedAt).toLocaleString()}</div>`;
+                messageDiv.innerHTML = `
+                    <div class='message-header'><i class='fas fa-sticky-note mr-2'></i>Anotação</div>
+                    <div class='note-content'>${msg.note.content.replace(/<[^>]*>/g, '').substring(0, 200)}</div>
+                    <div class='note-tags'>${(msg.note.tags||[]).map(t => `<span class='note-tag'>${t.name||t}</span>`).join(' ')}</div>
+                    <div class='message-time'>${new Date(msg.note.updatedAt).toLocaleString()}</div>
+                `;
+                messageDiv.classList.add('note-message');
             } else {
-                div.className = 'chat-bubble ' + (msg.from === currentUser.email ? 'me' : 'them');
-                div.textContent = msg.text;
+                messageDiv.innerHTML = `
+                    ${msg.text}
+                    <div class='message-time'>
+                        ${new Date(msg.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        ${msg.from === currentUser.email ? `<i class='fas fa-check-double message-status'></i>` : ''}
+                    </div>
+                `;
             }
-            box.appendChild(div);
+            
+            chatMessages.appendChild(messageDiv);
         });
-        box.scrollTop = box.scrollHeight;
+        
+        // Scroll para a última mensagem
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     }
+    
+    // Marcar como lido
     function markAsRead(user) {
         const key = chatKey(currentUser.email, user.email);
         let msgs = JSON.parse(localStorage.getItem(key) || '[]');
@@ -484,20 +1108,39 @@
         });
         if (changed) localStorage.setItem(key, JSON.stringify(msgs));
     }
-    document.getElementById('chat-form').onsubmit = function(e) {
-        e.preventDefault();
-        if (!selected) return;
-        const input = document.getElementById('chat-input');
-        const text = input.value.trim();
-        if (!text) return;
+    
+    // Enviar mensagem
+    function sendMessage(text) {
+        if (!selected || !text.trim()) return;
+        
         const key = chatKey(currentUser.email, selected.user.email);
         let msgs = JSON.parse(localStorage.getItem(key) || '[]');
-        msgs.push({ from: currentUser.email, to: selected.user.email, text, time: new Date().toISOString(), read: false });
+        msgs.push({ from: currentUser.email, to: selected.user.email, text: text.trim(), time: new Date().toISOString(), read: false });
         localStorage.setItem(key, JSON.stringify(msgs));
-        input.value = '';
+        
         renderMessages(selected.user);
         renderChatList();
+    }
+    
+    // Event listeners para enviar mensagem
+    sendMessageBtn.onclick = function() {
+        const text = chatInput.value.trim();
+        if (text) {
+            sendMessage(text);
+            chatInput.value = '';
+        }
     };
+    
+    chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const text = chatInput.value.trim();
+            if (text) {
+                sendMessage(text);
+                chatInput.value = '';
+            }
+        }
+    });
+    
     // Abrir chat direto por querystring
     const params = new URLSearchParams(window.location.search);
     if (params.has('user')) {
@@ -509,9 +1152,13 @@
             openChat(target);
         }
     }
+    
     renderChatList();
+    
+    // === Restante do código original mantido para compatibilidade ===
+    
     // Envio de anotações
-    const sendNoteBtn = document.getElementById('send-note-btn');
+    const oldSendNoteBtn = document.getElementById('old-send-note-btn');
     const noteModal = document.getElementById('note-modal');
     const closeNoteModal = document.getElementById('close-note-modal');
     const noteList = document.getElementById('note-list');
@@ -520,7 +1167,7 @@
     if (currentUser) {
         notes = JSON.parse(localStorage.getItem('enemai_notes_' + currentUser.email) || '[]');
     }
-    sendNoteBtn.onclick = function() {
+    oldSendNoteBtn.onclick = function() {
         noteModal.classList.remove('hidden');
         noteModalFeedback.innerHTML = '';
         renderNoteList();
@@ -598,6 +1245,10 @@
     newNoteBtn.onclick = function() {
         newNoteForm.classList.remove('hidden');
         newNoteBtn.classList.add('hidden');
+    };
+    cancelNewNote.onclick = function() {
+        newNoteForm.classList.add('hidden');
+        newNoteBtn.classList.remove('hidden');
         newNoteContent.value = '';
         newNoteTags.value = '';
         newNoteFeedback.textContent = '';
