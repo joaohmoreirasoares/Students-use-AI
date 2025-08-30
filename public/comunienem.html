@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
     <meta name="description" content="ComuniEnem: chat entre estudantes e professores da comunidade ENEM AI. Colabore, troque ideias e aprenda mais!">
     <meta name="keywords" content="ENEM, chat, comunidade, estudantes, professores, colaboração, educação, tecnologia">
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://ui-avatars.com;">
     <style>
         :root {
             --cor-primaria: #7F00FF;
@@ -44,13 +46,20 @@
             --sidebar-btn-border: #fff;
             --sidebar-btn-shadow: var(--cor-primaria);
         }
+        
+        html {
+            overflow: hidden; /* Remove scroll da página inteira */
+        }
+        
         body {
             font-family: var(--fonte-texto);
             background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-fundo) 100%);
             min-height: 100vh;
             color: var(--cor-branco);
-            margin-left: 60px;
-            transition: margin-left 0.3s;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Remove scroll vertical */
+            position: relative;
         }
         h1, h2, h3, h4, h5, h6 {
             font-family: var(--fonte-titulo);
@@ -135,8 +144,9 @@
             border-right: 1px solid var(--sidebar-border);
             display: flex;
             flex-direction: column;
-            z-index: 100;
+            z-index: 1000;
             transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+            height: 100vh;
         }
         .sidebar:hover, .sidebar:focus-within {
             width: 220px;
@@ -346,23 +356,31 @@
         /* Novos estilos para interface de chat estilo WhatsApp com cores do site */
         .chat-container {
             display: flex;
-            height: calc(100vh - 120px);
+            height: 100vh;
             background-color: #1a1a2e;
-            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 1px 1px rgba(0,0,0,0.06), 0 2px 2px rgba(0,0,0,0.06), 0 4px 4px rgba(0,0,0,0.06);
-            margin: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: none;
+            margin: 0;
+            border: none;
+            border-radius: 0;
+            position: relative;
+            top: 0;
+            left: 0;
+            padding-left: 60px;
+            box-sizing: border-box;
         }
         
         /* Coluna de contatos */
         .contacts-column {
-            width: 30%;
+            width: 25%;
             background-color: #1e1e36;
             border-right: 1px solid rgba(255,255,255,0.1);
             display: flex;
             flex-direction: column;
             height: 100%;
+            z-index: 10;
+            position: relative;
+            overflow: visible;
         }
         
         /* Coluna de chat */
@@ -372,6 +390,8 @@
             flex-direction: column;
             background-color: #1a1a2e;
             height: 100%;
+            z-index: 5;
+            position: relative;
         }
         
         /* Barra de pesquisa de contatos */
@@ -399,6 +419,7 @@
         .contacts-list {
             flex: 1;
             overflow-y: auto;
+            display: block;
         }
         
         .contact-item {
@@ -530,7 +551,7 @@
         }
         
         .message {
-            max-width: 65%;
+            max-width: 80%;
             padding: 10px 14px;
             margin-bottom: 10px;
             border-radius: 12px;
@@ -634,6 +655,42 @@
             transform: scale(0.95);
         }
         
+        /* Seletor de emojis */
+        .emoji-picker {
+            position: absolute;
+            bottom: 70px;
+            left: 20px;
+            background-color: #35355a;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            max-width: 300px;
+        }
+        
+        .emoji-category {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .emoji-item {
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .emoji-item:hover {
+            background-color: #2a2a4a;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
         /* Mensagens de anotações */
         .message.note-message {
             border: 1px solid #7F00FF;
@@ -724,7 +781,7 @@
             }
             
             .message {
-                max-width: 80%;
+                max-width: 85%;
             }
         }
     </style>
@@ -785,7 +842,14 @@
             if (!user) return;
             sidebarUsername.textContent = user.name || 'Usuário';
             if (user.avatar) {
-                sidebarAvatar.innerHTML = `<img src="${user.avatar}" alt="Avatar" style="width:100%;height:100%;border-radius:50%">`;
+                const img = document.createElement('img');
+                img.src = user.avatar;
+                img.alt = "Avatar";
+                img.style.width = "100%";
+                img.style.height = "100%";
+                img.style.borderRadius = "50%";
+                sidebarAvatar.innerHTML = '';
+                sidebarAvatar.appendChild(img);
             } else {
                 const initials = (user.name||'Usuário').split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
                 sidebarAvatar.textContent = initials;
@@ -812,28 +876,8 @@
         <stop offset="1" stop-color="#FF61A6"/>
       </radialGradient>
     </defs>
-    <header class="glass-card shadow-sm border-b border-gray-600">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <i class="fas fa-comments text-2xl text-green-400"></i>
-                <h1 class="text-xl font-bold text-gray-100">ComuniEnem</h1>
-            </div>
-            <div class="flex gap-2">
-                <button id="back-community" class="bg-pink-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-pink-700 transition flex items-center gap-2">
-                    <i class="fas fa-users"></i> Comunidade
-                </button>
-                <button id="back-dashboard" class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-purple-700 transition flex items-center gap-2">
-                    <i class="fas fa-home"></i> Dashboard
-                </button>
-                <button id="settings-btn" class="bg-gray-700 text-white px-3 py-2 rounded-lg text-sm hover:bg-gray-800 transition" title="Configurações">
-                    <i class="fas fa-cog"></i>
-                </button>
-            </div>
-        </div>
-    </header>
-    
-    <!-- Nova estrutura de chat estilo WhatsApp -->
-    <div class="chat-container">
+    <!-- Nova estrutura de chat estilo WhatsApp (agora ocupa toda a tela) -->
+    <div class="chat-container" id="main-chat-container">
         <!-- Coluna de contatos -->
         <div class="contacts-column">
             <div class="contacts-search">
@@ -874,7 +918,7 @@
             
             <!-- Área de entrada de mensagem -->
             <div class="message-input-area">
-                <i class="fas fa-smile"></i>
+                <i class="fas fa-smile emoji-btn" id="emoji-btn" style="cursor: pointer;"></i>
                 <i class="fas fa-paperclip"></i>
                 <input type="text" class="message-input" id="chat-input" placeholder="Digite sua mensagem...">
                 <button class="send-button" id="send-message-btn">
@@ -883,6 +927,32 @@
                 <button class="send-button" id="send-note-btn" title="Enviar Anotação">
                     <i class="fas fa-sticky-note"></i>
                 </button>
+            </div>
+            
+            <!-- Seletor de emojis -->
+            <div id="emoji-picker" class="emoji-picker hidden">
+                <div class="emoji-category">
+                    <div class="emoji-item" data-emoji="😀">😀</div>
+                    <div class="emoji-item" data-emoji="😂">😂</div>
+                    <div class="emoji-item" data-emoji="😍">😍</div>
+                    <div class="emoji-item" data-emoji="❤️">❤️</div>
+                    <div class="emoji-item" data-emoji="👍">👍</div>
+                    <div class="emoji-item" data-emoji="👏">👏</div>
+                    <div class="emoji-item" data-emoji="🔥">🔥</div>
+                    <div class="emoji-item" data-emoji="🎉">🎉</div>
+                    <div class="emoji-item" data-emoji="💯">💯</div>
+                    <div class="emoji-item" data-emoji="✨">✨</div>
+                    <div class="emoji-item" data-emoji="😊">😊</div>
+                    <div class="emoji-item" data-emoji="🤔">🤔</div>
+                    <div class="emoji-item" data-emoji="😎">😎</div>
+                    <div class="emoji-item" data-emoji="🤩">🤩</div>
+                    <div class="emoji-item" data-emoji="🥳">🥳</div>
+                    <div class="emoji-item" data-emoji="😭">😭</div>
+                    <div class="emoji-item" data-emoji="🤗">🤗</div>
+                    <div class="emoji-item" data-emoji="🙏">🙏</div>
+                    <div class="emoji-item" data-emoji="👀">👀</div>
+                    <div class="emoji-item" data-emoji="👌">👌</div>
+                </div>
             </div>
         </div>
     </div>
@@ -918,18 +988,9 @@
         <div class="bg-gray-900 rounded-2xl p-8 w-full max-w-lg shadow-2xl relative animate__animated animate__fadeInUp" style="max-height: 90vh; overflow-y: auto;">
             <button id="close-note-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-100 text-xl"><i class="fas fa-times"></i></button>
             <h3 class="text-2xl font-bold text-purple-400 mb-4">Enviar Anotação</h3>
-            <button id="new-note-btn" class="bg-purple-700 hover:bg-purple-800 text-white px-4 py-2 rounded-lg font-bold shadow transition flex items-center gap-2 mb-4"><i class="fas fa-plus"></i> Nova Anotação</button>
-            <form id="new-note-form" class="hidden flex flex-col gap-2 mb-4">
-                <textarea id="new-note-content" class="w-full px-3 py-2 rounded-lg bg-gray-800 border border-purple-700 text-purple-100" rows="3" placeholder="Digite sua anotação..."></textarea>
-                <input id="new-note-tags" class="w-full px-3 py-2 rounded-lg bg-gray-800 border border-pink-700 text-pink-100" placeholder="Tags separadas por vírgula (opcional)" />
-                <div class="flex gap-2">
-                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold shadow flex items-center gap-2"><i class="fas fa-save"></i> Salvar e Enviar</button>
-                    <button type="button" id="cancel-new-note" class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-bold shadow flex items-center gap-2"><i class="fas fa-times"></i> Cancelar</button>
-                </div>
-                <div id="new-note-feedback" class="text-sm mt-1"></div>
-            </form>
-            <div id="note-list" class="max-h-80 overflow-y-auto flex flex-col gap-3"></div>
-            <div id="note-modal-feedback" class="mt-4"></div>
+            <div id="note-content">
+                <!-- Conteúdo será carregado dinamicamente -->
+            </div>
         </div>
     </div>
     
@@ -952,30 +1013,95 @@
       </radialGradient>
     </defs>
     <script>
+    // Função para escapar HTML (proteção contra XSS)
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+    
+    // Função para criar elementos HTML de forma segura
+    function createElement(tag, attributes = {}, textContent = null) {
+        const element = document.createElement(tag);
+        for (const [key, value] of Object.entries(attributes)) {
+            element.setAttribute(key, value);
+        }
+        if (textContent !== null) {
+            element.textContent = textContent;
+        }
+        return element;
+    }
+    
     // Navegação
-    document.getElementById('back-dashboard').onclick = function() {
-        window.location.href = 'main-dashboard.html';
-    };
-    document.getElementById('back-community').onclick = function() {
-        window.location.href = 'community.html';
-    };
-    document.getElementById('settings-btn').onclick = function() {
-        window.location.href = 'settings.html';
-    };
+    document.addEventListener('DOMContentLoaded', function() {
+        const backDashboard = document.getElementById('back-dashboard');
+        const backCommunity = document.getElementById('back-community');
+        const settingsBtn = document.getElementById('settings-btn');
+        
+        if (backDashboard) {
+            backDashboard.onclick = function() {
+                window.location.href = 'main-dashboard.html';
+            };
+        }
+        
+        if (backCommunity) {
+            backCommunity.onclick = function() {
+                window.location.href = 'community.html';
+            };
+        }
+        
+        if (settingsBtn) {
+            settingsBtn.onclick = function() {
+                window.location.href = 'settings.html';
+            };
+        }
+    });
     
     // Utilidades
     function chatKey(email1, email2) {
         return 'enemai_chat_' + [email1, email2].sort().join('_');
     }
     function getUser() {
-        return JSON.parse(localStorage.getItem('enemai_user'));
+        try {
+            const user = localStorage.getItem('enemai_user');
+            console.log('Dados do usuário atual (raw):', user);
+            if (!user) {
+                console.log('Nenhum usuário logado');
+                return null;
+            }
+            const parsedUser = JSON.parse(user);
+            console.log('Usuário parseado:', parsedUser);
+            return parsedUser;
+        } catch (error) {
+            console.error('Erro ao parsear usuário atual:', error);
+            return null;
+        }
     }
     function getAllUsers() {
-        return JSON.parse(localStorage.getItem('enemai_users') || '[]');
+        try {
+            const users = localStorage.getItem('enemai_users');
+            console.log('Dados de todos os usuários (raw):', users);
+            if (!users) {
+                console.log('Nenhum usuário encontrado no localStorage');
+                return [];
+            }
+            const parsedUsers = JSON.parse(users);
+            console.log('Usuários parseados:', parsedUsers);
+            return Array.isArray(parsedUsers) ? parsedUsers : [];
+        } catch (error) {
+            console.error('Erro ao parsear usuários:', error);
+            return [];
+        }
     }
     
     // Estado
     const currentUser = getUser();
+    console.log('CurrentUser no estado:', currentUser);
     let conversations = [];
     let selected = null;
     
@@ -991,10 +1117,21 @@
     
     // Carregar conversas
     function loadConversations() {
-        const users = getAllUsers().filter(u => u.public !== false && u.email !== currentUser.email);
+        // Debug: verificar usuário atual
+        console.log('Usuário atual:', currentUser);
+        
+        // Verificar todos os usuários
+        const allUsers = getAllUsers();
+        console.log('Todos os usuários:', allUsers);
+        
+        // Filtrar usuários
+        const users = allUsers.filter(u => u.public !== false && u.email !== currentUser.email);
+        console.log('Usuários filtrados:', users);
+        
         conversations = users.map(u => {
             const key = chatKey(currentUser.email, u.email);
             const msgs = JSON.parse(localStorage.getItem(key) || '[]');
+            console.log(`Mensagens para ${u.email}:`, msgs);
             return {
                 user: u,
                 lastMsg: msgs.length ? msgs[msgs.length-1] : null,
@@ -1006,38 +1143,104 @@
             if (!b.lastMsg) return -1;
             return new Date(b.lastMsg.time) - new Date(a.lastMsg.time);
         });
+        
+        // Debug: log para verificar se as conversas estão sendo carregadas
+        console.log('Conversas carregadas:', conversations);
     }
     
     // Renderizar lista de contatos
     function renderChatList() {
+        console.log('Iniciando renderChatList');
         loadConversations();
+        console.log('Conversas após loadConversations:', conversations);
+        
+        if (!chatList) {
+            console.error('Elemento chatList não encontrado!');
+            return;
+        }
+        
         chatList.innerHTML = '';
-        conversations.forEach(conv => {
+        console.log('Limpando chatList, número de conversas:', conversations.length);
+        
+        if (conversations.length === 0) {
+            // Mostrar mensagem quando não há conversas
+            const noConversations = document.createElement('div');
+            noConversations.className = 'p-4 text-center text-gray-400';
+            noConversations.textContent = 'Nenhuma conversa encontrada';
+            chatList.appendChild(noConversations);
+            console.log('Nenhuma conversa para mostrar');
+            return;
+        }
+        
+        conversations.forEach((conv, index) => {
+            console.log(`Processando conversa ${index}:`, conv);
             const div = document.createElement('div');
             div.className = 'contact-item' + (selected && selected.user.email === conv.user.email ? ' active' : '');
-            div.innerHTML = `
-                <img src="${conv.user.avatar ? conv.user.avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.user.name||'ENEM AI')}`}" alt="Avatar" class="contact-avatar"/>
-                <div class="contact-info">
-                    <h3>${conv.user.name}</h3>
-                    <p>${conv.lastMsg ? (conv.lastMsg.from === currentUser.email ? 'Você: ' : '') + conv.lastMsg.text.substring(0, 30) + (conv.lastMsg.text.length > 30 ? '...' : '') : 'Nenhuma mensagem'}</p>
-                </div>
-                <div class="contact-meta">
-                    <div class="contact-time">${conv.lastMsg ? new Date(conv.lastMsg.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</div>
-                    ${conv.unread ? `<div class="contact-unread">${conv.unread}</div>` : ''}
-                </div>
-            `;
+            
+            // Criar elementos de forma segura
+            const img = document.createElement('img');
+            img.className = 'contact-avatar';
+            img.alt = 'Avatar';
+            img.src = conv.user.avatar ? conv.user.avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.user.name||'ENEM AI')}`;
+            
+            const contactInfo = document.createElement('div');
+            contactInfo.className = 'contact-info';
+            
+            const contactName = document.createElement('h3');
+            contactName.textContent = escapeHtml(conv.user.name);
+            
+            const contactMsg = document.createElement('p');
+            contactMsg.textContent = conv.lastMsg ? 
+                (conv.lastMsg.from === currentUser.email ? 'Você: ' : '') + 
+                escapeHtml(conv.lastMsg.text.substring(0, 30)) + 
+                (conv.lastMsg.text.length > 30 ? '...' : '') : 
+                'Nenhuma mensagem';
+            
+            contactInfo.appendChild(contactName);
+            contactInfo.appendChild(contactMsg);
+            
+            const contactMeta = document.createElement('div');
+            contactMeta.className = 'contact-meta';
+            
+            const contactTime = document.createElement('div');
+            contactTime.className = 'contact-time';
+            contactTime.textContent = conv.lastMsg ? 
+                new Date(conv.lastMsg.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 
+                '';
+            
+            contactMeta.appendChild(contactTime);
+            
+            if (conv.unread) {
+                const contactUnread = document.createElement('div');
+                contactUnread.className = 'contact-unread';
+                contactUnread.textContent = conv.unread;
+                contactMeta.appendChild(contactUnread);
+            }
+            
+            div.appendChild(img);
+            div.appendChild(contactInfo);
+            div.appendChild(contactMeta);
+            
             div.onclick = () => {
                 selected = conv;
                 renderChatList();
                 openChat(conv.user);
             };
+            
             chatList.appendChild(div);
         });
+        
+        // Garantir que a lista de contatos seja visível
+        if (chatList.parentElement) {
+            chatList.parentElement.style.display = 'flex';
+        }
+        
+        console.log('Finalizando renderChatList, elementos adicionados:', chatList.children.length);
     }
     
     // Abrir chat
     function openChat(user) {
-        chatName.textContent = user.name;
+        chatName.textContent = escapeHtml(user.name);
         chatAvatarImg.src = user.avatar ? user.avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name||'ENEM AI')}`;
         chatStatus.textContent = user.online ? 'online' : 'offline';
         renderMessages(user);
@@ -1056,15 +1259,27 @@
         chatMessages.innerHTML = '';
         
         if (msgs.length === 0) {
-            chatMessages.innerHTML = `
-                <div class="welcome-message">
-                    <div class="text-center py-10">
-                        <i class="fas fa-comments text-4xl mb-4"></i>
-                        <h3 class="text-xl font-semibold mb-2">Inicie uma conversa</h3>
-                        <p>Envie a primeira mensagem para ${user.name}</p>
-                    </div>
-                </div>
-            `;
+            const welcomeDiv = document.createElement('div');
+            welcomeDiv.className = 'welcome-message';
+            
+            const innerDiv = document.createElement('div');
+            innerDiv.className = 'text-center py-10';
+            
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-comments text-4xl mb-4';
+            
+            const title = document.createElement('h3');
+            title.className = 'text-xl font-semibold mb-2';
+            title.textContent = 'Inicie uma conversa';
+            
+            const text = document.createElement('p');
+            text.textContent = `Envie a primeira mensagem para ${escapeHtml(user.name)}`;
+            
+            innerDiv.appendChild(icon);
+            innerDiv.appendChild(title);
+            innerDiv.appendChild(text);
+            welcomeDiv.appendChild(innerDiv);
+            chatMessages.appendChild(welcomeDiv);
             return;
         }
         
@@ -1073,21 +1288,78 @@
             messageDiv.className = 'message fade-in ' + (msg.from === currentUser.email ? 'message-sent' : 'message-received');
             
             if (msg.type === 'note' && msg.note) {
-                messageDiv.innerHTML = `
-                    <div class='message-header'><i class='fas fa-sticky-note mr-2'></i>Anotação</div>
-                    <div class='note-content'>${msg.note.content.replace(/<[^>]*>/g, '').substring(0, 200)}</div>
-                    <div class='note-tags'>${(msg.note.tags||[]).map(t => `<span class='note-tag'>${t.name||t}</span>`).join(' ')}</div>
-                    <div class='message-time'>${new Date(msg.note.updatedAt).toLocaleString()}</div>
-                `;
+                // Criar mensagem de anotação de forma segura
+                const messageHeader = document.createElement('div');
+                messageHeader.className = 'message-header';
+                
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-sticky-note mr-2';
+                
+                const headerText = document.createElement('span');
+                headerText.textContent = 'Anotação';
+                
+                messageHeader.appendChild(icon);
+                messageHeader.appendChild(headerText);
+                
+                const noteContent = document.createElement('div');
+                noteContent.className = 'note-content';
+                noteContent.textContent = escapeHtml(msg.note.content.replace(/<[^>]*>/g, '').substring(0, 200));
+                
+                const noteTags = document.createElement('div');
+                noteTags.className = 'note-tags';
+                
+                if (msg.note.tags && Array.isArray(msg.note.tags)) {
+                    msg.note.tags.forEach(tag => {
+                        const noteTag = document.createElement('span');
+                        noteTag.className = 'note-tag';
+                        noteTag.textContent = escapeHtml(tag.name || tag);
+                        noteTags.appendChild(noteTag);
+                    });
+                }
+                
+                const messageTime = document.createElement('div');
+                messageTime.className = 'message-time';
+                messageTime.textContent = new Date(msg.note.updatedAt || msg.time).toLocaleString();
+                
+                messageDiv.appendChild(messageHeader);
+                messageDiv.appendChild(noteContent);
+                messageDiv.appendChild(noteTags);
+                messageDiv.appendChild(messageTime);
                 messageDiv.classList.add('note-message');
+                
+                // Adicionar funcionalidade para salvar anotação automaticamente ao clicar
+                if (msg.from !== currentUser.email) {
+                    messageDiv.onclick = function(e) {
+                        // Evitar salvamento quando clicar em links ou botões
+                        if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') return;
+                        
+                        saveReceivedNote(msg.note);
+                    };
+                    // Adicionar estilo para indicar que é clicável
+                    messageDiv.style.cursor = 'pointer';
+                    messageDiv.title = 'Clique para salvar esta anotação em seu dashboard';
+                }
             } else {
-                messageDiv.innerHTML = `
-                    ${msg.text}
-                    <div class='message-time'>
-                        ${new Date(msg.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                        ${msg.from === currentUser.email ? `<i class='fas fa-check-double message-status'></i>` : ''}
-                    </div>
-                `;
+                // Criar mensagem de texto de forma segura
+                const messageText = document.createElement('div');
+                messageText.textContent = escapeHtml(msg.text);
+                
+                const messageTime = document.createElement('div');
+                messageTime.className = 'message-time';
+                
+                const timeText = document.createElement('span');
+                timeText.textContent = new Date(msg.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                messageTime.appendChild(timeText);
+                
+                if (msg.from === currentUser.email) {
+                    const statusIcon = document.createElement('i');
+                    statusIcon.className = 'fas fa-check-double message-status';
+                    messageTime.appendChild(statusIcon);
+                }
+                
+                messageDiv.appendChild(messageText);
+                messageDiv.appendChild(messageTime);
             }
             
             chatMessages.appendChild(messageDiv);
@@ -1103,7 +1375,10 @@
         let msgs = JSON.parse(localStorage.getItem(key) || '[]');
         let changed = false;
         msgs = msgs.map(msg => {
-            if (msg.to === currentUser.email && !msg.read) { changed = true; return {...msg, read: true}; }
+            if (msg.to === currentUser.email && !msg.read) { 
+                changed = true; 
+                return {...msg, read: true}; 
+            }
             return msg;
         });
         if (changed) localStorage.setItem(key, JSON.stringify(msgs));
@@ -1113,9 +1388,18 @@
     function sendMessage(text) {
         if (!selected || !text.trim()) return;
         
+        // Sanitizar entrada
+        const sanitizedText = escapeHtml(text.trim());
+        
         const key = chatKey(currentUser.email, selected.user.email);
         let msgs = JSON.parse(localStorage.getItem(key) || '[]');
-        msgs.push({ from: currentUser.email, to: selected.user.email, text: text.trim(), time: new Date().toISOString(), read: false });
+        msgs.push({ 
+            from: currentUser.email, 
+            to: selected.user.email, 
+            text: sanitizedText, 
+            time: new Date().toISOString(), 
+            read: false 
+        });
         localStorage.setItem(key, JSON.stringify(msgs));
         
         renderMessages(selected.user);
@@ -1123,20 +1407,253 @@
     }
     
     // Event listeners para enviar mensagem
-    sendMessageBtn.onclick = function() {
-        const text = chatInput.value.trim();
-        if (text) {
-            sendMessage(text);
-            chatInput.value = '';
+    document.addEventListener('DOMContentLoaded', function() {
+        const sendMessageBtn = document.getElementById('send-message-btn');
+        const chatInput = document.getElementById('chat-input');
+        
+        if (sendMessageBtn) {
+            sendMessageBtn.onclick = function() {
+                if (chatInput) {
+                    const text = chatInput.value.trim();
+                    if (text) {
+                        sendMessage(text);
+                        chatInput.value = '';
+                    }
+                }
+            };
         }
-    };
+        
+        if (chatInput) {
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const text = chatInput.value.trim();
+                    if (text) {
+                        sendMessage(text);
+                        chatInput.value = '';
+                    }
+                }
+            });
+        }
+    });
     
-    chatInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            const text = chatInput.value.trim();
-            if (text) {
-                sendMessage(text);
-                chatInput.value = '';
+    // Verificar se há usuário logado
+    if (!currentUser) {
+        console.error('Nenhum usuário logado. Redirecionando para login.');
+        // Opcional: redirecionar para página de login
+        // window.location.href = 'login.html';
+    } else {
+        console.log('Usuário logado:', currentUser);
+    }
+    
+    // Funcionalidade dos botões de emoji e anotações
+    document.addEventListener('DOMContentLoaded', function() {
+        // Botão de emoji
+        const emojiBtn = document.getElementById('emoji-btn');
+        const emojiPicker = document.getElementById('emoji-picker');
+        const chatInput = document.getElementById('chat-input');
+        
+        if (emojiBtn && emojiPicker && chatInput) {
+            // Toggle do seletor de emojis
+            emojiBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                emojiPicker.classList.toggle('hidden');
+            });
+            
+            // Inserir emoji no campo de texto
+            const emojiItems = document.querySelectorAll('.emoji-item');
+            emojiItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const emoji = this.getAttribute('data-emoji');
+                    chatInput.value += emoji;
+                    chatInput.focus();
+                });
+            });
+            
+            // Fechar seletor de emojis ao clicar fora
+            document.addEventListener('click', function(e) {
+                if (!emojiBtn.contains(e.target) && !emojiPicker.contains(e.target)) {
+                    emojiPicker.classList.add('hidden');
+                }
+            });
+        }
+        
+        // Botão de anotações
+        const sendNoteBtn = document.getElementById('send-note-btn');
+        const noteModal = document.getElementById('note-modal');
+        const closeNoteModal = document.getElementById('close-note-modal');
+        const noteContent = document.getElementById('note-content');
+        
+        if (sendNoteBtn && noteModal && noteContent) {
+            sendNoteBtn.addEventListener('click', function() {
+                // Carregar anotações do dashboard
+                loadDashboardNotes();
+                noteModal.classList.remove('hidden');
+            });
+            
+            if (closeNoteModal) {
+                closeNoteModal.addEventListener('click', function() {
+                    noteModal.classList.add('hidden');
+                });
+            }
+            
+            // Fechar modal ao clicar fora
+            noteModal.addEventListener('click', function(e) {
+                if (e.target === noteModal) {
+                    noteModal.classList.add('hidden');
+                }
+            });
+        }
+        
+        // Função para carregar anotações do dashboard
+        function loadDashboardNotes() {
+            if (!noteContent) return;
+            
+            // Verificar se há anotações no dashboard
+            const dashboardNotes = JSON.parse(localStorage.getItem('enemai_notes') || '[]');
+            
+            if (dashboardNotes.length === 0) {
+                // Mostrar botão para criar nova nota
+                noteContent.innerHTML = `
+                    <div class="text-center py-8">
+                        <p class="text-gray-400 mb-6">Você ainda não tem anotações salvas.</p>
+                        <button id="create-note-btn" class="bg-purple-700 hover:bg-purple-800 text-white px-6 py-3 rounded-lg font-bold shadow transition flex items-center gap-2 mx-auto">
+                            <i class="fas fa-plus"></i> Criar Nova Anotação
+                        </button>
+                    </div>
+                `;
+                
+                // Adicionar evento ao botão
+                const createNoteBtn = document.getElementById('create-note-btn');
+                if (createNoteBtn) {
+                    createNoteBtn.addEventListener('click', function() {
+                        window.location.href = 'dashboard.html';
+                    });
+                }
+            } else {
+                // Mostrar lista de anotações
+                renderDashboardNotesList(dashboardNotes);
+            }
+        }
+        
+        // Função para renderizar a lista de anotações do dashboard
+        function renderDashboardNotesList(notes) {
+            if (!noteContent) return;
+            
+            let html = '';
+            
+            notes.slice(0, 5).forEach(note => {
+                // Calcular tempo relativo
+                const noteDate = new Date(note.updatedAt);
+                const now = new Date();
+                const diffTime = Math.abs(now - noteDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                let timeAgo;
+                if (diffDays === 1) {
+                    timeAgo = "hoje";
+                } else if (diffDays <= 7) {
+                    timeAgo = `há ${diffDays-1} dia${diffDays-1 > 1 ? 's' : ''}`;
+                } else {
+                    timeAgo = noteDate.toLocaleDateString('pt-BR');
+                }
+                
+                // Criar HTML para tags
+                let tagsHtml = '';
+                if (note.tags && note.tags.length > 0) {
+                    tagsHtml = '<div style="display: flex; gap: 0.3em; flex-wrap: wrap; margin-top: 0.5em;">';
+                    note.tags.slice(0, 3).forEach(tag => {
+                        tagsHtml += `<span class="px-2 py-1 bg-pink-900 text-pink-200 rounded-full text-xs">${tag}</span>`;
+                    });
+                    if (note.tags.length > 3) {
+                        tagsHtml += `<span class="px-2 py-1 bg-pink-900 text-pink-200 rounded-full text-xs">+${note.tags.length - 3}</span>`;
+                    }
+                    tagsHtml += '</div>';
+                }
+                
+                html += `
+                    <div class="p-4 bg-gray-800 rounded-lg border border-purple-700 hover:bg-purple-900 cursor-pointer transition flex flex-col gap-2 mb-3 note-item" data-id="${note.id}">
+                        <div class="font-bold text-purple-300 mb-1">${note.title || '(Sem título)'}</div>
+                        <div class="text-gray-300 text-sm mb-2">${note.content.replace(/<[^>]+>/g, '').slice(0, 100)}${note.content.length > 100 ? '...' : ''}</div>
+                        ${tagsHtml}
+                        <div class="text-xs text-gray-400 flex justify-between items-center">
+                            <span>${timeAgo}</span>
+                            <button class="send-note-btn bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-full text-xs flex items-center gap-1" data-note-id="${note.id}">
+                                <i class="fas fa-paper-plane"></i> Enviar
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Adicionar botão para ver todas as anotações
+            html += `
+                <div class="text-center mt-6">
+                    <button id="view-all-notes-btn" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-bold shadow transition">
+                        Ver Todas as Anotações
+                    </button>
+                </div>
+            `;
+            
+            noteContent.innerHTML = html;
+            
+            // Adicionar eventos aos botões
+            document.querySelectorAll('.send-note-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const noteId = this.getAttribute('data-note-id');
+                    sendDashboardNoteToChat(noteId);
+                });
+            });
+            
+            document.querySelectorAll('.note-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (!e.target.closest('.send-note-btn')) {
+                        const noteId = this.getAttribute('data-id');
+                        sendDashboardNoteToChat(noteId);
+                    }
+                });
+            });
+            
+            const viewAllNotesBtn = document.getElementById('view-all-notes-btn');
+            if (viewAllNotesBtn) {
+                viewAllNotesBtn.addEventListener('click', function() {
+                    window.location.href = 'dashboard.html';
+                });
+            }
+        }
+        
+        // Função para enviar anotação do dashboard para o chat
+        function sendDashboardNoteToChat(noteId) {
+            if (!selected) {
+                alert('Selecione um contato primeiro!');
+                return;
+            }
+            
+            const dashboardNotes = JSON.parse(localStorage.getItem('enemai_notes') || '[]');
+            const note = dashboardNotes.find(n => n.id === noteId);
+            
+            if (note) {
+                const key = chatKey(currentUser.email, selected.user.email);
+                let msgs = JSON.parse(localStorage.getItem(key) || '[]');
+                msgs.push({ 
+                    from: currentUser.email, 
+                    to: selected.user.email, 
+                    note: {
+                        content: note.content,
+                        tags: note.tags || []
+                    },
+                    time: new Date().toISOString(), 
+                    read: false, 
+                    type: 'note' 
+                });
+                localStorage.setItem(key, JSON.stringify(msgs));
+                
+                // Fechar modal
+                if (noteModal) noteModal.classList.add('hidden');
+                
+                // Atualizar chat
+                renderMessages(selected.user);
+                renderChatList();
             }
         }
     });
@@ -1153,87 +1670,42 @@
         }
     }
     
-    renderChatList();
-    
-    // === Restante do código original mantido para compatibilidade ===
-    
     // Envio de anotações
-    const oldSendNoteBtn = document.getElementById('old-send-note-btn');
-    const noteModal = document.getElementById('note-modal');
-    const closeNoteModal = document.getElementById('close-note-modal');
-    const noteList = document.getElementById('note-list');
-    const noteModalFeedback = document.getElementById('note-modal-feedback');
-    let notes = [];
-    if (currentUser) {
-        notes = JSON.parse(localStorage.getItem('enemai_notes_' + currentUser.email) || '[]');
-    }
-    oldSendNoteBtn.onclick = function() {
-        noteModal.classList.remove('hidden');
-        noteModalFeedback.innerHTML = '';
-        renderNoteList();
-    };
-    closeNoteModal.onclick = function() {
-        noteModal.classList.add('hidden');
-    };
-    function renderNoteList() {
-        noteList.innerHTML = '';
-        if (!notes.length) {
-            noteList.innerHTML = '<div class="text-gray-400 text-center py-8">Você não possui anotações.</div>';
-            return;
-        }
-        notes.slice().reverse().forEach((note, idx) => {
-            const div = document.createElement('div');
-            div.className = 'p-4 bg-gray-800 rounded-lg border border-purple-700 hover:bg-purple-900 cursor-pointer transition flex flex-col gap-2';
-            div.innerHTML = `<div class='font-bold text-purple-300 mb-1'>${note.content.replace(/<[^>]*>/g, '').substring(0, 60)}...</div>
-                <div class='flex flex-wrap gap-1'>${(note.tags||[]).map(t => `<span class='px-2 py-1 bg-pink-900 text-pink-200 rounded-full text-xs'>${t.name||t}</span>`).join(' ')}</div>
-                <div class='text-xs text-gray-400'>${new Date(note.updatedAt).toLocaleString()}</div>`;
-            div.onclick = () => sendNoteToChat(note);
-            noteList.appendChild(div);
-        });
-    }
-    function sendNoteToChat(note) {
-        if (!selected) return;
-        const key = chatKey(currentUser.email, selected.user.email);
-        let msgs = JSON.parse(localStorage.getItem(key) || '[]');
-        msgs.push({ from: currentUser.email, to: selected.user.email, note, time: new Date().toISOString(), read: false, type: 'note' });
-        localStorage.setItem(key, JSON.stringify(msgs));
-        noteModal.classList.add('hidden');
-        renderMessages(selected.user);
-        renderChatList();
-    }
-    // Fechar modal ao clicar fora
-    noteModal.addEventListener('mousedown', e => {
-        if (e.target === noteModal) noteModal.classList.add('hidden');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Todo o código de anotações foi movido para a nova implementação
     });
     // === Notificações Web API ===
-    function canNotify() {
-        return (Notification && Notification.permission === 'granted') && (localStorage.getItem('enemai_notify_' + currentUser.email) === 'on');
-    }
-    function requestNotificationPermission() {
-        if (Notification && Notification.permission !== 'granted') {
-            Notification.requestPermission();
+    document.addEventListener('DOMContentLoaded', function() {
+        function canNotify() {
+            return (Notification && Notification.permission === 'granted') && (localStorage.getItem('enemai_notify_' + currentUser.email) === 'on');
         }
-    }
-    requestNotificationPermission();
-
-    // Notificar ao receber mensagem nova
-    window.addEventListener('storage', function(e) {
-        if (!selected || !e.key || !e.key.startsWith('enemai_chat_')) return;
-        const chatKeyStr = chatKey(currentUser.email, selected.user.email);
-        if (e.key === chatKeyStr) return; // já está aberto
-        // Verifica se é destinatário
-        if (e.newValue) {
-            const msgs = JSON.parse(e.newValue);
-            const last = msgs[msgs.length-1];
-            if (last && last.to === currentUser.email && last.from !== currentUser.email && !last.read) {
-                if (canNotify()) {
-                    new Notification('Nova mensagem de ' + (selected ? selected.user.name : 'ENEM AI'), {
-                        body: last.text ? last.text : 'Nova anotação recebida!',
-                        icon: selected && selected.user.avatar ? selected.user.avatar : 'https://ui-avatars.com/api/?name=ENEM+AI'
-                    });
-                }
+        function requestNotificationPermission() {
+            if (Notification && Notification.permission !== 'granted') {
+                Notification.requestPermission();
             }
         }
+        requestNotificationPermission();
+
+        // Notificar ao receber mensagem nova
+        window.addEventListener('storage', function(e) {
+            console.log('Evento storage detectado:', e);
+            if (!selected || !e.key || !e.key.startsWith('enemai_chat_')) return;
+            const chatKeyStr = chatKey(currentUser.email, selected.user.email);
+            if (e.key === chatKeyStr) return; // já está aberto
+            // Verifica se é destinatário
+            if (e.newValue) {
+                const msgs = JSON.parse(e.newValue);
+                const last = msgs[msgs.length-1];
+                if (last && last.to === currentUser.email && last.from !== currentUser.email && !last.read) {
+                    if (canNotify()) {
+                        new Notification('Nova mensagem de ' + (selected ? escapeHtml(selected.user.name) : 'ENEM AI'), {
+                            body: last.text ? escapeHtml(last.text) : 'Nova anotação recebida!',
+                            icon: selected && selected.user.avatar ? selected.user.avatar : 'https://ui-avatars.com/api/?name=ENEM+AI'
+                        });
+                    }
+                }
+            }
+        });
     });
     // Nova Anotação no chat
     const newNoteBtn = document.getElementById('new-note-btn');
@@ -1265,9 +1737,11 @@
             newNoteFeedback.textContent = 'Digite o conteúdo da anotação.';
             return;
         }
-        const tags = newNoteTags.value.split(',').map(t => t.trim()).filter(Boolean).map(t => ({ name: t }));
+        // Sanitizar conteúdo e tags
+        const sanitizedContent = escapeHtml(content);
+        const tags = newNoteTags.value.split(',').map(t => t.trim()).filter(Boolean).map(t => ({ name: escapeHtml(t) }));
         const note = {
-            content,
+            content: sanitizedContent,
             tags,
             updatedAt: new Date().toISOString(),
             favorite: false
@@ -1283,6 +1757,31 @@
     };
     // Animação sequencial de fade-in usando Intersection Observer
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM totalmente carregado');
+        
+        // Verificar se os elementos essenciais existem
+        if (!chatList) {
+            console.error('Elemento chatList não encontrado no DOM!');
+            return;
+        }
+        
+        console.log('Iniciando processo de renderização');
+        console.log('chatList element:', chatList);
+        
+        if (!currentUser) {
+            console.error('Nenhum usuário logado!');
+            // Mostrar mensagem de erro na interface
+            chatList.innerHTML = '<div class="p-4 text-center text-red-400">Você precisa estar logado para ver as conversas.</div>';
+        } else {
+            renderChatList();
+            
+            // Forçar a exibição da lista de contatos
+            if (chatList) {
+                chatList.style.display = 'block';
+                console.log('Lista de contatos renderizada com', conversations.length, 'conversas');
+            }
+        }
+        
         const sections = Array.from(document.querySelectorAll('.fade-section'));
         let delay = 0;
         const observer = new IntersectionObserver((entries, obs) => {
@@ -1300,6 +1799,46 @@
             observer.observe(section);
         });
     });
+    
+    // Função para salvar anotação recebida no dashboard
+    function saveReceivedNote(noteData) {
+        try {
+            // Obter anotações existentes do dashboard
+            const dashboardNotes = JSON.parse(localStorage.getItem('enemai_notes') || '[]');
+            
+            // Verificar se a anotação já foi salva (comparando conteúdo)
+            const isDuplicate = dashboardNotes.some(note => 
+                note.content === noteData.content && 
+                JSON.stringify(note.tags || []) === JSON.stringify(noteData.tags || [])
+            );
+            
+            if (isDuplicate) {
+                alert('Esta anotação já foi salva em seu dashboard.');
+                return;
+            }
+            
+            // Criar nova anotação com estrutura compatível com o dashboard
+            const newNote = {
+                id: Date.now().toString(),
+                title: noteData.title || 'Anotação Recebida',
+                content: noteData.content || '',
+                tags: noteData.tags || [],
+                updatedAt: Date.now()
+            };
+            
+            // Adicionar nova anotação no início da lista
+            dashboardNotes.unshift(newNote);
+            
+            // Salvar no localStorage
+            localStorage.setItem('enemai_notes', JSON.stringify(dashboardNotes));
+            
+            // Mostrar feedback visual
+            alert('Anotação salva com sucesso em seu dashboard!');
+        } catch (error) {
+            console.error('Erro ao salvar anotação:', error);
+            alert('Erro ao salvar anotação. Por favor, tente novamente.');
+        }
+    }
     </script>
 </body>
-</html> 
+</html>
