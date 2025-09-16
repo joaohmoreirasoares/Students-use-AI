@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENEM AI - Gestão de Usuários</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+    <meta name="description" content="Gestão de Usuários do ENEM AI">
+    <meta name="robots" content="noindex, nofollow">
+    <style>
+        :root {
+            --cor-primaria: #7F00FF;
+            --cor-secundaria: #00C3FF;
+            --cor-destaque: #FF61A6;
+            --cor-fundo: #1A1A2E;
+            --cor-branco: #FFFFFF;
+            --fonte-titulo: 'Montserrat', sans-serif;
+            --fonte-texto: 'Poppins', sans-serif;
+        }
+        body {
+            font-family: var(--fonte-texto);
+            background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-fundo) 100%);
+            min-height: 100vh;
+            color: var(--cor-branco);
+            margin: 0;
+            padding: 0;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--fonte-titulo);
+        }
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            width: 250px;
+            background: rgba(53, 53, 90, 0.95);
+            color: var(--cor-branco);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 0;
+        }
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar-nav li {
+            margin-bottom: 5px;
+        }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--cor-branco);
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .sidebar-nav a:hover, .sidebar-nav a.active {
+            background: var(--cor-primaria);
+        }
+        .sidebar-nav a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .logout-btn {
+            width: 100%;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logout-btn i {
+            margin-right: 8px;
+        }
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .filters {
+            background: rgba(60, 30, 90, 0.92);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .filters form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .filters input, .filters select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background: rgba(40, 20, 60, 0.85);
+            color: white;
+        }
+        .filters button {
+            background: var(--cor-primaria);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .users-table-container {
+            background: rgba(60, 30, 90, 0.92);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        th {
+            background-color: rgba(127, 0, 255, 0.2);
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: rgba(127, 0, 255, 0.1);
+        }
+        .status-active {
+            color: #2ecc71;
+        }
+        .status-inactive {
+            color: #e74c3c;
+        }
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--cor-secundaria);
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 1rem;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .pagination button {
+            background: rgba(60, 30, 90, 0.92);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 12px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .pagination button.active {
+            background: var(--cor-primaria);
+        }
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .content {
+                margin-left: 0;
+            }
+            .menu-toggle {
+                display: block !important;
+            }
+        }
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--cor-primaria);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 101;
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" id="menu-toggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-brain mr-2"></i>EnemAI Admin</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="users.html" class="active"><i class="fas fa-users"></i> Gestão de Usuários</a></li>
+                <li><a href="reports.html"><i class="fas fa-chart-line"></i> Relatórios</a></li>
+                <li><a href="settings.html"><i class="fas fa-cog"></i> Configurações</a></li>
+            </ul>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="logout-btn" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Sair</button>
+        </div>
+    </aside>
+
+    <main class="content">
+        <div class="header">
+            <h1>Gestão de Usuários</h1>
+            <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold" id="add-user-btn">
+                <i class="fas fa-plus mr-2"></i>Adicionar Usuário
+            </button>
+        </div>
+
+        <div class="filters">
+            <form id="filter-form">
+                <input type="text" id="filter-name" placeholder="Nome">
+                <input type="email" id="filter-email" placeholder="Email">
+                <select id="filter-status">
+                    <option value="">Todos os Status</option>
+                    <option value="active">Ativo</option>
+                    <option value="inactive">Inativo</option>
+                </select>
+                <select id="filter-type">
+                    <option value="">Todos os Tipos</option>
+                    <option value="admin">Administrador</option>
+                    <option value="user">Usuário</option>
+                </select>
+                <button type="submit"><i class="fas fa-filter mr-2"></i>Filtrar</button>
+            </form>
+        </div>
+
+        <div class="users-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Tipo</th>
+                        <th>Data de Cadastro</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="users-table-body">
+                    <!-- Usuários serão carregados aqui -->
+                </tbody>
+            </table>
+            
+            <div class="pagination" id="pagination">
+                <!-- Paginação será carregada aqui -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Verificar autenticação ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = window.requireAdminAuth();
+            if (!user) {
+                // requireAdminAuth já redireciona, mas por segurança:
+                return;
+            }
+
+            // Toggle sidebar no mobile
+            document.getElementById('menu-toggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('active');
+            });
+
+            // Logout
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                window.adminLogout();
+            });
+
+            // Adicionar usuário
+            document.getElementById('add-user-btn').addEventListener('click', function() {
+                alert('Funcionalidade de adicionar usuário ainda não implementada.');
+            });
+
+            // Função para buscar dados de usuários do MCP Server
+            async function fetchUsers(filters = {}) {
+                try {
+                    const queryParams = new URLSearchParams(filters).toString();
+                    const response = await fetch(`http://localhost:3001/api/admin/users?${queryParams}`);
+                    const data = await response.json();
+                    return data;
+                } catch (error) {
+                    console.error('Erro ao buscar dados de usuários:', error);
+                    return { users: [], total: 0, page: 1, totalPages: 1 };
+                }
+            }
+
+            async function renderUsers(usersToRender) {
+                const tbody = document.getElementById('users-table-body');
+                tbody.innerHTML = '';
+                
+                usersToRender.forEach(user => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td class="${user.status === 'active' ? 'status-active' : 'status-inactive'}">
+                            ${user.status === 'active' ? 'Ativo' : 'Inativo'}
+                        </td>
+                        <td>${user.type === 'admin' ? 'Administrador' : 'Usuário'}</td>
+                        <td>${new Date(user.registrationDate).toLocaleDateString('pt-BR')}</td>
+                        <td>
+                            <button class="action-btn view-user" data-id="${user.id}" title="Visualizar">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="action-btn edit-user" data-id="${user.id}" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete-user" data-id="${user.id}" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button class="action-btn toggle-status" data-id="${user.id}" title="${user.status === 'active' ? 'Desativar' : 'Ativar'}">
+                                <i class="fas fa-${user.status === 'active' ? 'times' : 'check'}"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                
+                // Adicionar eventos aos botões
+                document.querySelectorAll('.view-user').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const userId = this.getAttribute('data-id');
+                        alert(`Visualizar usuário ID: ${userId}`);
+                    });
+                });
+                
+                document.querySelectorAll('.edit-user').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const userId = this.getAttribute('data-id');
+                        alert(`Editar usuário ID: ${userId}`);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-user').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const userId = this.getAttribute('data-id');
+                        if (confirm(`Tem certeza que deseja excluir o usuário ID: ${userId}?`)) {
+                            alert(`Usuário ID: ${userId} excluído.`);
+                            // Aqui você faria a chamada para o backend
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('.toggle-status').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const userId = this.getAttribute('data-id');
+                        alert(`Alternar status do usuário ID: ${userId}`);
+                        // Aqui você faria a chamada para o backend
+                    });
+                });
+            }
+
+            // Função de paginação
+            function setupPagination(currentPage, totalPages) {
+                const pagination = document.getElementById('pagination');
+                pagination.innerHTML = '';
+                
+                // Botão Anterior
+                const prevButton = document.createElement('button');
+                prevButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                prevButton.disabled = currentPage === 1;
+                prevButton.addEventListener('click', () => {
+                    if (currentPage > 1) loadData(currentPage - 1);
+                });
+                pagination.appendChild(prevButton);
+                
+                // Números das páginas (mostrar até 5 páginas)
+                const startPage = Math.max(1, currentPage - 2);
+                const endPage = Math.min(totalPages, currentPage + 2);
+                
+                for (let i = startPage; i <= endPage; i++) {
+                    const pageButton = document.createElement('button');
+                    pageButton.textContent = i;
+                    if (i === currentPage) pageButton.classList.add('active');
+                    pageButton.addEventListener('click', () => loadData(i));
+                    pagination.appendChild(pageButton);
+                }
+                
+                // Botão Próximo
+                const nextButton = document.createElement('button');
+                nextButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                nextButton.disabled = currentPage === totalPages;
+                nextButton.addEventListener('click', () => {
+                    if (currentPage < totalPages) loadData(currentPage + 1);
+                });
+                pagination.appendChild(nextButton);
+            }
+
+            // Função para carregar dados com filtros e paginação
+            async function loadData(page = 1) {
+                const filters = {
+                    name: document.getElementById('filter-name').value,
+                    email: document.getElementById('filter-email').value,
+                    status: document.getElementById('filter-status').value,
+                    type: document.getElementById('filter-type').value,
+                    page: page,
+                    limit: 10 // Itens por página
+                };
+                
+                const data = await fetchUsers(filters);
+                renderUsers(data.users);
+                setupPagination(data.page, data.totalPages);
+            }
+
+            // Inicializar a página
+            // Carregar dados iniciais
+            loadData(1);
+            
+            // Adicionar evento ao formulário de filtro
+            document.getElementById('filter-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                loadData(1); // Recarregar da página 1 ao aplicar filtros
+            });
+        });
+    </script>
+</body>
+</html>

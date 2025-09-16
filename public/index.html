@@ -1,3 +1,48 @@
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-site-logo">
+                <img src="images/logo.png" alt="Logo EnemAI" class="sidebar-logo-img" style="height:80px;max-width:90%;margin:0 auto 0.2em auto;display:block;object-fit:contain;" />
+                <i class="fas fa-brain" style="display:grid; place-items: center;"></i>
+                <span class="sidebar-logo-text">EnemAI</span>
+            </div>
+        <div class="sidebar-header"></div>
+        <style>
+            /* Exibe a logo sempre, mas oculta quando sidebar está retraída (não hover/focus) */
+            .sidebar .sidebar-logo-img {
+                display: block;
+                transition: opacity 0.3s;
+                opacity: 1;
+            }
+            .sidebar:not(:hover):not(:focus-within) .sidebar-logo-img {
+                opacity: 0;
+            }
+        </style>
+        <nav class="sidebar-content">
+                <a href="main-dashboard.html" class="sidebar-btn">
+                    <div class="circle-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    <span class="sidebar-label">Dashboard</span>
+                </a>
+                <a href="ai-chat.html" class="sidebar-btn">
+                    <div class="circle-icon"><i class="fas fa-robot"></i></div>
+                    <span class="sidebar-label">Chat IA</span>
+                </a>
+                <a href="settings.html" class="sidebar-btn">
+                    <div class="circle-icon"><i class="fas fa-cog"></i></div>
+                    <span class="sidebar-label">Configurações</span>
+                </a>
+                <a href="community.html" class="sidebar-btn">
+                    <div class="circle-icon"><i class="fas fa-users"></i></div>
+                    <span class="sidebar-label">Comunidade</span>
+                </a>
+                <a href="dashboard.html" class="sidebar-btn" id="sidebar-new-note-btn">
+                    <div class="circle-icon"><i class="fas fa-plus"></i></div>
+                    <span class="sidebar-label">Nova Nota</span>
+                </a>
+            </nav>
+            <div class="sidebar-user">
+                <div class="sidebar-avatar" id="sidebar-avatar">US</div>
+                <span class="sidebar-username" id="sidebar-username">Usuário</span>
+            </div>
+        </aside>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>

@@ -794,6 +794,17 @@
             <span class="sidebar-logo-text">EnemAI</span>
         </div>
         <div class="sidebar-header"></div>
+        <style>
+            /* Exibe a logo sempre, mas oculta quando sidebar está retraída (não hover/focus) */
+            .sidebar .sidebar-logo-img {
+                display: block;
+                transition: opacity 0.3s;
+                opacity: 1;
+            }
+            .sidebar:not(:hover):not(:focus-within) .sidebar-logo-img {
+                opacity: 0;
+            }
+        </style>
         <nav class="sidebar-content">
             <a href="main-dashboard.html" class="sidebar-btn">
                 <div class="circle-icon"><i class="fas fa-tachometer-alt"></i></div>

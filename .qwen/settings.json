@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "enemai-analytics": {
+      "command": "node",
+      "args": ["./mcp-servers/analytics-server.js"],
+      "cwd": ".",
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "timeout": 30000,
+      "trust": true
+    }
+  }
+}

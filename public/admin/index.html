@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENEM AI - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+    <meta name="description" content="Painel administrativo do ENEM AI">
+    <meta name="robots" content="noindex, nofollow"> <!-- Impede indexação -->
+    <style>
+        :root {
+            --cor-primaria: #7F00FF;
+            --cor-secundaria: #00C3FF;
+            --cor-destaque: #FF61A6;
+            --cor-fundo: #1A1A2E;
+            --cor-branco: #FFFFFF;
+            --fonte-titulo: 'Montserrat', sans-serif;
+            --fonte-texto: 'Poppins', sans-serif;
+        }
+        body {
+            font-family: var(--fonte-texto);
+            background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-fundo) 100%);
+            min-height: 100vh;
+            color: var(--cor-branco);
+            margin: 0;
+            padding: 0;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--fonte-titulo);
+        }
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            width: 250px;
+            background: rgba(53, 53, 90, 0.95); /* Cor da sidebar do site */
+            color: var(--cor-branco);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 0;
+        }
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar-nav li {
+            margin-bottom: 5px;
+        }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--cor-branco);
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .sidebar-nav a:hover, .sidebar-nav a.active {
+            background: var(--cor-primaria);
+        }
+        .sidebar-nav a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .logout-btn {
+            width: 100%;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logout-btn i {
+            margin-right: 8px;
+        }
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: rgba(60, 30, 90, 0.92);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .stat-card h3 {
+            margin-top: 0;
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .chart-container {
+            background: rgba(60, 30, 90, 0.92);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .recent-activity {
+            background: rgba(60, 30, 90, 0.92);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .activity-list {
+            list-style: none;
+            padding: 0;
+        }
+        .activity-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .activity-list li:last-child {
+            border-bottom: none;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .content {
+                margin-left: 0;
+            }
+            .menu-toggle {
+                display: block !important;
+            }
+        }
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--cor-primaria);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 101;
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" id="menu-toggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-brain mr-2"></i>EnemAI Admin</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="index.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="users.html"><i class="fas fa-users"></i> Gestão de Usuários</a></li>
+                <li><a href="reports.html"><i class="fas fa-chart-line"></i> Relatórios</a></li>
+                <li><a href="settings.html"><i class="fas fa-cog"></i> Configurações</a></li>
+            </ul>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="logout-btn" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Sair</button>
+        </div>
+    </aside>
+
+    <main class="content">
+        <div class="header">
+            <h1>Dashboard Administrativo</h1>
+            <div>
+                <span id="current-date"></span>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Usuários Totais</h3>
+                <div class="value" id="total-users">0</div>
+                <p><i class="fas fa-arrow-up text-green-500"></i> <span id="users-change">0%</span> desde ontem</p>
+            </div>
+            <div class="stat-card">
+                <h3>Usuários Ativos (7d)</h3>
+                <div class="value" id="active-users">0</div>
+                <p><i class="fas fa-arrow-up text-green-500"></i> <span id="active-users-change">0%</span> desde a última semana</p>
+            </div>
+            <div class="stat-card">
+                <h3>Visitas (7d)</h3>
+                <div class="value" id="visits-7d">0</div>
+                <p><i class="fas fa-arrow-up text-green-500"></i> <span id="visits-change">0%</span> em relação à semana anterior</p>
+            </div>
+            <div class="stat-card">
+                <h3>Engajamento (7d)</h3>
+                <div class="value" id="engagement-7d">0</div>
+                <p><i class="fas fa-arrow-up text-green-500"></i> <span id="engagement-change">0%</span> em relação à semana anterior</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="chart-container">
+                <h2><i class="fas fa-chart-bar mr-2"></i> Atividade dos Usuários (30 dias)</h2>
+                <canvas id="activityChart" height="100"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2><i class="fas fa-globe-americas mr-2"></i> Distribuição de Usuários</h2>
+                <canvas id="locationChart" height="100"></canvas>
+            </div>
+        </div>
+
+        <div class="recent-activity">
+            <h2><i class="fas fa-history mr-2"></i> Atividade Recente</h2>
+            <ul class="activity-list" id="activity-list">
+                <!-- Atividades serão carregadas aqui -->
+            </ul>
+        </div>
+    </main>
+
+    <script>
+        // Verificar autenticação ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = window.requireAdminAuth();
+            if (!user) {
+                // requireAdminAuth já redireciona, mas por segurança:
+                return;
+            }
+            
+            // Atualiza a data no header
+            document.getElementById('current-date').textContent = new Date().toLocaleDateString('pt-BR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // Toggle sidebar no mobile
+            document.getElementById('menu-toggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('active');
+            });
+
+            // Logout
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                window.adminLogout();
+            });
+
+            // Função para buscar dados do MCP Server
+            async function fetchDashboardData() {
+                try {
+                    const response = await fetch('http://localhost:3001/api/admin/dashboard/stats');
+                    const data = await response.json();
+                    
+                    // Atualizar cards com dados reais
+                    document.getElementById('total-users').textContent = data.totalUsers.toLocaleString('pt-BR');
+                    document.getElementById('users-change').textContent = data.usersChange;
+                    document.getElementById('active-users').textContent = data.activeUsers.toLocaleString('pt-BR');
+                    document.getElementById('active-users-change').textContent = data.activeUsersChange;
+                    document.getElementById('visits-7d').textContent = data.totalVisits.toLocaleString('pt-BR');
+                    document.getElementById('visits-change').textContent = data.visitsChange || '+0%';
+                    document.getElementById('engagement-7d').textContent = (data.totalNotes + data.totalMessages).toLocaleString('pt-BR');
+                    document.getElementById('engagement-change').textContent = data.notesChange || '+0%'; // Usando notesChange como proxy
+                } catch (error) {
+                    console.error('Erro ao buscar dados do dashboard:', error);
+                    // Em caso de erro, manter os dados de exemplo ou mostrar um erro
+                    document.getElementById('total-users').textContent = 'Erro';
+                    document.getElementById('active-users').textContent = 'Erro';
+                    document.getElementById('visits-7d').textContent = 'Erro';
+                    document.getElementById('engagement-7d').textContent = 'Erro';
+                }
+            }
+
+            // Chamar a função ao carregar a página
+            fetchDashboardData();
+
+            // Dados de exemplo para os gráficos (em um sistema real, buscariam do backend)
+            const activityCtx = document.getElementById('activityChart').getContext('2d');
+            const activityChart = new Chart(activityCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1 Jun', '5 Jun', '10 Jun', '15 Jun', '20 Jun', '25 Jun', '30 Jun'],
+                    datasets: [{
+                        label: 'Usuários Ativos',
+                        data: [120, 190, 130, 170, 210, 180, 230],
+                        borderColor: '#7F00FF',
+                        backgroundColor: 'rgba(127, 0, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            const locationCtx = document.getElementById('locationChart').getContext('2d');
+            const locationChart = new Chart(locationCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Teresina', 'São Paulo', 'Rio de Janeiro', 'Brasília', 'Outros'],
+                    datasets: [{
+                        data: [45, 20, 15, 10, 10],
+                        backgroundColor: [
+                            '#7F00FF',
+                            '#00C3FF',
+                            '#FF61A6',
+                            '#FFD700',
+                            '#95a5a6'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        }
+                    }
+                }
+            });
+
+            // Atividade recente de exemplo
+            const activityList = document.getElementById('activity-list');
+            const activities = [
+                {user: 'João Silva', action: 'criou uma nova anotação', time: '2 minutos atrás'},
+                {user: 'Maria Oliveira', action: 'enviou uma mensagem no chat', time: '5 minutos atrás'},
+                {user: 'Pedro Santos', action: 'fez uma pergunta à IA', time: '12 minutos atrás'},
+                {user: 'Ana Costa', action: 'editou uma anotação', time: '25 minutos atrás'},
+                {user: 'Carlos Lima', action: 'acessou o dashboard', time: '1 hora atrás'}
+            ];
+
+            activities.forEach(activity => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${activity.user}</strong> ${activity.action} <span class="text-gray-400">• ${activity.time}</span>`;
+                activityList.appendChild(li);
+            });
+        });
+    </script>
+</body>
+</html>

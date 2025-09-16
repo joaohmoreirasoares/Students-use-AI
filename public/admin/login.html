@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENEM AI - Login do Administrador</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+    <meta name="description" content="Login do Painel Administrativo do ENEM AI">
+    <meta name="robots" content="noindex, nofollow">
+    <style>
+        :root {
+            --cor-primaria: #7F00FF;
+            --cor-secundaria: #00C3FF;
+            --cor-destaque: #FF61A6;
+            --cor-fundo: #1A1A2E;
+            --cor-branco: #FFFFFF;
+            --fonte-titulo: 'Montserrat', sans-serif;
+            --fonte-texto: 'Poppins', sans-serif;
+        }
+        body {
+            font-family: var(--fonte-texto);
+            background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-fundo) 100%);
+            min-height: 100vh;
+            color: var(--cor-branco);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--fonte-titulo);
+        }
+        .login-container {
+            background: rgba(60, 30, 90, 0.92);
+            border-radius: 15px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--cor-secundaria);
+        }
+        .login-container h2 {
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: rgba(40, 20, 60, 0.85);
+            color: white;
+            box-sizing: border-box;
+        }
+        .btn-login {
+            background: var(--cor-primaria);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            font-size: 1.1rem;
+            transition: background 0.3s;
+        }
+        .btn-login:hover {
+            background: var(--cor-secundaria);
+        }
+        .error-message {
+            color: #e74c3c;
+            margin-top: 15px;
+            min-height: 20px;
+        }
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            color: var(--cor-secundaria);
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .captcha-container {
+            margin-bottom: 20px;
+            display: none; /* Inicialmente oculto */
+        }
+        .captcha-placeholder {
+            background: #2d2d3a;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <i class="fas fa-user-shield"></i>
+        </div>
+        <h2>Login do Administrador</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">Usuário</label>
+                <input type="text" id="username" name="username" required autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
+            </div>
+            <div class="captcha-container" id="captcha-container">
+                <div class="captcha-placeholder">
+                    <!-- Em um sistema real, aqui seria o widget do reCAPTCHA -->
+                    <p><i class="fas fa-robot mr-2"></i> Verificação CAPTCHA (simulada)</p>
+                    <input type="hidden" id="captcha-response" name="captcha_response">
+                </div>
+            </div>
+            <button type="submit" class="btn-login">Entrar</button>
+            <div class="error-message" id="error-message"></div>
+        </form>
+        <a href="../homepage.html" class="back-link"><i class="fas fa-arrow-left mr-2"></i>Voltar para o site</a>
+    </div>
+
+    <!-- Incluir o script de autenticação -->
+    <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsonwebtoken@9.0.0/lib/index.min.js"></script>
+    <script src="../src/scripts/admin-auth.js"></script>
+    <script>
+        // Verificar se o usuário já está autenticado
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('admin_auth_token');
+            if (token) {
+                // Verificar se o token ainda é válido
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1])); // Parte do payload do JWT
+                    const now = Math.floor(Date.now() / 1000);
+                    if (payload.exp > now) {
+                        // Token válido, redirecionar para o dashboard
+                        window.location.href = 'index.html';
+                    }
+                } catch (e) {
+                    // Token inválido, limpar
+                    localStorage.removeItem('admin_auth_token');
+                }
+            }
+        });
+
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const errorMessage = document.getElementById('error-message');
+            errorMessage.textContent = ''; // Limpar mensagens anteriores
+
+            try {
+                // Chamar a função de login do nosso script
+                const result = await window.adminLogin(username, password);
+                
+                if (result.success) {
+                    // Redirecionar para o dashboard
+                    window.location.href = 'index.html';
+                } else {
+                    errorMessage.textContent = result.message;
+                    
+                    // Mostrar CAPTCHA após algumas falhas (simulação)
+                    const attempts = loginAttempts[username] ? loginAttempts[username].attempts : 0;
+                    if (attempts >= 2) { // Mostrar após 2 tentativas
+                        document.getElementById('captcha-container').style.display = 'block';
+                    }
+                }
+            } catch (error) {
+                console.error("Erro inesperado no login:", error);
+                errorMessage.textContent = 'Ocorreu um erro. Tente novamente mais tarde.';
+            }
+        });
+    </script>
+</body>
+</html>

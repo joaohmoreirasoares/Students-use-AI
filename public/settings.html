@@ -337,10 +337,32 @@
     <!-- Sidebar moderna padronizada -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-site-logo">
+            <img src="images/logo.png" alt="Logo EnemAI" class="sidebar-logo-img" />
             <i class="fas fa-brain" style="display:grid; place-items: center;"></i>
             <span class="sidebar-logo-text">EnemAI</span>
         </div>
         <div class="sidebar-header"></div>
+        <style>
+            /* Exibe a logo sempre, mas oculta quando sidebar está retraída (não hover/focus) */
+            .sidebar .sidebar-logo-img {
+                height: 48px !important;
+                width: 48px !important;
+                min-width: 48px !important;
+                min-height: 48px !important;
+                max-width: 48px !important;
+                max-height: 48px !important;
+                margin: 0 0.5em 0 0.5em !important;
+                display: block !important;
+                object-fit: cover !important;
+                border-radius: 50% !important;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+                transition: opacity 0.3s ease;
+                opacity: 1 !important;
+            }
+            .sidebar:not(:hover):not(:focus-within) .sidebar-logo-img {
+                opacity: 0 !important;
+            }
+        </style>
         <nav class="sidebar-content">
             <a href="main-dashboard.html" class="sidebar-btn">
                 <div class="circle-icon"><i class="fas fa-tachometer-alt"></i></div>
@@ -369,6 +391,25 @@
         </div>
     </aside>
     <!-- Fim da sidebar padronizada -->
+    <script>
+    // Sidebar dinâmica: avatar e nome
+    (function() {
+        const sidebarAvatar = document.getElementById('sidebar-avatar');
+        const sidebarUsername = document.getElementById('sidebar-username');
+        function updateSidebarUser() {
+            const user = JSON.parse(localStorage.getItem('enemai_user'));
+            if (!user) return;
+            sidebarUsername.textContent = user.name || 'Usuário';
+            if (user.avatar) {
+                sidebarAvatar.innerHTML = `<img src="${user.avatar}" alt="Avatar" style="width:100%;height:100%;border-radius:50%">`;
+            } else {
+                const initials = (user.name||'Usuário').split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+                sidebarAvatar.textContent = initials;
+            }
+        }
+        updateSidebarUser();
+    })();
+    </script>
     <!-- Shapes SVG decorativos -->
     <svg class="shape-bg shape1" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="100" cy="100" rx="100" ry="100" fill="url(#paint0_radial)"/></svg>
     <svg class="shape-bg shape2" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="110" cy="110" rx="110" ry="110" fill="url(#paint1_radial)"/></svg>

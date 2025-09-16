@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENEM AI - Configurações do Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+    <meta name="description" content="Configurações do Painel Administrativo do ENEM AI">
+    <meta name="robots" content="noindex, nofollow">
+    <style>
+        :root {
+            --cor-primaria: #7F00FF;
+            --cor-secundaria: #00C3FF;
+            --cor-destaque: #FF61A6;
+            --cor-fundo: #1A1A2E;
+            --cor-branco: #FFFFFF;
+            --fonte-titulo: 'Montserrat', sans-serif;
+            --fonte-texto: 'Poppins', sans-serif;
+        }
+        body {
+            font-family: var(--fonte-texto);
+            background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-fundo) 100%);
+            min-height: 100vh;
+            color: var(--cor-branco);
+            margin: 0;
+            padding: 0;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--fonte-titulo);
+        }
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            width: 250px;
+            background: rgba(53, 53, 90, 0.95);
+            color: var(--cor-branco);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 0;
+        }
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar-nav li {
+            margin-bottom: 5px;
+        }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--cor-branco);
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .sidebar-nav a:hover, .sidebar-nav a.active {
+            background: var(--cor-primaria);
+        }
+        .sidebar-nav a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .logout-btn {
+            width: 100%;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logout-btn i {
+            margin-right: 8px;
+        }
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .settings-section {
+            background: rgba(60, 30, 90, 0.92);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .settings-section h2 {
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background: rgba(40, 20, 60, 0.85);
+            color: white;
+        }
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-group input {
+            width: auto;
+            margin-right: 10px;
+        }
+        .btn-save {
+            background: var(--cor-primaria);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        .btn-save i {
+            margin-right: 8px;
+        }
+        .security-alert {
+            background: rgba(231, 76, 60, 0.2);
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            border-radius: 0 5px 5px 0;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .content {
+                margin-left: 0;
+            }
+            .menu-toggle {
+                display: block !important;
+            }
+        }
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--cor-primaria);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 101;
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" id="menu-toggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-brain mr-2"></i>EnemAI Admin</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="users.html"><i class="fas fa-users"></i> Gestão de Usuários</a></li>
+                <li><a href="reports.html"><i class="fas fa-chart-line"></i> Relatórios</a></li>
+                <li><a href="settings.html" class="active"><i class="fas fa-cog"></i> Configurações</a></li>
+            </ul>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="logout-btn" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Sair</button>
+        </div>
+    </aside>
+
+    <main class="content">
+        <div class="header">
+            <h1>Configurações do Sistema</h1>
+        </div>
+
+        <div class="security-alert">
+            <p><i class="fas fa-exclamation-triangle mr-2"></i> <strong>Alerta de Segurança:</strong> Esta página contém configurações críticas. Altere-as com cuidado.</p>
+        </div>
+
+        <form id="settings-form">
+            <div class="settings-section">
+                <h2><i class="fas fa-shield-alt mr-2"></i> Segurança</h2>
+                
+                <div class="form-group">
+                    <label for="max-login-attempts">Tentativas Máximas de Login</label>
+                    <input type="number" id="max-login-attempts" name="max_login_attempts" value="5" min="1" max="10">
+                </div>
+                
+                <div class="form-group">
+                    <label for="lockout-duration">Duração do Bloqueio (minutos)</label>
+                    <input type="number" id="lockout-duration" name="lockout_duration" value="15" min="1" max="120">
+                </div>
+                
+                <div class="form-group">
+                    <label for="enable-2fa">Autenticação de Dois Fatores (2FA)</label>
+                    <select id="enable-2fa" name="enable_2fa">
+                        <option value="required">Obrigatória para Admins</option>
+                        <option value="optional">Opcional</option>
+                        <option value="disabled">Desativada</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="session-timeout">Tempo Limite de Sessão (minutos)</label>
+                    <input type="number" id="session-timeout" name="session_timeout" value="30" min="5" max="120">
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="enable-captcha" name="enable_captcha" checked>
+                    <label for="enable-captcha">Ativar CAPTCHA após falhas de login</label>
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="rate-limiting" name="rate_limiting" checked>
+                    <label for="rate-limiting">Ativar Rate Limiting (IP)</label>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h2><i class="fas fa-bell mr-2"></i> Notificações</h2>
+                
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="notify-login" name="notify_login" checked>
+                    <label for="notify-login">Notificar administradores sobre novos logins</label>
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="notify-security" name="notify_security" checked>
+                    <label for="notify-security">Notificar sobre eventos de segurança</label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="admin-email">Email para Notificações Administrativas</label>
+                    <input type="email" id="admin-email" name="admin_email" value="admin@enemai.com">
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h2><i class="fas fa-database mr-2"></i> Banco de Dados</h2>
+                
+                <div class="form-group">
+                    <label for="backup-frequency">Frequência de Backup</label>
+                    <select id="backup-frequency" name="backup_frequency">
+                        <option value="daily">Diário</option>
+                        <option value="weekly" selected>Semanal</option>
+                        <option value="monthly">Mensal</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="retention-period">Período de Retenção de Backups (dias)</label>
+                    <input type="number" id="retention-period" name="retention_period" value="30" min="7" max="365">
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h2><i class="fas fa-file-export mr-2"></i> Exportação de Dados</h2>
+                
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="allow-csv-export" name="allow_csv_export" checked>
+                    <label for="allow-csv-export">Permitir exportação em CSV</label>
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="allow-excel-export" name="allow_excel_export" checked>
+                    <label for="allow-excel-export">Permitir exportação em Excel</label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="export-password">Senha para arquivos exportados (opcional)</label>
+                    <input type="password" id="export-password" name="export_password" placeholder="Deixe em branco para não proteger">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-save">
+                <i class="fas fa-save"></i> Salvar Configurações
+            </button>
+        </form>
+    </main>
+
+    <script>
+        // Toggle sidebar no mobile
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            alert('Logout realizado com sucesso!');
+            window.location.href = '../login.html';
+        });
+
+        // Salvar configurações
+        document.getElementById('settings-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Configurações salvas com sucesso!');
+            // Aqui você faria a chamada para o backend
+        });
+    </script>
+</body>
+</html>
