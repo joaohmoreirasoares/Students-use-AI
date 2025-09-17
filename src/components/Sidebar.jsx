@@ -19,7 +19,6 @@ const Sidebar = () => (
         }}
         onError={e => { e.target.onerror = null; e.target.style.display = 'none'; e.target.parentNode.append(' [logo não carregou]'); }}
       />
-      <i className="fas fa-brain" style={{ display: "grid", placeItems: "center" }}></i>
       <span className="sidebar-logo-text">EnemAI</span>
     </div>
     <div className="sidebar-header"></div>

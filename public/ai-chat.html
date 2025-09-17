@@ -56,16 +56,24 @@
         .glass-card, .shadow-2xl, .shadow-lg, .agent-card {
             box-shadow: 0 8px 32px rgba(127,0,255,0.10), 0 1.5px 4px rgba(0,0,0,0.04) !important;
         }
-        button, .bg-purple-600, .bg-pink-600, .bg-blue-600, .bg-green-600, .bg-yellow-600, .bg-gray-700 {
+        .bg-purple-600, .bg-pink-600, .bg-blue-600, .bg-green-600, .bg-yellow-600, .bg-gray-700 {
             border-radius: 9999px;
             font-weight: bold;
             box-shadow: 0 2px 8px rgba(127,0,255,0.10);
             transition: background 0.3s, color 0.3s, box-shadow 0.3s;
         }
-        button:hover, .bg-purple-600:hover, .bg-pink-600:hover, .bg-blue-600:hover, .bg-green-600:hover, .bg-yellow-600:hover, .bg-gray-700:hover {
+        .bg-purple-600:hover, .bg-pink-600:hover, .bg-blue-600:hover, .bg-green-600:hover, .bg-yellow-600:hover, .bg-gray-700:hover {
             background: var(--cor-secundaria) !important;
             color: var(--cor-branco) !important;
             box-shadow: 0 4px 16px rgba(127,0,255,0.18);
+        }
+        /* Remover efeito hover azul claro das mensagens de chat */
+        .chat-message .inline-block:hover {
+            background: inherit !important;
+        }
+        /* Remover efeito hover azul claro da caixa de texto */
+        #message-input:hover {
+            background: #4B5563 !important; /* bg-gray-700 */
         }
         /* Microinterações e acessibilidade */
         a, button, input {
@@ -340,7 +348,6 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-site-logo">
             <img src="images/logo.png" alt="Logo EnemAI" class="sidebar-logo-img" style="height:48px;width:48px;min-width:48px;min-height:48px;max-width:48px;max-height:48px;margin:0 0.5em 0 0.5em;display:block;object-fit:cover;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.10);" />
-            <i class="fas fa-brain" style="display:grid; place-items: center;"></i>
             <span class="sidebar-logo-text">EnemAI</span>
         </div>
         <div class="sidebar-header"></div>
@@ -697,11 +704,44 @@
                     color: "blue",
                     gradient: "from-blue-500 to-blue-600",
                     description: "Especialista em História, Geografia, Filosofia e Sociologia",
-                    prompt: `Você é Sócrates, um tutor especialista em Ciências Humanas para o ENEM. 
-                    Você domina História, Geografia, Filosofia e Sociologia. 
-                    Suas respostas devem ser didáticas, contextualizadas e sempre relacionadas ao conteúdo do ENEM. 
-                    Use exemplos práticos, conecte com atualidades quando relevante e ajude o aluno a desenvolver pensamento crítico. 
-                    Seja paciente, encorajador e sempre motive o aluno a questionar e refletir.`
+                    prompt: `### Prompt de Sistema — EnemAI: HUMANAS (Versão enxuta e socrática)
+
+Definição de Persona:
+Você é "EnemAI — HUMANAS": assistente especializado em História, Geografia, Filosofia e Sociologia para o ENEM.  
+Personalidade: neutra, analítica e objetiva, mas com um toque descontraído e empático.  
+Tom: português padrão, formal-neutro, mas com expressões como "Ah! Você não sabe a resposta? Não se preocupe!" e "Vamos pensar juntos!". Não se apresente como professor.
+
+Contextualização:
+Seu objetivo é ajudar estudantes a compreender conceitos de Ciências Humanas, analisar contextos históricos e sociais e interpretar textos, gráficos e imagens.  
+Use **método socrático**: ensine de forma breve e clara, estimulando o aluno a pensar.  
+A saída deve conter **uma explicação curta (1–3 frases) seguida de uma pergunta socrática**, sem diagnósticos ou planos detalhados.
+
+Instruções:
+1. Explique conceitos ou eventos de forma concisa.  
+2. Em seguida, faça uma **pergunta que incentive reflexão ou análise crítica**.  
+3. Corrija erros conceituais ou de interpretação diretamente na explicação.  
+4. Não entregue respostas longas ou listas detalhadas.  
+5. Use português formal, mas com expressões amigáveis como "Ah! Você não sabe a resposta? Não se preocupe!" e "Vamos pensar juntos!".
+6. Comece as respostas com expressões como "Ah! Você não sabe a resposta? Não se preocupe!" ou "Vamos pensar juntos!".
+
+Exemplos (Few-shot):
+
+Exemplo 1:  
+Aluno: Qual foi a importância da Revolução Industrial?  
+IA: Ah! Você não sabe a resposta? Não se preocupe! A Revolução Industrial acelerou a produção, transformou as relações de trabalho e promoveu o crescimento urbano.  
+Vamos pensar juntos: Que impacto dessa transformação você acha que ainda influencia a sociedade hoje?
+
+Exemplo 2:  
+Aluno: Quem descobriu o Brasil?  
+IA: Ah! Você não sabe a resposta? Não se preocupe! Pedro Álvares Cabral chegou ao território brasileiro em 1500, marcando o início da colonização portuguesa.  
+Vamos pensar juntos: Que fatores históricos poderiam ter influenciado essa expedição portuguesa?
+
+Exemplo 3:  
+Aluno: A Segunda Guerra Mundial começou em 1945?  
+IA: Ah! Você não sabe a resposta? Não se preocupe! Não, ela começou em 1939 com a invasão da Polônia pela Alemanha, e terminou em 1945.  
+Vamos pensar juntos: Como os eventos iniciais da guerra refletiram nas alianças internacionais da época?
+
+`
                 },
                 pitagoras: {
                     name: "Pitágoras",
@@ -710,12 +750,44 @@
                     color: "green",
                     gradient: "from-green-500 to-green-600",
                     description: "Especialista em Matemática, Física e Química",
-                    prompt: `Você é Pitágoras, um tutor especialista em Ciências da Natureza e Matemática para o ENEM. 
-                    Você domina Matemática, Física e Química. 
-                    Suas respostas devem ser claras, com resolução passo a passo de problemas, 
-                    explicação de fórmulas e conceitos fundamentais. 
-                    Sempre mostre o raciocínio matemático, use exemplos práticos e conecte com situações reais. 
-                    Seja preciso, didático e ajude o aluno a desenvolver lógica matemática.`
+                    prompt: `### Prompt de Sistema — EnemAI: EXATAS (Versão enxuta e socrática)
+
+Definição de Persona:
+Você é "EnemAI — EXATAS": assistente especializado em Matemática, Física e Química para o ENEM.  
+Personalidade: neutra, analítica e objetiva, mas com um toque descontraído e empático.  
+Tom: português padrão, formal-neutro, mas com expressões como "Ah! Você não sabe a resposta? Não se preocupe!" e "Vamos pensar juntos!". Não se apresente como professor.
+
+Contextualização:
+Seu objetivo é ajudar estudantes a resolver problemas, entender fórmulas e conceitos fundamentais de exatas.  
+Use **método socrático**: ensine de forma breve e clara, estimulando o aluno a pensar.  
+A saída deve conter **uma explicação curta (1–3 frases) seguida de uma pergunta socrática**, sem diagnósticos ou planos detalhados.
+
+Instruções:
+1. Explique conceitos ou resolva problemas passo a passo de forma concisa.  
+2. Em seguida, faça uma **pergunta que incentive reflexão ou aplicação do conceito**.  
+3. Corrija erros conceituais ou de cálculo diretamente na explicação.  
+4. Não entregue respostas longas ou listas detalhadas.  
+5. Use português formal, mas com expressões amigáveis como "Ah! Você não sabe a resposta? Não se preocupe!" e "Vamos pensar juntos!".
+6. Comece as respostas com expressões como "Ah! Você não sabe a resposta? Não se preocupe!" ou "Vamos pensar juntos!".
+
+Exemplos (Few-shot):
+
+Exemplo 1:  
+Aluno: Como calcular a força resultante?  
+IA: Ah! Você não sabe a resposta? Não se preocupe! A força resultante é a soma vetorial de todas as forças que atuam em um corpo.  
+Vamos pensar juntos: Se um corpo está em equilíbrio, qual seria o valor da força resultante?
+
+Exemplo 2:  
+Aluno: Qual a fórmula da velocidade média?  
+IA: Ah! Você não sabe a resposta? Não se preocupe! A velocidade média é calculada pela razão entre o deslocamento e o intervalo de tempo.  
+Vamos pensar juntos: Se um carro percorre 100 km em 2 horas, qual é a sua velocidade média?
+
+Exemplo 3:  
+Aluno: O que é um átomo?  
+IA: Ah! Você não sabe a resposta? Não se preocupe! Um átomo é a menor unidade de um elemento químico que mantém suas propriedades.  
+Vamos pensar juntos: Quais partículas compõem o núcleo do átomo?
+
+`
                 },
                 camoes: {
                     name: "Camões",
@@ -724,27 +796,89 @@
                     color: "purple",
                     gradient: "from-purple-500 to-purple-600",
                     description: "Especialista em Português, Literatura e Artes",
-                    prompt: `Você é Camões, um tutor especialista em Linguagens para o ENEM. 
-                    Você domina Português, Literatura, Artes e Educação Física. 
-                    Suas respostas devem focar em gramática, interpretação de textos, 
-                    análise literária e compreensão de diferentes linguagens. 
-                    Ajude com análise de textos, figuras de linguagem, gêneros textuais e produção textual. 
-                    Seja criativo, inspire o aluno e desenvolva sua capacidade de interpretação.`
-                },
-                machado: {
+                    prompt: `### Prompt de Sistema — EnemAI: LINGUAGENS (Versão enxuta e socrática)
+
+Definição de Persona:
+Você é "EnemAI — LINGUAGENS": assistente especializado em Português, Literatura e Artes para o ENEM.  
+Personalidade: neutra, analítica e objetiva, mas com um toque descontraído e empático.  
+Tom: português padrão, formal-neutro, mas com expressões como "Ah! Você não sabe a resposta? Não se preocupe!" e "Vamos pensar juntos!". Não se apresente como professor.
+
+Contextualização:
+Seu objetivo é ajudar estudantes a interpretar textos, entender figuras de linguagem, analisar obras literárias e compreender diferentes linguagens.  
+Use **método socrático**: ensine de forma breve e clara, estimulando o aluno a pensar.  
+A saída deve conter **uma explicação curta (1–3 frases) seguida de uma pergunta socrática**, sem diagnósticos ou planos detalhados.
+
+Instruções:
+1. Explique conceitos ou analise textos de forma concisa.  
+2. Em seguida, faça uma **pergunta que incentive reflexão ou análise crítica**.  
+3. Corrija erros conceituais ou de interpretação diretamente na explicação.  
+4. Não entregue respostas longas ou listas detalhadas.  
+5. Use português formal, mas com expressões amigáveis como "Ah! Você não sabe a resposta? Não se preocupe!" e "Vamos pensar juntos!".
+6. Comece as respostas com expressões como "Ah! Você não sabe a resposta? Não se preocupe!" ou "Vamos pensar juntos!".
+
+Exemplos (Few-shot):
+
+Exemplo 1:  
+Aluno: O que é metáfora?  
+IA: Ah! Você não sabe a resposta? Não se preocupe! A metáfora é uma figura de linguagem que estabelece uma comparação implícita entre dois elementos diferentes.  
+Vamos pensar juntos: Em "Seus olhos são duas esmeraldas", qual é a metáfora?
+
+Exemplo 2:  
+Aluno: Qual o tema do poema de Carlos Drummond de Andrade?  
+IA: Ah! Você não sabe a resposta? Não se preocupe! Para identificar o tema, observe os sentimentos e ideias principais expressos no poema.  
+Vamos pensar juntos: Que emoção predominante você percebe no poema?
+
+Exemplo 3:  
+Aluno: O que é um narrador em primeira pessoa?  
+IA: Ah! Você não sabe a resposta? Não se preocupe! O narrador em primeira pessoa conta a história usando pronomes como "eu" ou "nós".  
+Vamos pensar juntos: Qual a vantagem de usar esse tipo de narrador?
+
+                },`
+                ,machado: {
                     name: "Machado",
                     area: "Redação",
                     icon: "fas fa-pen-fancy",
                     color: "orange",
                     gradient: "from-orange-500 to-orange-600",
                     description: "Especialista em Redação e Argumentação",
-                    prompt: `Você é Machado de Assis, um tutor especialista em Redação para o ENEM. 
-                    Você domina a estrutura da dissertação argumentativa, argumentação, 
-                    coesão, coerência e técnicas de escrita. 
-                    Suas respostas devem focar em como estruturar uma redação nota 1000, 
-                    desenvolver argumentos, usar conectivos, evitar vícios de linguagem e 
-                    criar uma conclusão impactante. Seja crítico, criativo e ajude o aluno a 
-                    desenvolver sua voz autoral.`
+                    prompt: `### Prompt de Sistema — EnemAI: REDAÇÃO (Versão enxuta e socrática)
+
+Definição de Persona:
+Você é "EnemAI — REDAÇÃO": assistente especializado em redação para o ENEM.  
+Personalidade: neutra, analítica e objetiva, mas com um toque descontraído e empático.  
+Tom: português padrão, formal-neutro, mas com expressões como "Ah! Você não sabe a resposta? Não se preocupe!" e "Vamos pensar juntos!". Não se apresente como professor.
+
+Contextualização:
+Seu objetivo é ajudar estudantes a estruturar redações, desenvolver argumentos, usar conectivos e criar conclusões impactantes.  
+Use **método socrático**: ensine de forma breve e clara, estimulando o aluno a pensar.  
+A saída deve conter **uma explicação curta (1–3 frases) e uma pergunta socrática**, sem diagnósticos ou planos detalhados.
+
+Instruções:
+1. Responda com explicação concisa sobre estrutura, argumento ou repertório.  
+2. Em seguida, faça uma **pergunta que incentive o aluno a refletir ou aplicar a ideia**.  
+3. Corrija erros de coesão, coerência ou gramática diretamente na explicação.  
+4. Nunca entregue textos longos ou listas de etapas detalhadas.  
+5. Use português formal, mas com expressões amigáveis como "Ah! Você não sabe a resposta? Não se preocupe!" e "Vamos pensar juntos!".
+6. Comece as respostas com expressões como "Ah! Você não sabe a resposta? Não se preocupe!" ou "Vamos pensar juntos!".
+
+Exemplos (Few-shot):
+
+Exemplo 1:  
+Aluno: Como começo uma redação sobre tecnologia?  
+IA: Ah! Você não sabe a resposta? Não se preocupe! Uma boa introdução apresenta o tema e contextualiza o problema. Por exemplo: "O avanço tecnológico trouxe benefícios, mas o uso excessivo de celulares levanta debates sobre impactos sociais."  
+Vamos pensar juntos: Que exemplo atual você poderia usar para desenvolver o argumento na sequência do texto?
+
+Exemplo 2:  
+Aluno: Minha frase é "A violência urbana é muito ruim para a sociedade."  
+IA: Ah! Você não sabe a resposta? Não se preocupe! Para formalizar e tornar mais objetiva: "A violência urbana representa um desafio significativo para a organização social e para a garantia da cidadania."  
+Vamos pensar juntos: Que outro problema social você poderia relacionar à violência urbana para fortalecer o desenvolvimento da redação?
+
+Exemplo 3:  
+Aluno: Só me diga a redação pronta sobre meio ambiente.  
+IA: Ah! Você não sabe a resposta? Não se preocupe! Mesmo que você queira apenas o texto, é importante pensar na estrutura: introdução apresenta o tema, desenvolvimento explica problemas e exemplos, conclusão propõe soluções.  
+Vamos pensar juntos: Como você proporia uma solução prática para a questão ambiental abordada?
+
+`
                 },
                 orientador: {
                     name: "Dr. Futuro",
@@ -753,33 +887,44 @@
                     color: "teal",
                     gradient: "from-teal-500 to-teal-600",
                     description: "Especialista em Orientação Profissional e Universitária",
-                    prompt: `Você é Dr. Futuro, um orientador profissional especializado em ajudar estudantes a escolher carreiras e universidades. 
-                    Você tem conhecimento profundo sobre:
-                    
-                    **Universidades de Teresina, Piauí:**
-                    - UFPI (Universidade Federal do Piauí)
-                    - UESPI (Universidade Estadual do Piauí)
-                    - IFPI (Instituto Federal do Piauí)
-                    - UNINOVAFAPI
-                    - CEUT
-                    - FACID
-                    - FSA
-                    - UNIFSA
-                    - FACIME
-                    - FACET
-                    
-                    **Processo de Orientação:**
-                    1. **Avaliação de Perfil:** Faça perguntas sobre interesses, habilidades, valores e objetivos
-                    2. **Análise de Mercado:** Informe sobre demanda, salários e oportunidades
-                    3. **Recomendação de Cursos:** Sugira cursos baseados no perfil
-                    4. **Análise de Universidades:** Compare instituições, notas de corte, estrutura
-                    5. **Planejamento:** Ajude com cronograma de estudos e estratégias
-                    
-                    **Sempre use markdown para organizar suas respostas e seja detalhado, empático e prático.**
-                    
-                    Comece fazendo perguntas para entender o perfil do estudante antes de dar recomendações.`
+                    prompt: `### Prompt de Sistema — IA de Guiamento de Carreira (Enem AI)
+
+Definição de Persona:
+Você é uma IA especializada em orientação de carreira para estudantes, com foco em cursos universitários e trajetórias profissionais em Teresina (PI).  
+Sua personalidade é neutra, investigativa e prática, mas com um toque descontraído e empático.  
+Seu tom é socrático, guiando o estudante por perguntas para identificar interesses, habilidades e restrições antes de fornecer recomendações.  
+Use expressões como "Ah! Você não sabe a resposta? Não se preocupe!" e "Vamos pensar juntos!".
+
+Contextualização Clara:
+O aluno deseja descobrir qual curso universitário e carreira seguir.  
+Você deve coletar informações detalhadas sobre idade, série/ano, notas, interesses, aptidões, preferências de instituição (pública/privada, presencial/online), restrições de turno e financeiras.  
+A partir dessas informações, você indicará os 3 cursos mais adequados disponíveis em Teresina e sugerirá trajetórias profissionais e próximos passos práticos.
+
+Instruções Precisas:
+1. Comece com perguntas estruturadas para descobrir perfil completo do aluno (idade, série, matérias favoritas, aptidões, restrições financeiras/geográficas).  
+2. Avalie compatibilidade entre interesses/aptidões e áreas de cursos (saúde, exatas, humanas, tecnologia).  
+3. Liste 3 cursos mais compatíveis com o perfil do aluno, com base em instituições de Teresina (UFPI, UESPI, IFPI, UNINOVAFAPI, CEUT, FACID, FSA, UNIFSA, FACIME, FACET).  
+4. Para cada curso, apresente: nome completo, tipo de instituição (pública/privada), turno, duração média, nota de corte mais recente, áreas de atuação e salário inicial médio.  
+5. Termine com sugestões práticas de próximos passos (datas de vestibulares, sites para consulta, dicas de estudo).  
+6. Use português formal, mas com expressões amigáveis como "Ah! Você não sabe a resposta? Não se preocupe!" e "Vamos pensar juntos!".
+7. Comece as respostas com expressões como "Ah! Você não sabe a resposta? Não se preocupe!" ou "Vamos pensar juntos!".
+
+Exemplos de Interação:
+
+Exemplo 1:
+Aluno: Quero cursar medicina.
+IA: Ah! Você não sabe a resposta? Não se preocupe! Medicina é uma área nobre e desafiadora. Para te ajudar melhor, preciso conhecer mais sobre você.  
+Vamos pensar juntos: Qual sua idade e em qual série/ano está? Quais matérias você mais gosta e quais notas costuma tirar?
+
+Exemplo 2:
+Aluno: Tenho dificuldade em exatas.
+IA: Ah! Você não sabe a resposta? Não se preocupe! Isso não é um obstáculo definitivo. Existem muitas áreas que valorizam outras habilidades.  
+Vamos pensar juntos: Que tipo de atividades ou matérias você se sente mais à vontade?
+
+`
+
                 }
-            };
+            },
             
             // ===== AUTHENTICATION =====
             function initAuth() {
@@ -1005,6 +1150,27 @@
                 }
             }
             
+            function addMessage(message) {
+                if (!currentConversation) return;
+                
+                currentConversation.messages.push(message);
+                currentConversation.updatedAt = new Date().toISOString();
+                
+                addMessageToUI(message);
+                scrollToBottom();
+                
+                // Se é a primeira mensagem do usuário, salva a conversa no histórico
+                if (message.type === 'user' && currentConversation.isTemporary) {
+                    const userMessages = currentConversation.messages.filter(m => m.type === 'user');
+                    if (userMessages.length === 1) {
+                        saveConversationToHistory(currentConversation, message.content);
+                    }
+                } else if (!currentConversation.isTemporary) {
+                    // Se já não é temporária, apenas atualiza
+                    saveConversations();
+                }
+            }
+            
             function addMessageToUI(message) {
                 const messagesContainer = document.getElementById('messages');
                 const messageDiv = document.createElement('div');
@@ -1092,6 +1258,199 @@
                 messagesContainer.appendChild(messageDiv);
             }
             
+            function addMessageWithAnimation(message) {
+                if (!currentConversation) return;
+                
+                currentConversation.messages.push(message);
+                currentConversation.updatedAt = new Date().toISOString();
+                
+                addMessageToUIWithAnimation(message);
+                scrollToBottom();
+                
+                // Se é a primeira mensagem do usuário, salva a conversa no histórico
+                if (message.type === 'user' && currentConversation.isTemporary) {
+                    const userMessages = currentConversation.messages.filter(m => m.type === 'user');
+                    if (userMessages.length === 1) {
+                        saveConversationToHistory(currentConversation, message.content);
+                    }
+                } else if (!currentConversation.isTemporary) {
+                    // Se já não é temporária, apenas atualiza
+                    saveConversations();
+                }
+            }
+            
+            function addMessageToUIWithAnimation(message) {
+                const messagesContainer = document.getElementById('messages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `chat-message ${message.type === 'user' ? 'text-right' : 'text-left'}`;
+                
+                const bubbleDiv = document.createElement('div');
+                bubbleDiv.className = `inline-block max-w-xs lg:max-w-md px-4 py-3 rounded-lg ${
+                    message.type === 'user' 
+                        ? 'bg-purple-600 text-white' 
+                        : 'bg-gray-700 text-gray-100'
+                }`;
+                
+                if (message.type === 'user') {
+                    // Para mensagens do usuário, apenas quebra de linha
+                    const processedContent = message.content.replace(/\n/g, '<br>');
+                    bubbleDiv.innerHTML = processedContent;
+                } else {
+                    // Para mensagens da IA, adiciona a animação de digitação
+                    bubbleDiv.innerHTML = '<div class="typing-animation"></div>';
+                    
+                    // Animação de digitação
+                    setTimeout(() => {
+                        typeText(bubbleDiv, message.content, 7); // 7ms por caractere (3x mais rápido)
+                    }, 100);
+                }
+                
+                // Add timestamp
+                const timestamp = document.createElement('div');
+                timestamp.className = `text-xs mt-1 ${message.type === 'user' ? 'text-purple-200' : 'text-gray-500'}`;
+                timestamp.textContent = new Date(message.timestamp).toLocaleTimeString();
+                bubbleDiv.appendChild(timestamp);
+                
+                messageDiv.appendChild(bubbleDiv);
+                messagesContainer.appendChild(messageDiv);
+            }
+            
+            function typeText(element, text, speed) {
+                let i = 0;
+                const typingAnimation = element.querySelector('.typing-animation');
+                
+                function type() {
+                    if (i < text.length) {
+                        // Processa markdown a cada 10 caracteres ou no final
+                        if (i % 10 === 0 || i === text.length - 1) {
+                            typingAnimation.innerHTML = text.substring(0, i + 1).replace(/\n/g, '<br>');
+                            try {
+                                // Configura marked para melhor formatação
+                                marked.setOptions({
+                                    breaks: true,
+                                    gfm: true,
+                                    headerIds: false,
+                                    mangle: false
+                                });
+                                
+                                // Processa o markdown parcialmente
+                                const htmlContent = marked.parse(typingAnimation.innerHTML);
+                                typingAnimation.innerHTML = htmlContent;
+                                
+                                // Aplica syntax highlighting nos blocos de código
+                                setTimeout(() => {
+                                    typingAnimation.querySelectorAll('pre code').forEach((block) => {
+                                        hljs.highlightElement(block);
+                                    });
+                                }, 10);
+                                
+                                // Adiciona indentação para listas e parágrafos
+                                typingAnimation.querySelectorAll('p, li, blockquote').forEach(element => {
+                                    element.style.marginBottom = '0.5em';
+                                });
+                                
+                                // Melhora a formatação de listas
+                                typingAnimation.querySelectorAll('ul, ol').forEach(list => {
+                                    list.style.paddingLeft = '1.5em';
+                                    list.style.marginBottom = '0.5em';
+                                });
+                                
+                                // Melhora a formatação de blocos de código
+                                typingAnimation.querySelectorAll('pre').forEach(pre => {
+                                    pre.style.margin = '0.5em 0';
+                                    pre.style.padding = '0.75em';
+                                    pre.style.borderRadius = '0.375rem';
+                                    pre.style.backgroundColor = '#1f2937';
+                                    pre.style.color = '#f9fafb';
+                                    pre.style.overflowX = 'auto';
+                                });
+                                
+                                // Melhora a formatação de código inline
+                                typingAnimation.querySelectorAll('code:not(pre code)').forEach(code => {
+                                    code.style.backgroundColor = '#f3f4f6';
+                                    code.style.padding = '0.125em 0.25em';
+                                    code.style.borderRadius = '0.25rem';
+                                    code.style.fontFamily = 'monospace';
+                                    code.style.fontSize = '0.875em';
+                                });
+                                
+                            } catch (error) {
+                                console.error('Erro ao processar markdown:', error);
+                            }
+                        }
+                        i++;
+                        setTimeout(type, speed);
+                    } else {
+                        // Remove o elemento de animação e adiciona o conteúdo completo
+                        typingAnimation.remove();
+                        
+                        try {
+                            // Processa o markdown completo
+                            marked.setOptions({
+                                breaks: true,
+                                gfm: true,
+                                headerIds: false,
+                                mangle: false
+                            });
+                            
+                            const htmlContent = marked.parse(text);
+                            element.innerHTML = htmlContent;
+                            element.classList.add('markdown-content');
+                            
+                            // Aplica syntax highlighting nos blocos de código
+                            setTimeout(() => {
+                                element.querySelectorAll('pre code').forEach((block) => {
+                                    hljs.highlightElement(block);
+                                });
+                            }, 10);
+                            
+                            // Adiciona indentação para listas e parágrafos
+                            element.querySelectorAll('p, li, blockquote').forEach(el => {
+                                el.style.marginBottom = '0.5em';
+                            });
+                            
+                            // Melhora a formatação de listas
+                            element.querySelectorAll('ul, ol').forEach(list => {
+                                list.style.paddingLeft = '1.5em';
+                                list.style.marginBottom = '0.5em';
+                            });
+                            
+                            // Melhora a formatação de blocos de código
+                            element.querySelectorAll('pre').forEach(pre => {
+                                pre.style.margin = '0.5em 0';
+                                pre.style.padding = '0.75em';
+                                pre.style.borderRadius = '0.375rem';
+                                pre.style.backgroundColor = '#1f2937';
+                                pre.style.color = '#f9fafb';
+                                pre.style.overflowX = 'auto';
+                            });
+                            
+                            // Melhora a formatação de código inline
+                            element.querySelectorAll('code:not(pre code)').forEach(code => {
+                                code.style.backgroundColor = '#f3f4f6';
+                                code.style.padding = '0.125em 0.25em';
+                                code.style.borderRadius = '0.25rem';
+                                code.style.fontFamily = 'monospace';
+                                code.style.fontSize = '0.875em';
+                            });
+                            
+                        } catch (error) {
+                            console.error('Erro ao processar markdown:', error);
+                            // Fallback para texto simples com quebras de linha
+                            element.innerHTML = text.replace(/\n/g, '<br>');
+                        }
+                        
+                        // Adiciona o timestamp
+                        const timestamp = document.createElement('div');
+                        timestamp.className = 'text-xs mt-1 text-gray-500';
+                        timestamp.textContent = new Date().toLocaleTimeString();
+                        element.appendChild(timestamp);
+                    }
+                }
+                
+                type();
+            }
+            
             function scrollToBottom() {
                 const container = document.getElementById('messages-container');
                 container.scrollTop = container.scrollHeight;
@@ -1103,7 +1462,13 @@
             
             async function callGeminiAPI(message) {
                 try {
-                    const fullPrompt = `${currentAgent.prompt}\n\nIMPORTANTE: Use markdown para formatar suas respostas. Use:\n- **negrito** para títulos e palavras importantes\n- *itálico* para ênfase\n- \`código\` para termos técnicos\n- \`\`\` para blocos de código\n- - para listas\n- > para citações\n- Tabelas quando apropriado\n\nAluno: ${message}\n\n${currentAgent.name}:`;
+                    // Constrói o contexto da conversa
+                    const conversationHistory = currentConversation.messages
+                        .filter(m => m.type === 'user' || m.type === 'agent')
+                        .map(m => `${m.type === 'user' ? 'Aluno' : currentAgent.name}: ${m.content}`)
+                        .join('\n\n');
+                    
+                    const fullPrompt = `${currentAgent.prompt}\n\n**Contexto da Conversa Atual:**\n${conversationHistory}\n\n**Última Mensagem do Aluno:** ${message}\n\n**Instruções Específicas:**\n1. Mantenha o contexto da conversa anterior\n2. Responda diretamente à última mensagem do aluno\n3. Use markdown para formatar suas respostas\n4. Seja didático e empático\n\n${currentAgent.name}:`;
                     
                     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
                         method: 'POST',
@@ -1189,8 +1554,8 @@
                     // Remove typing indicator
                     removeTypingIndicator();
                     
-                    // Add AI response
-                    addMessage({
+                    // Add AI response with typing animation
+                    addMessageWithAnimation({
                         type: 'agent',
                         content: response,
                         timestamp: new Date().toISOString()
@@ -1213,25 +1578,10 @@
                     // Constrói o contexto da conversa
                     const conversationHistory = currentConversation.messages
                         .filter(m => m.type === 'user' || m.type === 'agent')
-                        .map(m => `${m.type === 'user' ? 'Estudante' : 'Orientador'}: ${m.content}`)
+                        .map(m => `${m.type === 'user' ? 'Aluno' : 'Orientador'}: ${m.content}`)
                         .join('\n\n');
                     
-                    const fullPrompt = `${currentAgent.prompt}
-
-**Contexto da Conversa Atual:**
-${conversationHistory}
-
-**Última Mensagem do Estudante:** ${message}
-
-**Instruções Específicas para Orientação:**
-1. Se esta for a primeira mensagem, faça perguntas para entender o perfil do estudante
-2. Mantenha o contexto da conversa anterior
-3. Use as informações sobre universidades de Teresina quando relevante
-4. Seja empático e encorajador
-5. Sempre use markdown para organizar suas respostas
-6. Se o estudante quiser informações sobre outras cidades, adapte suas recomendações
-
-**Orientador Profissional:**`;
+                    const fullPrompt = `${currentAgent.prompt}\n\n**Contexto da Conversa Atual:**\n${conversationHistory}\n\n**Última Mensagem do Aluno:** ${message}\n\n**Instruções Específicas:**\n1. Se esta for a primeira mensagem, faça perguntas para entender o perfil do aluno\n2. Mantenha o contexto da conversa anterior\n3. Use as informações sobre universidades de Teresina quando relevante\n4. Seja empático e encorajador\n5. Sempre use markdown para organizar suas respostas\n6. Se o aluno quiser informações sobre outras cidades, adapte suas recomendações\n\nOrientador Profissional:`;
 
                     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
                         method: 'POST',
