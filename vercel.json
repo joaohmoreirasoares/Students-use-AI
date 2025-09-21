@@ -1,0 +1,18 @@
+{
+  "public": true,
+  "functions": {
+    "api/chat.js": {
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/public/homepage.html"
+    },
+    {
+      "source": "/homepage.html",
+      "destination": "/public/homepage.html"
+    }
+  ]
+}

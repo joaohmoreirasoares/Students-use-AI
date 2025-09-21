@@ -37,23 +37,13 @@
             --sidebar-btn-border: #fff;
             --sidebar-btn-shadow: var(--cor-primaria);
         }
-        html {
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-fundo) 100%);
-            background-attachment: fixed;
-            min-height: 100%;
-        }
         body {
-            margin: 0;
-            padding: 0;
             font-family: var(--fonte-texto);
-            background: transparent;
+            background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-fundo) 100%);
+            min-height: 100vh;
             color: var(--cor-branco);
             margin-left: 60px;
             transition: margin-left 0.3s;
-            min-height: 100vh;
             overflow-x: hidden;
         }
         h1, h2, h3, h4, h5, h6 {
@@ -344,20 +334,11 @@
             opacity: 1;
         }
         @media (max-width: 900px) {
-            body {
-                margin-left: 0 !important;
-            }
             .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-                z-index: 1000;
-                width: 280px !important;
-            }
-            .sidebar.mobile-open {
-                transform: translateX(0);
+                width: 60px !important;
             }
             .sidebar:hover, .sidebar:focus-within {
-                width: 280px !important;
+                width: 180px !important;
             }
         }
         
@@ -393,136 +374,13 @@
         .quick-action-btn.warning:hover {
             background: #d97706;
         }
-        
-        /* Prevent horizontal overflow */
-        html {
-            overflow-x: hidden;
-            width: 100%;
-            max-width: 100%;
-        }
-        
-        * {
-            box-sizing: border-box;
-        }
-        
-        /* Mobile responsive improvements */
-        @media (max-width: 768px) {
-            main {
-                padding: 1rem 0.5rem;
-                margin-left: 0 !important;
-                width: 100% !important;
-                max-width: 100% !important;
-            }
-            
-            .container {
-                padding: 0 0.5rem;
-                width: 100% !important;
-                max-width: 100% !important;
-            }
-            
-            /* Grid mobile */
-            .grid {
-                grid-template-columns: 1fr !important;
-                gap: 1rem;
-            }
-            
-            /* Agent cards mobile - lista compacta */
-            .agent-card {
-                cursor: pointer;
-                transition: all 0.2s ease;
-                min-height: 44px;
-            }
-            
-            .agent-card:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 12px 40px rgba(127,0,255,0.15) !important;
-            }
-            
-            .agent-card.selected {
-                transform: scale(1.02);
-                box-shadow: 0 0 0 3px rgba(255,255,255,0.3) !important;
-            }
-            
-            /* Messages container mobile */
-            #messages-container {
-                height: 400px !important;
-                max-height: 50vh;
-            }
-            
-            .chat-message .inline-block {
-                max-width: 85% !important;
-                padding: 0.75rem;
-                font-size: 0.9rem;
-            }
-            
-            /* Input area mobile */
-            #message-input {
-                font-size: 16px;
-                padding: 0.75rem;
-                min-height: 80px;
-            }
-            
-            .flex.space-x-3 {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            
-            .flex.flex-col.space-y-2 {
-                flex-direction: row;
-                gap: 0.5rem;
-            }
-            
-            /* Quick actions mobile */
-            .grid.grid-cols-2 {
-                grid-template-columns: 1fr !important;
-                gap: 0.5rem;
-            }
-            
-            .quick-action-btn {
-                padding: 0.75rem;
-                font-size: 0.9rem;
-                width: 100%;
-            }
-            
-            /* Header mobile */
-            header {
-                padding: 0.5rem 1rem;
-                margin-left: 0 !important;
-            }
-            
-            header .container {
-                padding: 0.5rem;
-            }
-            
-            header .flex {
-                flex-wrap: wrap;
-                gap: 0.5rem;
-            }
-            
-            header h1 {
-                font-size: 1.2rem !important;
-            }
-            
-            header button {
-                padding: 0.5rem 0.75rem;
-                font-size: 0.8rem;
-            }
-        }
     </style>
 </head>
 <body class="font-sans sidebar-dark">
-    <!-- Botão menu mobile -->
-    <button class="fixed top-4 left-4 z-50 md:hidden bg-purple-600 text-white p-3 rounded-full shadow-lg" id="mobile-menu-btn">
-        <i class="fas fa-bars"></i>
-    </button>
-    
-    <!-- Overlay -->
-    <div class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden" id="sidebar-overlay"></div>
-    
     <!-- Sidebar moderna padronizada -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-site-logo">
-            <img src="images/logo.png" alt="Logo EnemAI" class="sidebar-logo-img" style="height:48px;width:48px;min-width:48px;min-height:48px;max-width:48px;max-height:48px;margin:0 0.5em 0 0.5em;display:block;object-fit:cover;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.10);" />
+            <div class="sidebar-logo-img" style="height:48px;width:48px;min-width:48px;min-height:48px;max-width:48px;max-height:48px;margin:0 0.5em 0 0.5em;display:flex;align-items:center;justify-content:center;background:#7F00FF;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.10);"><i class="fas fa-brain text-white text-xl"></i></div>
             <span class="sidebar-logo-text">EnemAI</span>
         </div>
         <div class="sidebar-header"></div>
@@ -612,113 +470,64 @@
         <stop offset="1" stop-color="#FF61A6"/>
       </radialGradient>
     </defs>
-
+    <!-- Header -->
+    <header class="glass-card shadow-sm border-b border-gray-600">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-brain text-2xl text-purple-400"></i>
+                    <h1 class="text-xl font-bold text-gray-100">ENEM AI - Chat Especializado</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="main-dashboard-btn" class="bg-purple-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-purple-700 transition">
+                        <i class="fas fa-home mr-2"></i>Dashboard Principal
+                    </button>
+                    <button id="community-btn" class="bg-pink-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-pink-700 transition" title="Comunidade">
+                        <i class="fas fa-users"></i> Comunidade
+                    </button>
+                    <button id="settings-btn" class="bg-gray-700 text-white px-3 py-2 rounded-lg text-sm hover:bg-gray-800 transition" title="Configurações">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-purple-900 flex items-center justify-center">
+                            <i class="fas fa-user text-purple-300 text-sm"></i>
+                        </div>
+                        <span id="user-name" class="font-medium text-gray-200"></span>
+                    </div>
+                    <button id="logout-btn" class="text-gray-400 hover:text-gray-200 transition">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
 
     <!-- Main Content -->
-    <main class="px-6 py-4 fade-section" style="min-height: 100vh;">
-        <!-- Mobile: Botões de navegação -->
-        <div class="md:hidden mb-4 flex gap-2">
-            <button id="toggle-conversations" class="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
-                <i class="fas fa-history"></i> Conversas
-            </button>
-            <button id="new-chat-btn-mobile" class="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
-                <i class="fas fa-plus"></i> Nova
-            </button>
-        </div>
-        
+    <main class="container mx-auto px-6 py-8 fade-section">
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
             <!-- Sidebar - Histórico de Conversas -->
-            <div class="lg:col-span-1 hidden lg:block" id="conversations-sidebar">
+            <div class="lg:col-span-1">
                 <div class="glass-card rounded-xl p-6 h-fit">
-                    <div class="flex justify-center items-center mb-4 gap-3">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-gray-100">Conversas</h3>
                         <button id="new-chat-btn" class="bg-purple-600 text-white p-2 rounded-lg hover:bg-purple-700 transition" title="Nova conversa">
                             <i class="fas fa-plus"></i>
                         </button>
-                        <h3 class="text-lg font-bold text-gray-100">Conversas</h3>
                     </div>
                     <div id="conversations-list" class="space-y-2 max-h-96 overflow-y-auto scrollbar-hide">
                         <!-- Conversas serão carregadas aqui -->
                     </div>
                 </div>
             </div>
-            
-            <!-- Mobile: Modal de conversas -->
-            <div id="conversations-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden md:hidden">
-                <div class="bg-gray-800 h-full w-80 max-w-full p-4 overflow-y-auto">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-gray-100">Conversas</h3>
-                        <button id="close-conversations" class="text-gray-400 hover:text-white">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div id="conversations-list-mobile" class="space-y-2">
-                        <!-- Conversas mobile -->
-                    </div>
-                </div>
-            </div>
 
             <!-- Main Chat Area -->
-            <div class="lg:col-span-4 col-span-1">
+            <div class="lg:col-span-4">
                 <div class="glass-card rounded-xl p-6">
                     <!-- Seleção de Agentes -->
                     <div class="mb-6">
-                        <h2 class="text-lg md:text-xl font-bold text-gray-100 mb-4 text-center">Escolha seu Tutor</h2>
-                        
-                        <!-- Mobile: Lista compacta -->
-                        <div class="md:hidden space-y-3">
-                            <div class="agent-card bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg p-3 flex items-center gap-3" data-agent="socrates">
-                                <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-landmark text-lg"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <h3 class="font-bold text-base">Sócrates</h3>
-                                    <p class="text-sm opacity-90">Humanas • História, Geografia, Filosofia</p>
-                                </div>
-                            </div>
-                            
-                            <div class="agent-card bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg p-3 flex items-center gap-3" data-agent="pitagoras">
-                                <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-calculator text-lg"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <h3 class="font-bold text-base">Pitágoras</h3>
-                                    <p class="text-sm opacity-90">Exatas • Matemática, Física, Química</p>
-                                </div>
-                            </div>
-                            
-                            <div class="agent-card bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg p-3 flex items-center gap-3" data-agent="camoes">
-                                <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-book text-lg"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <h3 class="font-bold text-base">Camões</h3>
-                                    <p class="text-sm opacity-90">Linguagens • Português, Literatura</p>
-                                </div>
-                            </div>
-                            
-                            <div class="agent-card bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg p-3 flex items-center gap-3" data-agent="machado">
-                                <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-pen-fancy text-lg"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <h3 class="font-bold text-base">Machado</h3>
-                                    <p class="text-sm opacity-90">Redação • Dissertação, Argumentação</p>
-                                </div>
-                            </div>
-                            
-                            <div class="agent-card bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg p-3 flex items-center gap-3" data-agent="orientador">
-                                <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-graduation-cap text-lg"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <h3 class="font-bold text-base">Dr. Futuro</h3>
-                                    <p class="text-sm opacity-90">Carreiras • Orientação Profissional</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Desktop: Grid original -->
-                        <div class="hidden md:grid grid-cols-5 gap-4">
+                        <h2 class="text-xl font-bold text-gray-100 mb-4">Escolha seu Tutor Especializado</h2>
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                            <!-- Sócrates - Humanas -->
                             <div class="agent-card bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl p-4 text-center" data-agent="socrates">
                                 <div class="w-16 h-16 mx-auto mb-3 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
                                     <i class="fas fa-landmark text-2xl"></i>
@@ -727,7 +536,8 @@
                                 <p class="text-sm opacity-90">Humanas</p>
                                 <p class="text-xs opacity-75 mt-1">História, Geografia, Filosofia</p>
                             </div>
-                            
+
+                            <!-- Pitágoras - Exatas -->
                             <div class="agent-card bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl p-4 text-center" data-agent="pitagoras">
                                 <div class="w-16 h-16 mx-auto mb-3 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
                                     <i class="fas fa-calculator text-2xl"></i>
@@ -736,7 +546,8 @@
                                 <p class="text-sm opacity-90">Exatas</p>
                                 <p class="text-xs opacity-75 mt-1">Matemática, Física, Química</p>
                             </div>
-                            
+
+                            <!-- Camões - Linguagens -->
                             <div class="agent-card bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl p-4 text-center" data-agent="camoes">
                                 <div class="w-16 h-16 mx-auto mb-3 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
                                     <i class="fas fa-book text-2xl"></i>
@@ -745,7 +556,8 @@
                                 <p class="text-sm opacity-90">Linguagens</p>
                                 <p class="text-xs opacity-75 mt-1">Português, Literatura, Artes</p>
                             </div>
-                            
+
+                            <!-- Machado - Redação -->
                             <div class="agent-card bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-xl p-4 text-center" data-agent="machado">
                                 <div class="w-16 h-16 mx-auto mb-3 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
                                     <i class="fas fa-pen-fancy text-2xl"></i>
@@ -754,7 +566,8 @@
                                 <p class="text-sm opacity-90">Redação</p>
                                 <p class="text-xs opacity-75 mt-1">Dissertação, Argumentação</p>
                             </div>
-                            
+
+                            <!-- Orientador Profissional -->
                             <div class="agent-card bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-xl p-4 text-center" data-agent="orientador">
                                 <div class="w-16 h-16 mx-auto mb-3 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
                                     <i class="fas fa-graduation-cap text-2xl"></i>
@@ -780,43 +593,40 @@
                         </div>
 
                         <!-- Messages -->
-                        <div id="messages-container" class="border border-gray-600 rounded-lg p-4 bg-gray-800 mb-4 h-[400px] md:h-[500px] overflow-y-auto scrollbar-hide">
+                        <div id="messages-container" class="border border-gray-600 rounded-lg p-4 bg-gray-800 mb-4 h-[500px] overflow-y-auto scrollbar-hide">
                             <div id="messages" class="space-y-4">
                                 <!-- Mensagens serão adicionadas aqui -->
                             </div>
                         </div>
 
                         <!-- Input Area -->
-                        <div class="flex flex-col md:flex-row gap-3">
+                        <div class="flex space-x-3">
                             <div class="flex-1 relative">
                                 <textarea id="message-input" 
                                           placeholder="Digite sua pergunta ou dúvida..." 
                                           class="w-full px-4 py-3 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none bg-gray-700 text-gray-100 dark-placeholder"
-                                          rows="3" style="font-size: 16px;"></textarea>
+                                          rows="3"></textarea>
                                 <div class="absolute bottom-2 right-2 text-xs text-gray-400">
                                     <span id="char-count">0</span>/1000
                                 </div>
                             </div>
-                            <div class="flex md:flex-col gap-2">
-                                <button id="send-btn" class="bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition flex items-center justify-center flex-1 md:flex-none min-h-[44px]">
-                                    <i class="fas fa-paper-plane mr-2 md:mr-0"></i>
-                                    <span class="md:hidden">Enviar</span>
+                            <div class="flex flex-col space-y-2">
+                                <button id="send-btn" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition flex items-center justify-center">
+                                    <i class="fas fa-paper-plane"></i>
                                 </button>
-                                <button id="clear-btn" class="bg-gray-600 text-white px-4 py-3 rounded-lg hover:bg-gray-700 transition flex items-center justify-center flex-1 md:flex-none min-h-[44px]" title="Limpar conversa">
-                                    <i class="fas fa-trash mr-2 md:mr-0"></i>
-                                    <span class="md:hidden">Limpar</span>
+                                <button id="clear-btn" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition flex items-center justify-center" title="Limpar conversa">
+                                    <i class="fas fa-trash"></i>
                                 </button>
-                                <button id="use-note-btn" class="bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center flex-1 md:flex-none min-h-[44px]" title="Usar anotação">
-                                    <i class="fas fa-sticky-note mr-2 md:mr-0"></i>
-                                    <span class="md:hidden">Nota</span>
+                                <button id="use-note-btn" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center" title="Usar anotação">
+                                    <i class="fas fa-sticky-note"></i>
                                 </button>
                             </div>
                         </div>
 
                         <!-- Quick Actions -->
                         <div class="mt-4">
-                            <h4 class="text-sm font-medium text-gray-200 mb-3 text-center md:text-left">Ferramentas de Estudo:</h4>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <h4 class="text-sm font-medium text-gray-200 mb-3">Ferramentas de Estudo:</h4>
+                            <div class="grid grid-cols-2 gap-3">
                                 <button class="quick-action-btn" data-action="summary">
                                     <i class="fas fa-compress-alt mr-2"></i>Fazer Resumo
                                 </button>
@@ -1162,6 +972,10 @@ Vamos pensar juntos: Que tipo de atividades ou matérias você se sente mais à 
                     }
                     const user = JSON.parse(userStr);
                     currentUser = user;
+                    const userNameEl = document.getElementById('user-name');
+                    if (userNameEl) {
+                        userNameEl.textContent = user.name || user.email;
+                    }
                 } catch (error) {
                     console.error('Error parsing user data:', error);
                     window.location.href = 'login.html';
@@ -1325,44 +1139,6 @@ Vamos pensar juntos: Que tipo de atividades ou matérias você se sente mais à 
                 
                 if (savedConversations.length === 0) {
                     container.innerHTML = '<p class="text-gray-400 text-center py-4">Nenhuma conversa ainda</p>';
-                }
-            }
-            
-            function renderConversationsMobile() {
-                const container = document.getElementById('conversations-list-mobile');
-                container.innerHTML = '';
-                
-                // Filtra apenas conversas que não são temporárias
-                const savedConversations = conversations.filter(c => !c.isTemporary);
-                
-                savedConversations.forEach(conversation => {
-                    const agent = agents[conversation.agentId];
-                    const div = document.createElement('div');
-                    div.className = `conversation-item group p-3 rounded-lg cursor-pointer bg-gray-700 hover:bg-gray-600 ${conversation.id === currentConversation?.id ? 'bg-purple-600' : ''}`;
-                    div.onclick = () => {
-                        loadConversation(conversation.id);
-                        document.getElementById('conversations-modal').classList.add('hidden');
-                    };
-                    
-                    div.innerHTML = `
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-full bg-gradient-to-br ${agent.gradient} flex items-center justify-center">
-                                <i class="${agent.icon} text-white"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="font-medium text-gray-100 truncate">${conversation.title}</p>
-                                <p class="text-xs text-gray-400">${agent.name} • ${new Date(conversation.updatedAt).toLocaleDateString()}</p>
-                            </div>
-                            <button class="delete-conversation-btn text-red-400 hover:text-red-300 p-2" onclick="deleteConversation('${conversation.id}'); event.stopPropagation();" title="Excluir conversa">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    `;
-                    container.appendChild(div);
-                });
-                
-                if (savedConversations.length === 0) {
-                    container.innerHTML = '<p class="text-gray-400 text-center py-8">Nenhuma conversa ainda</p>';
                 }
             }
             
@@ -1711,13 +1487,38 @@ Vamos pensar juntos: Que tipo de atividades ou matérias você se sente mais à 
                 container.scrollTop = container.scrollHeight;
             }
             
-            // ===== GOOGLE GEMINI API =====
-            const GEMINI_API_KEY = 'AIzaSyCSs6saGHeHDUAZMIJWGbfP8Bvx_cvmtl4';
-            const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent';
+            // ===== SECURE API =====
+            const API_URL = '/api/chat';
+            let lastRequest = 0;
+            const MIN_INTERVAL = 3000; // 3 seconds between requests
+            let requestCount = 0;
+            const MAX_REQUESTS_PER_HOUR = 20;
             
-            async function callGeminiAPI(message) {
+            function canSendMessage() {
+                const now = Date.now();
+                if (now - lastRequest < MIN_INTERVAL) {
+                    showToast('Aguarde 3 segundos entre mensagens', 'warning');
+                    return false;
+                }
+                
+                // Reset counter every hour
+                const hourAgo = now - (60 * 60 * 1000);
+                if (lastRequest < hourAgo) {
+                    requestCount = 0;
+                }
+                
+                if (requestCount >= MAX_REQUESTS_PER_HOUR) {
+                    showToast('Limite de 20 mensagens por hora atingido', 'error');
+                    return false;
+                }
+                
+                lastRequest = now;
+                requestCount++;
+                return true;
+            }
+            
+            async function callSecureAPI(message) {
                 try {
-                    // Constrói o contexto da conversa
                     const conversationHistory = currentConversation.messages
                         .filter(m => m.type === 'user' || m.type === 'agent')
                         .map(m => `${m.type === 'user' ? 'Aluno' : currentAgent.name}: ${m.content}`)
@@ -1725,34 +1526,20 @@ Vamos pensar juntos: Que tipo de atividades ou matérias você se sente mais à 
                     
                     const fullPrompt = `${currentAgent.prompt}\n\n**Contexto da Conversa Atual:**\n${conversationHistory}\n\n**Última Mensagem do Aluno:** ${message}\n\n**Instruções Específicas:**\n1. Mantenha o contexto da conversa anterior\n2. Responda diretamente à última mensagem do aluno\n3. Use markdown para formatar suas respostas\n4. Seja didático e empático\n\n${currentAgent.name}:`;
                     
-                    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+                    const response = await fetch(API_URL, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            contents: [{
-                                parts: [{
-                                    text: fullPrompt
-                                }]
-                            }]
-                        })
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: fullPrompt })
                     });
 
                     if (!response.ok) {
-                        const errorText = await response.text();
-                        throw new Error(`Erro na API: ${response.status} - ${errorText}`);
+                        throw new Error(`API Error: ${response.status}`);
                     }
 
                     const data = await response.json();
-                    
-                    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-                        return data.candidates[0].content.parts[0].text;
-                    } else {
-                        throw new Error('Resposta inválida da API');
-                    }
+                    return data.response;
                 } catch (error) {
-                    console.error('Erro ao chamar Gemini API:', error);
+                    console.error('API Error:', error);
                     throw error;
                 }
             }
@@ -1785,43 +1572,37 @@ Vamos pensar juntos: Que tipo de atividades ou matérias você se sente mais à 
             async function sendMessage(message) {
                 if (!currentAgent || !currentConversation) return;
                 
-                // Try to increment action if function exists
+                if (!canSendMessage()) return;
+                
                 if (typeof incrementAction === 'function') {
                     incrementAction('ask_ai');
                 }
                 
-                // Add user message
                 addMessage({
                     type: 'user',
                     content: message,
                     timestamp: new Date().toISOString()
                 });
                 
-                // Show typing indicator
                 showTypingIndicator();
                 
                 try {
-                    // Get AI response
                     let response;
                     
-                    // Se for o orientador, usa lógica especial
                     if (currentAgent.area === 'Orientação') {
                         response = await callOrientadorAPI(message);
                     } else {
-                        response = await callGeminiAPI(message);
+                        response = await callSecureAPI(message);
                     }
                     
-                    // Remove typing indicator
                     removeTypingIndicator();
                     
-                    // Add AI response with typing animation
                     addMessageWithAnimation({
                         type: 'agent',
                         content: response,
                         timestamp: new Date().toISOString()
                     });
                     
-                    // Try to increment action if function exists
                     if (typeof incrementAction === 'function') {
                         incrementAction('answer_ai');
                     }
@@ -1829,54 +1610,23 @@ Vamos pensar juntos: Que tipo de atividades ou matérias você se sente mais à 
                     removeTypingIndicator();
                     addMessage({
                         type: 'agent',
-                        content: 'Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente.',
+                        content: 'Desculpe, ocorreu um erro. Tente novamente em alguns segundos.',
                         timestamp: new Date().toISOString()
                     });
-                    showToast('Erro na comunicação com a IA', 'error');
+                    showToast('Erro na comunicação', 'error');
                 }
             }
             
             // ===== ORIENTADOR PROFISSIONAL API =====
             async function callOrientadorAPI(message) {
-                try {
-                    // Constrói o contexto da conversa
-                    const conversationHistory = currentConversation.messages
-                        .filter(m => m.type === 'user' || m.type === 'agent')
-                        .map(m => `${m.type === 'user' ? 'Aluno' : 'Orientador'}: ${m.content}`)
-                        .join('\n\n');
-                    
-                    const fullPrompt = `${currentAgent.prompt}\n\n**Contexto da Conversa Atual:**\n${conversationHistory}\n\n**Última Mensagem do Aluno:** ${message}\n\n**Instruções Específicas:**\n1. Se esta for a primeira mensagem, faça perguntas para entender o perfil do aluno\n2. Mantenha o contexto da conversa anterior\n3. Use as informações sobre universidades de Teresina quando relevante\n4. Seja empático e encorajador\n5. Sempre use markdown para organizar suas respostas\n6. Se o aluno quiser informações sobre outras cidades, adapte suas recomendações\n\nOrientador Profissional:`;
+                const conversationHistory = currentConversation.messages
+                    .filter(m => m.type === 'user' || m.type === 'agent')
+                    .map(m => `${m.type === 'user' ? 'Aluno' : 'Orientador'}: ${m.content}`)
+                    .join('\n\n');
+                
+                const fullPrompt = `${currentAgent.prompt}\n\n**Contexto da Conversa Atual:**\n${conversationHistory}\n\n**Última Mensagem do Aluno:** ${message}\n\n**Instruções Específicas:**\n1. Se esta for a primeira mensagem, faça perguntas para entender o perfil do aluno\n2. Mantenha o contexto da conversa anterior\n3. Use as informações sobre universidades de Teresina quando relevante\n4. Seja empático e encorajador\n5. Sempre use markdown para organizar suas respostas\n6. Se o aluno quiser informações sobre outras cidades, adapte suas recomendações\n\nOrientador Profissional:`;
 
-                    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            contents: [{
-                                parts: [{
-                                    text: fullPrompt
-                                }]
-                            }]
-                        })
-                    });
-
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        throw new Error(`Erro na API: ${response.status} - ${errorText}`);
-                    }
-
-                    const data = await response.json();
-                    
-                    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-                        return data.candidates[0].content.parts[0].text;
-                    } else {
-                        throw new Error('Resposta inválida da API');
-                    }
-                } catch (error) {
-                    console.error('Erro ao chamar Orientador API:', error);
-                    throw error;
-                }
+                return callSecureAPI(fullPrompt);
             }
             
             // ===== QUICK ACTIONS =====
@@ -2111,35 +1861,6 @@ Me conte um pouco sobre você:
                     });
                 });
                 
-                // New chat mobile
-                document.getElementById('new-chat-btn-mobile').addEventListener('click', () => {
-                    document.getElementById('welcome-message').classList.remove('hidden');
-                    document.getElementById('chat-container').classList.add('hidden');
-                    currentConversation = null;
-                    currentAgent = null;
-                    document.querySelectorAll('.agent-card').forEach(card => {
-                        card.classList.remove('selected');
-                    });
-                });
-                
-                // Toggle conversations mobile
-                document.getElementById('toggle-conversations').addEventListener('click', () => {
-                    document.getElementById('conversations-modal').classList.remove('hidden');
-                    renderConversationsMobile();
-                });
-                
-                // Close conversations mobile
-                document.getElementById('close-conversations').addEventListener('click', () => {
-                    document.getElementById('conversations-modal').classList.add('hidden');
-                });
-                
-                // Close modal when clicking outside
-                document.getElementById('conversations-modal').addEventListener('click', (e) => {
-                    if (e.target.id === 'conversations-modal') {
-                        document.getElementById('conversations-modal').classList.add('hidden');
-                    }
-                });
-                
                 // Quick actions
                 document.querySelectorAll('.quick-action-btn').forEach(btn => {
                     btn.addEventListener('click', () => {
@@ -2148,8 +1869,25 @@ Me conte um pouco sobre você:
                     });
                 });
                 
+                // Navigation
+                document.getElementById('main-dashboard-btn').addEventListener('click', () => {
+                    window.location.href = 'main-dashboard.html';
+                });
+                
+                document.getElementById('logout-btn').addEventListener('click', logout);
+                
                 // Start mission
                 document.getElementById('start-mission-btn').addEventListener('click', startDrFuturoMission);
+
+                // Community button
+                document.getElementById('community-btn').onclick = function() {
+                    window.location.href = 'community.html';
+                };
+
+                // Settings button
+                document.getElementById('settings-btn').onclick = function() {
+                    window.location.href = 'settings.html';
+                };
 
                 // Use note button
                 document.getElementById('use-note-btn').addEventListener('click', openNotesModal);
@@ -2222,23 +1960,6 @@ Me conte um pouco sobre você:
             sidebarToggle.onclick = function() {
                 document.body.classList.toggle('sidebar-collapsed');
                 document.getElementById('sidebar').classList.toggle('collapsed');
-            };
-        }
-        
-        // Menu mobile
-        const mobileBtn = document.getElementById('mobile-menu-btn');
-        const sidebar = document.querySelector('.sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
-        
-        if (mobileBtn && sidebar && overlay) {
-            mobileBtn.onclick = () => {
-                sidebar.classList.add('mobile-open');
-                overlay.classList.remove('hidden');
-            };
-            
-            overlay.onclick = () => {
-                sidebar.classList.remove('mobile-open');
-                overlay.classList.add('hidden');
             };
         }
     </script>

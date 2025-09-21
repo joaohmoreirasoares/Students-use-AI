@@ -31,23 +31,13 @@
             --sidebar-btn-border: #fff;
             --sidebar-btn-shadow: var(--cor-primaria);
         }
-        html {
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-fundo) 100%);
-            background-attachment: fixed;
-            min-height: 100%;
-        }
         body {
-            margin: 0;
-            padding: 0;
             font-family: var(--fonte-texto);
-            background: transparent;
+            background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-fundo) 100%);
+            min-height: 100vh;
             color: var(--cor-branco);
             margin-left: 60px;
-            transition: margin-left 0.3s;
-            min-height: 100vh;
+            transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1);
             overflow-x: hidden;
         }
         h1, h2, h3, h4, h5, h6 {
@@ -130,7 +120,8 @@
             padding: 0;
         }
         .sidebar-header {
-            height: 70px;
+            max-height: 70px;
+            min-height: 70px;
             border-bottom: 1px solid var(--sidebar-border);
         }
         .sidebar-content {
@@ -138,7 +129,7 @@
             display: flex;
             flex-direction: column;
             gap: 0.7rem;
-            padding: 1.2rem 0.8rem 0.5rem 0.5rem;
+            padding: 1.2rem 1.3rem 0.5rem 0.5rem;
             align-items: flex-start;
         }
         .sidebar-btn, .sidebar-label {
@@ -150,7 +141,7 @@
             border: none;
             outline: none;
             margin: 0;
-            padding: 0;
+            padding: 0.25em 0.3em;
             display: flex;
             align-items: center;
             justify-content: flex-start;
@@ -158,14 +149,13 @@
             border-radius: 7px;
             box-shadow: 0 1px 0 1px var(--sidebar-btn-shadow);
             border: 1.2px solid var(--sidebar-btn-border);
-            padding: 0.25em 0.3em;
             font-size: 10px;
             color: #fff;
             font-weight: 600;
             background-color: var(--sidebar-btn-bg);
             overflow: hidden;
             min-height: 32px;
-            height: 36px;
+            height: 32px;
             transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
         }
         .sidebar-btn .circle-icon {
@@ -263,32 +253,12 @@
             opacity: 1;
         }
         @media (max-width: 900px) {
-            body {
-                margin-left: 0 !important;
-            }
             .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-                z-index: 1000;
-                width: 280px !important;
-            }
-            .sidebar.mobile-open {
-                transform: translateX(0);
+                width: 60px !important;
             }
             .sidebar:hover, .sidebar:focus-within {
-                width: 280px !important;
+                width: 180px !important;
             }
-        }
-        
-        /* Prevent horizontal overflow */
-        html {
-            overflow-x: hidden;
-            width: 100%;
-            max-width: 100%;
-        }
-        
-        * {
-            box-sizing: border-box;
         }
         /* Dashboard layout */
         .dashboard-container {
@@ -338,79 +308,9 @@
             margin-left: auto;
             color: var(--cor-secundaria);
         }
-        .level-xp-panel {
-            background: rgba(60, 30, 90, 0.8);
-            border-radius: 1.2rem;
-            padding: 1.5rem 1.2rem;
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-        }
-        .level-xp-panel .level {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #FFD700;
-        }
-        .level-xp-panel .xp-bar-container {
-            flex: 1;
-            background: #2d1a3a;
-            border-radius: 1rem;
-            height: 18px;
-            overflow: hidden;
-            margin: 0 1rem;
-        }
-        .level-xp-panel .xp-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #FFD700 0%, #00C3FF 100%);
-            border-radius: 1rem;
-            transition: width 0.5s;
-        }
-        .level-xp-panel .xp-label {
-            color: #fff;
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-        .dashboard-charts {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-        .dashboard-card {
-            background: rgba(40, 20, 60, 0.7);
-            border-radius: 1.2rem;
-            padding: 1.5rem 1.2rem;
-            box-shadow: 0 4px 24px rgba(127,0,255,0.10);
-        }
-        .dashboard-card canvas {
-            width: 100% !important;
-            max-width: 400px;
-            height: 220px !important;
-            max-height: 220px;
-            display: block;
-            margin: 0 auto;
-            background: #1A1A2E;
-            border-radius: 1rem;
-        }
-        .achievements-list {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-bottom: 2rem;
-        }
-        .achievement-badge {
-            background: #6c4cff;
-            color: #fff;
-            border-radius: 2rem;
-            padding: 0.5rem 1.2rem;
-            font-size: 1rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 2px 8px rgba(127,0,255,0.10);
-        }
+
+
+
         .profile-card {
             background: rgba(40, 20, 60, 0.7);
             border-radius: 1.2rem;
@@ -477,99 +377,28 @@
         .quick-action-btn:hover {
             background: var(--cor-secundaria);
         }
+        .dashboard-card {
+            background: rgba(40, 20, 60, 0.7);
+            border-radius: 1.2rem;
+            padding: 1.5rem 1.2rem;
+            box-shadow: 0 4px 24px rgba(127,0,255,0.10);
+        }
+        .dashboard-card canvas {
+            width: 100% !important;
+            height: 300px !important;
+            display: block;
+            margin: 0 auto;
+        }
         @media (max-width: 900px) {
-            .dashboard-charts {
-                grid-template-columns: 1fr;
-            }
             .profile-card {
                 flex-direction: column;
                 align-items: flex-start;
             }
         }
         
-        /* Mobile responsive improvements */
-        @media (max-width: 768px) {
-            .dashboard-container {
-                padding: 1rem 0.5rem;
-            }
-            
-            .stats-cards {
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 0.75rem;
-            }
-            
-            .dashboard-charts {
-                grid-template-columns: 1fr !important;
-            }
-            
-            .profile-card {
-                flex-direction: column;
-                text-align: center;
-                gap: 1rem;
-            }
-            
-            .profile-avatar {
-                width: 60px;
-                height: 60px;
-            }
-            
-            .level-xp-panel {
-                flex-direction: column;
-                gap: 1rem;
-                text-align: center;
-            }
-            
-            .level-xp-panel .xp-bar-container {
-                margin: 0;
-                width: 100%;
-            }
-            
-            .achievements-list {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            
-            .achievement-badge {
-                justify-content: center;
-                padding: 0.75rem;
-            }
-            
-            .quick-actions {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            
-            .quick-action-btn {
-                width: 100%;
-                padding: 0.75rem;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .stats-cards {
-                grid-template-columns: 1fr !important;
-            }
-            
-            .stat-card {
-                padding: 1rem 0.75rem;
-            }
-            
-            .stat-value {
-                font-size: 1.5rem !important;
-            }
-        }
-        
     </style>
 </head>
 <body>
-    <!-- Botão menu mobile -->
-    <button class="fixed top-4 left-4 z-50 md:hidden bg-purple-600 text-white p-3 rounded-full shadow-lg" id="mobile-menu-btn">
-        <i class="fas fa-bars"></i>
-    </button>
-    
-    <!-- Overlay -->
-    <div class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden" id="sidebar-overlay"></div>
-    
     <!-- Sidebar moderna -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-site-logo">
@@ -652,26 +481,13 @@
                 <i class="fas fa-fire stat-icon"></i>
             </div>
         </div>
-        <div class="level-xp-panel">
-            <span class="level" id="user-level">1</span>
-            <div class="xp-bar-container">
-                <div class="xp-bar" id="xp-bar" style="width: 0%"></div>
-            </div>
-            <span class="xp-label">XP: <span id="user-xp">0</span></span>
+        
+        <!-- Gráfico de Atividade -->
+        <div class="dashboard-card" style="background: rgba(40, 20, 60, 0.7); border-radius: 1.2rem; padding: 1.5rem 1.2rem; box-shadow: 0 4px 24px rgba(127,0,255,0.10); margin-bottom: 2rem;">
+            <h3 style="color: #fff; margin-bottom: 1rem;">Anotações dos Últimos 6 Dias</h3>
+            <canvas id="activityChart" style="width: 100% !important; height: 300px !important;"></canvas>
         </div>
-        <div class="dashboard-charts">
-            <div class="dashboard-card">
-                <h3>Atividade Semanal</h3>
-                <canvas id="activityChart" height="180"></canvas>
-            </div>
-            <div class="dashboard-card">
-                <h3>Distribuição por Matérias</h3>
-                <canvas id="subjectChart" height="180"></canvas>
-            </div>
-        </div>
-        <div class="achievements-list" id="achievements-list">
-            <!-- Conquistas recentes -->
-        </div>
+
         <div class="profile-card">
             <img id="profile-avatar" class="profile-avatar" src="https://ui-avatars.com/api/?name=ENEM+AI" alt="Avatar"/>
             <div class="profile-info">
@@ -691,7 +507,7 @@
             <button class="quick-action-btn" id="ai-chat-btn"><i class="fas fa-comments"></i>Chat com IA</button>
             <button class="quick-action-btn" id="editor-btn"><i class="fas fa-edit"></i>Editor</button>
             <button class="quick-action-btn" id="export-btn"><i class="fas fa-download"></i>Exportar Dados</button>
-            <button class="quick-action-btn" id="reset-btn" style="background:#ef4444"><i class="fas fa-trash"></i>Resetar Gráficos</button>
+
         </div>
     </div>
     <script>
@@ -759,123 +575,243 @@
             const privacy = user.public === false ? 'Privado' : 'Público';
             document.getElementById('profile-privacy').textContent = privacy;
             document.getElementById('profile-privacy').className = 'profile-tag ' + (privacy==='Privado'?'bg-gray-700':'bg-pink-800');
-            // Estatísticas
-            const stats = JSON.parse(localStorage.getItem('enemai_stats_' + user.email)) || {totalNotes:0,studyTime:0,favorites:0,streak:0,xp:0,level:1,activity:[],subjects:{},achievements:[]};
-            document.getElementById('total-notes').textContent = stats.totalNotes || 0;
-            const hours = Math.floor((stats.studyTime||0)/60);
-            const minutes = (stats.studyTime||0)%60;
-            document.getElementById('study-time').textContent = `${hours}h ${minutes}m`;
-            document.getElementById('favorites').textContent = stats.favorites || 0;
-            document.getElementById('streak').textContent = `${stats.streak||0} dias`;
-            document.getElementById('user-level').textContent = stats.level || 1;
-            document.getElementById('user-xp').textContent = stats.xp || 0;
-            // XP bar
-            const LEVEL_XP = lvl => 100 + (lvl-1)*50;
-            const percent = Math.round(((stats.xp||0)/LEVEL_XP(stats.level||1))*100);
-            document.getElementById('xp-bar').style.width = percent+'%';
-            // Gráficos
-            setTimeout(()=>{
-                // Depuração: logs
-                console.log('Canvas Atividade:', document.querySelectorAll('#activityChart').length);
-                console.log('Canvas Matérias:', document.querySelectorAll('#subjectChart').length);
-                console.log('Instância activityChartInstance:', window.activityChartInstance);
-                console.log('Instância subjectChartInstance:', window.subjectChartInstance);
-                // Atividade semanal (limitar a 7 dias)
-                const activityCanvas = document.getElementById('activityChart');
-                if (activityCanvas) {
-                    const ctx1 = activityCanvas.getContext('2d');
-                    if (window.activityChartInstance) {
-                        window.activityChartInstance.destroy();
-                    }
-                    const activityData = (stats.activity||[]).slice(-7);
-                    window.activityChartInstance = new Chart(ctx1, {
-                        type: 'line',
-                        data: {
-                            labels: activityData.map(d=>d.date||''),
-                            datasets: [{
-                                label: 'Anotações',
-                                data: activityData.map(d=>d.count||0),
-                                borderColor: '#8b5cf6',
-                                backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                                tension: 0.4,
-                                fill: true
-                            }]
-                        },
-                        options: {responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
-                    });
-                }
-                // Distribuição por matérias (limitar a 6 mais frequentes)
-                const subjectCanvas = document.getElementById('subjectChart');
-                if (subjectCanvas) {
-                    const ctx2 = subjectCanvas.getContext('2d');
-                    if (window.subjectChartInstance) {
-                        window.subjectChartInstance.destroy();
-                    }
-                    const subjectsEntries = Object.entries(stats.subjects||{}).sort((a,b)=>b[1]-a[1]).slice(0,6);
-                    window.subjectChartInstance = new Chart(ctx2, {
-                        type: 'doughnut',
-                        data: {
-                            labels: subjectsEntries.map(([k])=>k),
-                            datasets: [{
-                                data: subjectsEntries.map(([,v])=>v),
-                                backgroundColor: ['#8b5cf6','#3b82f6','#10b981','#f59e0b','#ef4444','#8b5a2b'],
-                                borderWidth: 0
-                            }]
-                        },
-                        options: {responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}
-                    });
-                }
-                // Botão de reset
-                document.getElementById('reset-btn').onclick = ()=>{
-                    if(confirm('Tem certeza que deseja limpar os dados dos gráficos?')){
-                        Object.keys(localStorage).forEach(k=>{if(k.startsWith('enemai_stats_')||k.startsWith('enemai_notes_'))localStorage.removeItem(k);});
-                        location.reload();
-                    }
+            // Funções para gerenciar estatísticas
+            function getStats() {
+                return JSON.parse(localStorage.getItem('enemai_stats_' + user.email)) || {
+                    totalNotes: 0,
+                    studyTime: 0,
+                    favorites: 0,
+                    streak: 0,
+                    lastStudyDate: null,
+                    sessionStartTime: null
                 };
-            }, 200);
-            // Conquistas recentes
-            const achievementsDiv = document.getElementById('achievements-list');
-            achievementsDiv.innerHTML = '';
-            const badgeIcons = {
-                'first_note': ['fas fa-star', 'Primeira Anotação'],
-                'week_streak': ['fas fa-fire', 'Semana Produtiva'],
-                'hundred_notes': ['fas fa-trophy', 'Centenário'],
-                'all_subjects': ['fas fa-brain', 'Polímata'],
-                'favorite_notes': ['fas fa-bookmark', 'Organizado']
-            };
-            (stats.achievements||[]).slice(-3).reverse().forEach(badge => {
-                const [icon, label] = badgeIcons[badge] || ['fas fa-award', 'Conquista'];
-                const div = document.createElement('div');
-                div.className = 'achievement-badge';
-                div.innerHTML = `<i class="${icon}"></i> ${label}`;
-                achievementsDiv.appendChild(div);
-            });
-            if ((stats.achievements||[]).length === 0) {
-                achievementsDiv.innerHTML = '<span class="achievement-badge">Nenhuma conquista ainda</span>';
             }
-            // Ações rápidas
-            document.getElementById('new-note-btn').onclick = ()=>alert('Nova anotação!');
-            document.getElementById('ai-chat-btn').onclick = ()=>window.location.href='ai-chat.html';
-            document.getElementById('editor-btn').onclick = ()=>alert('Editor de anotações!');
-            document.getElementById('export-btn').onclick = ()=>alert('Exportar dados!');
-        })();
-        
-        // Menu mobile
-        const mobileBtn = document.getElementById('mobile-menu-btn');
-        const sidebar = document.querySelector('.sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
-        
-        if (mobileBtn && sidebar && overlay) {
-            mobileBtn.onclick = () => {
-                sidebar.classList.add('mobile-open');
-                overlay.classList.remove('hidden');
-            };
             
-            overlay.onclick = () => {
-                sidebar.classList.remove('mobile-open');
-                overlay.classList.add('hidden');
+            function saveStats(stats) {
+                localStorage.setItem('enemai_stats_' + user.email, JSON.stringify(stats));
+            }
+            
+            function updateTotalNotes() {
+                const notes = JSON.parse(localStorage.getItem('enemai_notes')) || [];
+                const stats = getStats();
+                stats.totalNotes = notes.length;
+                saveStats(stats);
+                document.getElementById('total-notes').textContent = stats.totalNotes;
+            }
+            
+            function updateFavorites() {
+                const notes = JSON.parse(localStorage.getItem('enemai_notes')) || [];
+                const stats = getStats();
+                stats.favorites = notes.filter(note => note.favorite).length;
+                saveStats(stats);
+                document.getElementById('favorites').textContent = stats.favorites;
+            }
+            
+            function updateStreak() {
+                const stats = getStats();
+                const today = new Date().toDateString();
+                const lastStudyDate = stats.lastStudyDate;
+                
+                if (!lastStudyDate) {
+                    stats.streak = 1;
+                    stats.lastStudyDate = today;
+                } else if (lastStudyDate !== today) {
+                    const lastDate = new Date(lastStudyDate);
+                    const currentDate = new Date(today);
+                    const diffTime = currentDate - lastDate;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays === 1) {
+                        stats.streak += 1;
+                    } else if (diffDays > 1) {
+                        stats.streak = 1;
+                    }
+                    stats.lastStudyDate = today;
+                }
+                
+                saveStats(stats);
+                document.getElementById('streak').textContent = `${stats.streak} dias`;
+            }
+            
+            function startStudySession() {
+                const stats = getStats();
+                stats.sessionStartTime = Date.now();
+                saveStats(stats);
+            }
+            
+            function updateStudyTime() {
+                const stats = getStats();
+                if (stats.sessionStartTime) {
+                    const sessionTime = Math.floor((Date.now() - stats.sessionStartTime) / (1000 * 60));
+                    stats.studyTime += sessionTime;
+                    stats.sessionStartTime = Date.now();
+                    saveStats(stats);
+                }
+                
+                const hours = Math.floor(stats.studyTime / 60);
+                const minutes = stats.studyTime % 60;
+                document.getElementById('study-time').textContent = `${hours}h ${minutes}m`;
+            }
+            
+            // Inicializar estatísticas
+            const stats = getStats();
+            updateTotalNotes();
+            updateFavorites();
+            updateStreak();
+            
+            // Iniciar sessão de estudo
+            startStudySession();
+            
+            // Atualizar tempo de estudo a cada minuto
+            setInterval(updateStudyTime, 60000);
+            
+            // Atualizar tempo de estudo quando a página for fechada
+            window.addEventListener('beforeunload', updateStudyTime);
+            
+            // Exibir estatísticas atuais
+            const hours = Math.floor(stats.studyTime / 60);
+            const minutes = stats.studyTime % 60;
+            document.getElementById('study-time').textContent = `${hours}h ${minutes}m`;
+            
+            // Função para obter dados de atividade dos últimos 6 dias
+            function getActivityData() {
+                const notes = JSON.parse(localStorage.getItem('enemai_notes')) || [];
+                const today = new Date();
+                const activityData = [];
+                
+                for (let i = 5; i >= 0; i--) {
+                    const date = new Date(today);
+                    date.setDate(date.getDate() - i);
+                    const dateStr = date.toDateString();
+                    
+                    const count = notes.filter(note => {
+                        const noteDate = new Date(note.updatedAt);
+                        return noteDate.toDateString() === dateStr;
+                    }).length;
+                    
+                    activityData.push({
+                        date: date.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric' }),
+                        count: count
+                    });
+                }
+                
+                return activityData;
+            }
+            
+            // Criar gráfico de atividade
+            function createActivityChart() {
+                const canvas = document.getElementById('activityChart');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                if (window.activityChartInstance) {
+                    window.activityChartInstance.destroy();
+                }
+                
+                const activityData = getActivityData();
+                
+                window.activityChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: activityData.map(d => d.date),
+                        datasets: [{
+                            label: 'Anotações',
+                            data: activityData.map(d => d.count),
+                            borderColor: '#00C3FF',
+                            backgroundColor: 'rgba(0, 195, 255, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#00C3FF',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 6,
+                            pointHoverRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(40, 20, 60, 0.9)',
+                                titleColor: '#fff',
+                                bodyColor: '#fff',
+                                borderColor: '#00C3FF',
+                                borderWidth: 1
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#e0e0e0'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#e0e0e0',
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Inicializar gráfico
+            setTimeout(createActivityChart, 100);
+            
+            // Tornar funções globais para uso em outras páginas
+            window.updateDashboardStats = function() {
+                updateTotalNotes();
+                updateFavorites();
+                updateStreak();
+                createActivityChart();
             };
-        }
+
+
+
+            // Ações rápidas
+            document.getElementById('new-note-btn').onclick = () => {
+                window.location.href = 'dashboard.html';
+            };
+            document.getElementById('ai-chat-btn').onclick = () => {
+                window.location.href = 'ai-chat.html';
+            };
+            document.getElementById('editor-btn').onclick = () => {
+                window.location.href = 'dashboard.html';
+            };
+            document.getElementById('export-btn').onclick = () => {
+                const notes = JSON.parse(localStorage.getItem('enemai_notes')) || [];
+                const stats = getStats();
+                const exportData = {
+                    user: user,
+                    notes: notes,
+                    stats: stats,
+                    exportDate: new Date().toISOString()
+                };
+                
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `enemai-backup-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+            };
+        })();
     </script>
 </body>
 </html> 

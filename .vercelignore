@@ -1,0 +1,8 @@
+.conda/
+mcp-servers/
+src/backend/
+server.py
+*.md
+test-*.html
+demo-*.html
+.env.example

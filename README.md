@@ -2,6 +2,8 @@
 
 Uma plataforma completa para estudantes do ENEM que combina chat colaborativo, assistente de IA e gerenciamento de anotações.
 
+**Desenvolvido em parceria com o Colégio Sagrado Coração de Jesus** 🎓
+
 ## 🚀 Começando
 
 ### Pré-requisitos

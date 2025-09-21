@@ -353,20 +353,11 @@
             opacity: 1;
         }
         @media (max-width: 900px) {
-            body {
-                margin-left: 0 !important;
-            }
             .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-                z-index: 1000;
-                width: 280px !important;
-            }
-            .sidebar.mobile-open {
-                transform: translateX(0);
+                width: 60px !important;
             }
             .sidebar:hover, .sidebar:focus-within {
-                width: 280px !important;
+                width: 180px !important;
             }
         }
         
@@ -1014,14 +1005,6 @@
     </script>
 </head>
 <body>
-    <!-- Botão menu mobile -->
-    <button class="fixed top-4 left-4 z-50 md:hidden bg-purple-600 text-white p-3 rounded-full shadow-lg" id="mobile-menu-btn" style="position: fixed; top: 1rem; left: 1rem; z-index: 1001; background: var(--cor-primaria); color: white; border: none; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(127, 0, 255, 0.3); cursor: pointer;">
-        <i class="fas fa-bars"></i>
-    </button>
-    
-    <!-- Overlay -->
-    <div class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden" id="sidebar-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); z-index: 999; opacity: 0; visibility: hidden; transition: all 0.3s ease;"></div>
-    
     <!-- Sidebar moderna padronizada -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-site-logo">
@@ -1259,6 +1242,9 @@
                             </div>
                         </div>
                         <div style="display:flex;flex-direction:column;gap:0.4em;flex-shrink:0;">
+                            <button class="note-action-btn" data-id="${note.id}" data-action="favorite" style="background:${note.favorite ? '#FFD700' : '#666'};padding: 0.4em 0.8em; font-size: 0.85em;" title="${note.favorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}">
+                                <i class="fas fa-star"></i>
+                            </button>
                             <button class="note-action-btn" data-id="${note.id}" data-action="edit" style="padding: 0.4em 0.8em; font-size: 0.85em;">
                                 <i class="fas fa-pencil-alt"></i>
                             </button>
@@ -1268,6 +1254,10 @@
                         </div>
                     </div>
                 `;
+                div.querySelector('[data-action="favorite"]').onclick = (e) => {
+                    e.stopPropagation();
+                    toggleFavorite(note.id);
+                };
                 div.querySelector('[data-action="edit"]').onclick = () => loadNote(note.id);
                 div.querySelector('[data-action="delete"]').onclick = () => deleteNote(note.id);
                 div.onclick = (e) => { 
@@ -1360,23 +1350,47 @@
             }
         }
         
+        // Função para alternar favorito
+        function toggleFavorite(id) {
+            let notes = getNotes();
+            let noteIndex = notes.findIndex(n => n.id === id);
+            if (noteIndex === -1) return;
+            
+            notes[noteIndex].favorite = !notes[noteIndex].favorite;
+            saveNotes(notes);
+            renderNotesList(document.getElementById('search-notes').value);
+            
+            // Atualizar estatísticas do dashboard
+            if (typeof window.updateDashboardStats === 'function') {
+                window.updateDashboardStats();
+            }
+        }
+        
         function saveCurrentNote() {
             const title = document.getElementById('note-title').value.trim();
             const content = document.getElementById('editor-content').innerHTML.trim();
             let id = document.getElementById('note-title').dataset.id;
             let notes = getNotes();
             if(!title && !content) return;
+            
+            const isNewNote = !id;
+            
             if(id) {
                 // Editar
                 notes = notes.map(n => n.id === id ? {...n, title, content, updatedAt: Date.now()} : n);
             } else {
                 // Nova
                 id = Date.now().toString();
-                notes.unshift({id, title, content, updatedAt: Date.now(), tags: []});
+                notes.unshift({id, title, content, updatedAt: Date.now(), tags: [], favorite: false});
             }
             saveNotes(notes);
             document.getElementById('note-title').dataset.id = id;
             renderNotesList(document.getElementById('search-notes').value);
+            
+            // Atualizar estatísticas do dashboard se for uma nova nota
+            if (isNewNote && typeof window.updateDashboardStats === 'function') {
+                window.updateDashboardStats();
+            }
         }
         function loadNote(id) {
             const note = getNotes().find(n => n.id === id);
@@ -1392,6 +1406,11 @@
             saveNotes(notes);
             if(document.getElementById('note-title').dataset.id === id) clearEditor();
             renderNotesList(document.getElementById('search-notes').value);
+            
+            // Atualizar estatísticas do dashboard
+            if (typeof window.updateDashboardStats === 'function') {
+                window.updateDashboardStats();
+            }
         }
         // Função para renderizar tags da nota atual
         function renderNoteTags() {
@@ -1407,7 +1426,7 @@
             const notes = getNotes();
             const note = notes.find(n => n.id === id);
             
-            if (!note || !note.tags || note.tags.length === 0) {
+            if (!note) {
                 tagsSection.style.display = 'none';
                 return;
             }
@@ -1415,12 +1434,15 @@
             tagsSection.style.display = 'block';
             noteTagsContainer.innerHTML = '';
             
-            note.tags.forEach(tag => {
-                const tagElement = document.createElement('span');
-                tagElement.className = 'note-tag';
-                tagElement.innerHTML = `${tag} <button onclick="removeTagFromNote('${tag}')" style="background:none;border:none;color:#fff;margin-left:0.3em;cursor:pointer;">×</button>`;
-                noteTagsContainer.appendChild(tagElement);
-            });
+            if (note.tags && note.tags.length > 0) {
+                note.tags.forEach(tag => {
+                    const tagElement = document.createElement('span');
+                    tagElement.className = 'note-tag';
+                    tagElement.style.cssText = 'background: #7F00FF; color: #fff; border-radius: 1em; padding: 0.2em 0.8em; font-size: 0.9em; font-weight: 500; display: inline-flex; align-items: center; gap: 0.3em;';
+                    tagElement.innerHTML = `${tag} <button onclick="removeTagFromNote('${tag}')" style="background: none; border: none; color: #fff; cursor: pointer; padding: 0; margin: 0; font-size: 1.1em;">&times;</button>`;
+                    noteTagsContainer.appendChild(tagElement);
+                });
+            }
         }
         
         // Função para atualizar contadores do editor
@@ -1442,47 +1464,39 @@
                 const range = selection.getRangeAt(0);
                 const headerElement = document.createElement('h3');
                 headerElement.textContent = 'Cabeçalho';
-                headerElement.style.color = '#fff';
-                headerElement.style.marginTop = '1em';
-                headerElement.style.marginBottom = '0.5em';
+                headerElement.style.cssText = 'color: #fff; margin: 1em 0 0.5em 0; font-weight: bold;';
                 
                 range.deleteContents();
                 range.insertNode(headerElement);
                 
                 // Posicionar cursor após o cabeçalho
-                const newRange = document.createRange();
-                newRange.setStartAfter(headerElement);
-                newRange.collapse(true);
+                range.setStartAfter(headerElement);
+                range.collapse(true);
                 selection.removeAllRanges();
-                selection.addRange(newRange);
+                selection.addRange(range);
             }
         }
         
         // Função para exportar nota atual
         function exportCurrentNote(format = 'txt') {
-            const id = document.getElementById('note-title').dataset.id;
-            if (!id) return;
+            const title = document.getElementById('note-title').value || 'nota';
+            const content = document.getElementById('editor-content').innerText || '';
             
-            const notes = getNotes();
-            const note = notes.find(n => n.id === id);
-            if (!note) return;
-            
-            let content, filename, mimeType;
+            let fileContent = '';
+            let fileName = '';
             
             if (format === 'md') {
-                content = `# ${note.title}\n\n${note.content.replace(/<[^>]+>/g, '')}`;
-                filename = `${note.title || 'nota'}.md`;
-                mimeType = 'text/markdown';
+                fileContent = `# ${title}\n\n${content}`;
+                fileName = `${title}.md`;
             } else {
-                content = `${note.title}\n\n${note.content.replace(/<[^>]+>/g, '')}`;
-                filename = `${note.title || 'nota'}.txt`;
-                mimeType = 'text/plain';
+                fileContent = `${title}\n\n${content}`;
+                fileName = `${title}.txt`;
             }
             
-            const blob = new Blob([content], {type: mimeType});
+            const blob = new Blob([fileContent], { type: 'text/plain' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = filename;
+            a.download = fileName;
             a.click();
         }
         
@@ -1493,20 +1507,13 @@
                 renderNoteTags();
             };
             document.getElementById('search-notes').oninput = function() { renderNotesList(this.value); };
-            document.getElementById('note-title').oninput = saveCurrentNote;
-            document.getElementById('editor-content').addEventListener('input', function() {
-                updateEditorCounts();
-                autoSaveEditor();
+            document.getElementById('note-title').oninput = function() {
                 saveCurrentNote();
-            });
+                renderNoteTags();
+            };
+            document.getElementById('editor-content').addEventListener('input', saveCurrentNote);
             
-            // Inicializar contadores
-            updateEditorCounts();
-            
-            // Inicializar seção de tags
-            renderNoteTags();
-            
-            // Adicionar eventos para tags
+            // Adicionar evento para adicionar tag
             document.getElementById('add-tag-btn').onclick = function() {
                 const input = document.getElementById('new-tag-input');
                 const tag = input.value.trim();
@@ -1517,21 +1524,26 @@
                 }
             };
             
+            // Adicionar tag com Enter
             document.getElementById('new-tag-input').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     document.getElementById('add-tag-btn').click();
                 }
             });
+            
+            // Inicializar seção de tags
+            renderNoteTags();
         });
         // --- Salvamento automático ---
         let saveTimeout;
         function autoSaveEditor() {
+            const editor = document.getElementById('editor-content');
             const status = document.getElementById('save-status');
             status.textContent = 'Salvando...';
-            
+            // Salva no localStorage
+            localStorage.setItem('enemai_editor_content', editor.innerHTML);
             // Limpa timeout anterior
             if (saveTimeout) clearTimeout(saveTimeout);
-            
             // Após 1.5s sem digitar, mostra 'Salvo!'
             saveTimeout = setTimeout(() => {
                 status.textContent = 'Salvo!';
@@ -1540,25 +1552,33 @@
         }
         document.addEventListener('DOMContentLoaded', function() {
             const editor = document.getElementById('editor-content');
+            // Restaura conteúdo salvo
+            const saved = localStorage.getItem('enemai_editor_content');
+            if (saved) editor.innerHTML = saved;
+            editor.addEventListener('input', function() {
+                updateEditorCounts();
+                autoSaveEditor();
+            });
+            
+            // Adicionar eventos para botões da toolbar
+            document.getElementById('btn-bold').onclick = () => document.execCommand('bold');
+            document.getElementById('btn-italic').onclick = () => document.execCommand('italic');
+            document.getElementById('btn-underline').onclick = () => document.execCommand('underline');
+            document.getElementById('btn-list').onclick = () => document.execCommand('insertUnorderedList');
+            document.getElementById('btn-undo').onclick = () => document.execCommand('undo');
+            document.getElementById('btn-redo').onclick = () => document.execCommand('redo');
+            document.getElementById('btn-save').onclick = saveCurrentNote;
+            
+            updateEditorCounts(); // inicializa
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            const editor = document.getElementById('editor-content');
             const toolbarBtns = Array.from(document.querySelectorAll('.editor-toolbar .toolbar-btn'));
             
-            // Funções de formatação
-            function execCommand(command, value = null) {
-                document.execCommand(command, false, value);
-                editor.focus();
-            }
-            
-            // Eventos dos botões da toolbar
-            document.getElementById('btn-bold').addEventListener('click', () => execCommand('bold'));
-            document.getElementById('btn-italic').addEventListener('click', () => execCommand('italic'));
-            document.getElementById('btn-underline').addEventListener('click', () => execCommand('underline'));
-            document.getElementById('btn-list').addEventListener('click', () => execCommand('insertUnorderedList'));
-            document.getElementById('btn-undo').addEventListener('click', () => execCommand('undo'));
-            document.getElementById('btn-redo').addEventListener('click', () => execCommand('redo'));
-            document.getElementById('btn-save').addEventListener('click', saveCurrentNote);
-            
             // Adicionar evento para o botão de cabeçalho
-            document.getElementById('btn-heading').addEventListener('click', insertHeader);
+            if (document.getElementById('btn-heading')) {
+                document.getElementById('btn-heading').addEventListener('click', insertHeader);
+            }
             
             // Adicionar eventos para o dropdown de exportação
             const exportBtn = document.getElementById('btn-export');
@@ -1583,40 +1603,6 @@
             document.addEventListener('click', function(e) {
                 if (!exportBtn.contains(e.target) && !exportDropdown.contains(e.target)) {
                     exportDropdown.style.display = 'none';
-                }
-            });
-            
-            // Atalhos de teclado
-            editor.addEventListener('keydown', function(e) {
-                if (e.ctrlKey || e.metaKey) {
-                    switch(e.key) {
-                        case 'b':
-                            e.preventDefault();
-                            execCommand('bold');
-                            break;
-                        case 'i':
-                            e.preventDefault();
-                            execCommand('italic');
-                            break;
-                        case 'u':
-                            e.preventDefault();
-                            execCommand('underline');
-                            break;
-                        case 'z':
-                            if (!e.shiftKey) {
-                                e.preventDefault();
-                                execCommand('undo');
-                            }
-                            break;
-                        case 'y':
-                            e.preventDefault();
-                            execCommand('redo');
-                            break;
-                        case 's':
-                            e.preventDefault();
-                            saveCurrentNote();
-                            break;
-                    }
                 }
             });
             
@@ -1650,40 +1636,6 @@
             });
         });
         // Remover todo o JS relacionado à alternância de tema
-        
-        // Menu mobile
-        const mobileBtn = document.getElementById('mobile-menu-btn');
-        const sidebar = document.querySelector('.sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
-        
-        if (mobileBtn && sidebar && overlay) {
-            mobileBtn.onclick = () => {
-                sidebar.classList.add('mobile-open');
-                overlay.style.opacity = '1';
-                overlay.style.visibility = 'visible';
-                overlay.classList.remove('hidden');
-            };
-            
-            overlay.onclick = () => {
-                sidebar.classList.remove('mobile-open');
-                overlay.style.opacity = '0';
-                overlay.style.visibility = 'hidden';
-                setTimeout(() => overlay.classList.add('hidden'), 300);
-            };
-        }
-        
-        // Esconder botão mobile em telas grandes
-        function checkScreenSize() {
-            if (window.innerWidth > 768) {
-                if (mobileBtn) mobileBtn.style.display = 'none';
-            } else {
-                if (mobileBtn) mobileBtn.style.display = 'flex';
-            }
-        }
-        
-        window.addEventListener('resize', checkScreenSize);
-        checkScreenSize();
-        
         </script>
     </main>
 
