@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar Usuários - ENEM AI</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .user { border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .online { background-color: #d4edda; }
+        .offline { background-color: #f8d7da; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Verificação de Usuários - ENEM AI</h1>
+    
+    <div id="status" class="status"></div>
+    
+    <button onclick="checkUsers()">Verificar Usuários</button>
+    <button onclick="clearLocalStorage()">Limpar localStorage</button>
+    
+    <div id="users-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Configuração do Supabase (hardcoded para funcionar em produção)
+        const supabaseUrl = 'https://nnetwklqcubrfxtoygyc.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uZXR3a2xxY3VicmZ4dG95Z3ljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0ODU3OTIsImV4cCI6MjA3NDA2MTc5Mn0.Wkjblz_GsikPZnFo50DnN5llQEH3enVe2uh_ZlcW_5g';
+        
+        let supabase;
+        
+        // Inicializar Supabase
+        try {
+            supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+            console.log('Supabase inicializado');
+        } catch (error) {
+            console.error('Erro ao inicializar Supabase:', error);
+        }
+
+        async function checkUsers() {
+            const statusDiv = document.getElementById('status');
+            const usersContainer = document.getElementById('users-container');
+            
+            statusDiv.innerHTML = 'Verificando...';
+            usersContainer.innerHTML = '';
+
+            if (!supabase) {
+                statusDiv.innerHTML = '<div class="offline">❌ Supabase não inicializado</div>';
+                return;
+            }
+
+            try {
+                console.log('Tentando conectar ao Supabase...');
+                
+                // Verificar usuários no Supabase
+                const { data: supabaseUsers, error } = await supabase
+                    .from('users')
+                    .select('*');
+
+                console.log('Resposta do Supabase:', { data: supabaseUsers, error });
+
+                if (error) {
+                    throw error;
+                }
+
+                statusDiv.innerHTML = `<div class="online">✅ Conectado ao Supabase - ${supabaseUsers.length} usuários encontrados</div>`;
+                
+                if (supabaseUsers.length === 0) {
+                    usersContainer.innerHTML = '<p>Nenhum usuário encontrado no banco de dados.</p>';
+                    return;
+                }
+                
+                supabaseUsers.forEach(user => {
+                    const userDiv = document.createElement('div');
+                    userDiv.className = 'user';
+                    userDiv.innerHTML = `
+                        <h3>👤 ${user.name}</h3>
+                        <p><strong>Email:</strong> ${user.email}</p>
+                        <p><strong>Escola:</strong> ${user.school || 'Não informado'}</p>
+                        <p><strong>Série:</strong> ${user.grade || 'Não informado'}</p>
+                        <p><strong>Criado em:</strong> ${new Date(user.created_at).toLocaleString('pt-BR')}</p>
+                    `;
+                    usersContainer.appendChild(userDiv);
+                });
+
+            } catch (error) {
+                console.error('Erro ao conectar com Supabase:', error);
+                
+                statusDiv.innerHTML = `<div class="offline">❌ Erro: ${error.message}</div>`;
+                
+                // Verificar localStorage como fallback
+                const localUsers = JSON.parse(localStorage.getItem('enemai_users') || '[]');
+                
+                if (localUsers.length > 0) {
+                    statusDiv.innerHTML += `<div class="offline">Usando localStorage (${localUsers.length} usuários)</div>`;
+                    
+                    localUsers.forEach(user => {
+                        const userDiv = document.createElement('div');
+                        userDiv.className = 'user';
+                        userDiv.innerHTML = `
+                            <h3>👤 ${user.name}</h3>
+                            <p><strong>Email:</strong> ${user.email}</p>
+                            <p><strong>Escola:</strong> ${user.school || 'Não informado'}</p>
+                            <p><strong>Série:</strong> ${user.grade || 'Não informado'}</p>
+                            <p><em>Dados do localStorage</em></p>
+                        `;
+                        usersContainer.appendChild(userDiv);
+                    });
+                } else {
+                    usersContainer.innerHTML = '<p>Nenhum usuário encontrado no localStorage também.</p>';
+                }
+            }
+        }
+
+        function clearLocalStorage() {
+            if (confirm('Tem certeza que deseja limpar todos os dados do localStorage?')) {
+                localStorage.clear();
+                alert('localStorage limpo!');
+                checkUsers();
+            }
+        }
+
+        // Verificar automaticamente ao carregar a página
+        window.onload = checkUsers;
+    </script>
+</body>
+</html>

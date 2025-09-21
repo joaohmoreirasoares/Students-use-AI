@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Supabase - ENEM AI</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .log { background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Debug Supabase - ENEM AI</h1>
+    
+    <button onclick="testConnection()">Testar Conexão</button>
+    <button onclick="listTables()">Listar Tabelas</button>
+    <button onclick="checkUsers()">Verificar Usuários</button>
+    <button onclick="createTestUser()">Criar Usuário Teste</button>
+    
+    <div id="logs"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseUrl = 'https://nnetwklqcubrfxtoygyc.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uZXR3a2xxY3VicmZ4dG95Z3ljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0ODU3OTIsImV4cCI6MjA3NDA2MTc5Mn0.Wkjblz_GsikPZnFo50DnN5llQEH3enVe2uh_ZlcW_5g';
+        
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const logDiv = document.createElement('div');
+            logDiv.className = `log ${type}`;
+            logDiv.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logsDiv.appendChild(logDiv);
+            console.log(message);
+        }
+
+        async function testConnection() {
+            log('Testando conexão com Supabase...');
+            
+            try {
+                const { data, error } = await supabase.auth.getSession();
+                if (error) {
+                    log(`Erro na autenticação: ${error.message}`, 'error');
+                } else {
+                    log('Conexão com Supabase OK!', 'success');
+                }
+            } catch (error) {
+                log(`Erro de conexão: ${error.message}`, 'error');
+            }
+        }
+
+        async function listTables() {
+            log('Tentando listar tabelas...');
+            
+            try {
+                // Tentar acessar algumas tabelas comuns
+                const tables = ['users', 'messages', 'notes'];
+                
+                for (const table of tables) {
+                    try {
+                        const { data, error } = await supabase
+                            .from(table)
+                            .select('*')
+                            .limit(1);
+                        
+                        if (error) {
+                            log(`Tabela '${table}': ${error.message}`, 'error');
+                        } else {
+                            log(`Tabela '${table}': OK (${data ? data.length : 0} registros na amostra)`, 'success');
+                        }
+                    } catch (e) {
+                        log(`Tabela '${table}': Erro - ${e.message}`, 'error');
+                    }
+                }
+            } catch (error) {
+                log(`Erro geral: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkUsers() {
+            log('Verificando usuários...');
+            
+            try {
+                const { data: users, error } = await supabase
+                    .from('users')
+                    .select('*');
+
+                if (error) {
+                    log(`Erro ao buscar usuários: ${error.message}`, 'error');
+                    return;
+                }
+
+                log(`Encontrados ${users.length} usuários:`, 'success');
+                
+                users.forEach((user, index) => {
+                    log(`${index + 1}. ${user.name} (${user.email}) - ${user.school || 'Sem escola'}`);
+                });
+
+            } catch (error) {
+                log(`Erro: ${error.message}`, 'error');
+            }
+        }
+
+        async function createTestUser() {
+            log('Criando usuário teste...');
+            
+            const testUser = {
+                name: 'Teste Usuario',
+                email: 'teste@exemplo.com',
+                school: 'Escola Teste',
+                grade: '3º Ano',
+                created_at: new Date().toISOString()
+            };
+
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .insert([testUser])
+                    .select();
+
+                if (error) {
+                    log(`Erro ao criar usuário: ${error.message}`, 'error');
+                } else {
+                    log(`Usuário criado com sucesso: ${JSON.stringify(data)}`, 'success');
+                }
+
+            } catch (error) {
+                log(`Erro: ${error.message}`, 'error');
+            }
+        }
+
+        // Testar conexão automaticamente
+        window.onload = () => {
+            log('Iniciando debug do Supabase...');
+            testConnection();
+        };
+    </script>
+</body>
+</html>

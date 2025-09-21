@@ -345,11 +345,20 @@
             opacity: 1;
         }
         @media (max-width: 900px) {
+            body {
+                margin-left: 0 !important;
+            }
             .sidebar {
-                width: 60px !important;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1000;
+                width: 280px !important;
+            }
+            .sidebar.mobile-open {
+                transform: translateX(0);
             }
             .sidebar:hover, .sidebar:focus-within {
-                width: 180px !important;
+                width: 280px !important;
             }
         }
         
@@ -766,27 +775,87 @@
             animation: fadeIn 0.3s ease-out;
         }
         
-        /* Responsividade */
+        /* Mobile responsive improvements */
         @media (max-width: 768px) {
+            body {
+                margin-left: 0 !important;
+            }
+            
+            .chat-container {
+                padding-left: 0 !important;
+                flex-direction: column;
+            }
+            
             .contacts-column {
                 width: 100%;
+                height: 50vh;
+                border-right: none;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
             }
             
             .chat-column {
-                display: none;
-            }
-            
-            .chat-column.active {
-                display: flex;
+                width: 100%;
+                height: 50vh;
             }
             
             .message {
                 max-width: 85%;
+                font-size: 0.9rem;
+            }
+            
+            .message-input {
+                font-size: 16px;
+                padding: 0.75rem;
+            }
+            
+            .send-button {
+                min-width: 44px;
+                min-height: 44px;
+            }
+            
+            .contact-item {
+                padding: 16px;
+            }
+            
+            .contact-avatar {
+                width: 44px;
+                height: 44px;
+            }
+            
+            .chat-header {
+                padding: 12px 16px;
+            }
+            
+            .messages-container {
+                padding: 16px;
+            }
+            
+            .message-input-area {
+                padding: 16px;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            .message-input-area i {
+                font-size: 18px;
+                padding: 12px;
+                min-width: 44px;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body class="font-sans sidebar-dark">
+    <!-- Botão menu mobile -->
+    <button class="fixed top-4 left-4 z-50 md:hidden bg-purple-600 text-white p-3 rounded-full shadow-lg" id="mobile-menu-btn">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Overlay -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden" id="sidebar-overlay"></div>
     <!-- Sidebar moderna padronizada -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-site-logo">
@@ -1850,6 +1919,57 @@
         }
     }
     </script>
+    
+    <!-- JavaScript Mobile -->
+    <script>
+    (function() {
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        if (mobileBtn && sidebar && overlay) {
+            mobileBtn.addEventListener('click', function() {
+                sidebar.classList.add('mobile-open');
+                overlay.classList.remove('hidden');
+            });
+            
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('mobile-open');
+                overlay.classList.add('hidden');
+            });
+        }
+    })();
+    
+    // Mobile chat improvements
+    document.addEventListener('DOMContentLoaded', function() {
+        const isMobile = window.innerWidth <= 768;
+        
+        if (isMobile) {
+            const chatContainer = document.querySelector('.chat-container');
+            if (chatContainer) {
+                chatContainer.style.height = '100vh';
+                chatContainer.style.flexDirection = 'column';
+            }
+            
+            document.querySelectorAll('.contact-item, .message-input-area i, .send-button').forEach(el => {
+                el.style.minHeight = '44px';
+                el.style.minWidth = '44px';
+            });
+            
+            const messageInput = document.getElementById('chat-input');
+            if (messageInput) {
+                messageInput.style.fontSize = '16px';
+            }
+        }
+        
+        window.addEventListener('orientationchange', function() {
+            setTimeout(() => window.scrollTo(0, 0), 100);
+        });
+    });
+    </script>
+    
+    <!-- Sistema de fallback para banco de dados -->
+    <script src="js/database-fallback.js"></script>
     
     <!-- Sistema de comunidade com banco real -->
     <script src="js/community-real.js"></script>

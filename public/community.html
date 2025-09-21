@@ -664,6 +664,21 @@
         </div>
     </header>
     <main class="container mx-auto px-6 py-10 fade-section">
+        <!-- Debug Section -->
+        <div id="debug-section" class="mb-6 p-4 bg-gray-800 rounded-lg border border-gray-600">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-lg font-bold text-white">🔍 Debug - Verificar Usuários</h3>
+                <button id="toggle-debug" class="bg-purple-600 text-white px-3 py-1 rounded text-sm">Mostrar</button>
+            </div>
+            <div id="debug-content" class="hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <button id="check-supabase" class="bg-blue-600 text-white px-4 py-2 rounded">Verificar Supabase</button>
+                    <button id="check-localstorage" class="bg-green-600 text-white px-4 py-2 rounded">Verificar localStorage</button>
+                </div>
+                <div id="debug-logs" class="bg-gray-900 p-3 rounded text-sm text-gray-300 font-mono max-h-40 overflow-y-auto"></div>
+            </div>
+        </div>
+        
         <div class="mb-8 flex flex-col md:flex-row md:items-center gap-4">
             <input id="search-user" type="text" placeholder="Buscar por nome, turma, matéria, cidade..." class="w-full md:w-96 px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all duration-300" />
             <select id="filter-type" class="px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all duration-300">
@@ -675,7 +690,157 @@
         </div>
         <div id="community-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../populate-demo-users.js"></script>
     <script>
+    // Debug functions
+    const supabaseUrl = 'https://nnetwklqcubrfxtoygyc.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uZXR3a2xxY3VicmZ4dG95Z3ljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0ODU3OTIsImV4cCI6MjA3NDA2MTc5Mn0.Wkjblz_GsikPZnFo50DnN5llQEH3enVe2uh_ZlcW_5g';
+    let supabase;
+    
+    try {
+        supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    } catch (error) {
+        console.error('Erro ao inicializar Supabase:', error);
+    }
+    
+    function debugLog(message) {
+        const logs = document.getElementById('debug-logs');
+        if (logs) {
+            logs.innerHTML += `[${new Date().toLocaleTimeString()}] ${message}\n`;
+            logs.scrollTop = logs.scrollHeight;
+        }
+        console.log(message);
+    }
+    
+    async function checkSupabaseUsers() {
+        debugLog('🔍 Verificando usuários no Supabase...');
+        
+        if (!supabase) {
+            debugLog('❌ Supabase não inicializado');
+            return [];
+        }
+        
+        try {
+            const { data: users, error } = await supabase
+                .from('users')
+                .select('*');
+            
+            if (error) {
+                debugLog(`❌ Erro Supabase: ${error.message}`);
+                return [];
+            }
+            
+            debugLog(`✅ Supabase: ${users.length} usuários encontrados`);
+            users.forEach((user, i) => {
+                debugLog(`  ${i+1}. ${user.name} (${user.email})`);
+            });
+            
+            return users;
+        } catch (error) {
+            debugLog(`❌ Erro de conexão: ${error.message}`);
+            return [];
+        }
+    }
+    
+    function checkLocalStorageUsers() {
+        debugLog('🔍 Verificando usuários no localStorage...');
+        
+        const users = JSON.parse(localStorage.getItem('enemai_users') || '[]');
+        debugLog(`📦 localStorage: ${users.length} usuários encontrados`);
+        
+        users.forEach((user, i) => {
+            debugLog(`  ${i+1}. ${user.name} (${user.email})`);
+        });
+        
+        return users;
+    }
+    
+    // Event listeners para debug
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('toggle-debug').addEventListener('click', function() {
+            const content = document.getElementById('debug-content');
+            const btn = this;
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                btn.textContent = 'Ocultar';
+            } else {
+                content.classList.add('hidden');
+                btn.textContent = 'Mostrar';
+            }
+        });
+        
+        document.getElementById('check-supabase').addEventListener('click', checkSupabaseUsers);
+        document.getElementById('check-localstorage').addEventListener('click', checkLocalStorageUsers);
+        
+        // Função para adicionar usuários demo
+        function addDemoUsers() {
+            const existingUsers = JSON.parse(localStorage.getItem('enemai_users') || '[]');
+            const demoUsers = [
+                {
+                    name: 'Ana Silva',
+                    email: 'ana@exemplo.com',
+                    avatar: 'https://ui-avatars.com/api/?name=Ana+Silva&background=7F00FF&color=fff',
+                    type: 'estudante',
+                    materiasGosta: ['Matemática', 'Física'],
+                    formacao: 'Engenharia',
+                    public: true
+                },
+                {
+                    name: 'Carlos Santos', 
+                    email: 'carlos@exemplo.com',
+                    avatar: 'https://ui-avatars.com/api/?name=Carlos+Santos&background=00C3FF&color=fff',
+                    type: 'estudante',
+                    materiasGosta: ['História', 'Geografia'],
+                    formacao: 'Direito',
+                    public: true
+                },
+                {
+                    name: 'Prof. Maria',
+                    email: 'maria@professor.com',
+                    avatar: 'https://ui-avatars.com/api/?name=Prof+Maria&background=FF61A6&color=fff',
+                    type: 'professor',
+                    materiasGosta: ['Português', 'Literatura'],
+                    public: true
+                }
+            ];
+            
+            const allEmails = existingUsers.map(u => u.email);
+            const usersToAdd = demoUsers.filter(u => !allEmails.includes(u.email));
+            
+            if (usersToAdd.length > 0) {
+                const updatedUsers = [...existingUsers, ...usersToAdd];
+                localStorage.setItem('enemai_users', JSON.stringify(updatedUsers));
+                debugLog(`✅ Adicionados ${usersToAdd.length} usuários demo`);
+                return updatedUsers;
+            }
+            return existingUsers;
+        }
+        
+        // Auto-check ao carregar
+        setTimeout(async function() {
+            debugLog('🚀 Iniciando verificação automática...');
+            const supabaseUsers = await checkSupabaseUsers();
+            let localUsers = checkLocalStorageUsers();
+            
+            // Se poucos usuários no localStorage, adicionar demos
+            if (localUsers.length <= 1) {
+                localUsers = addDemoUsers();
+            }
+            
+            // Usar Supabase se disponível, senão localStorage
+            if (supabaseUsers.length > 0) {
+                debugLog('✅ Usando dados do Supabase');
+                allUsers = supabaseUsers;
+            } else {
+                debugLog('📦 Usando dados do localStorage');
+                allUsers = localUsers;
+            }
+            
+            filterCommunity();
+        }, 1000);
+    });
     
     function normalizeUser(user) {
         if (!user.type) user.type = user.professor ? 'professor' : 'estudante';
@@ -782,23 +947,7 @@
     document.getElementById('back-dashboard').onclick = function() {
         window.location.href = 'main-dashboard.html';
     };
-    // Mostrar dados dos usuários no console automaticamente
-    console.log('Usuários no localStorage:', JSON.parse(localStorage.getItem('enemai_users') || '[]'));
-    // Usuários exemplo
-    const exampleUsers = [
-        { name: "Ana Silva", email: "ana@exemplo.com", type: "estudante", materiasGosta: ["Matemática", "Física"], formacao: "Engenharia", avatar: "https://ui-avatars.com/api/?name=Ana+Silva&background=7F00FF&color=fff", public: true },
-        { name: "Carlos Santos", email: "carlos@exemplo.com", type: "professor", materias: ["História", "Geografia"], avatar: "https://ui-avatars.com/api/?name=Carlos+Santos&background=00C3FF&color=fff", public: true },
-        { name: "Maria Oliveira", email: "maria@exemplo.com", type: "estudante", materiasGosta: ["Biologia", "Química"], formacao: "Medicina", avatar: "https://ui-avatars.com/api/?name=Maria+Oliveira&background=FF61A6&color=fff", public: true },
-        { name: "João Pedro", email: "joao@exemplo.com", type: "estudante", materiasGosta: ["Literatura", "Redação"], formacao: "Jornalismo", avatar: "https://ui-avatars.com/api/?name=João+Pedro&background=7F00FF&color=fff", public: true },
-        { name: "Prof. Roberto", email: "roberto@exemplo.com", type: "professor", materias: ["Matemática", "Física"], avatar: "https://ui-avatars.com/api/?name=Prof+Roberto&background=00C3FF&color=fff", public: true }
-    ];
-    
-    // Sempre usar usuários exemplo
-    localStorage.setItem('enemai_users', JSON.stringify(exampleUsers));
-    allUsers = exampleUsers;
-    
-    // Inicializar
-    filterCommunity();
+    // Inicialização será feita pelo debug auto-check
     
     // Atualizar badges de convite ao abrir a comunidade
     window.addEventListener('storage', function(e) {
@@ -811,7 +960,11 @@
             const ripple = document.createElement('span');
             ripple.className = 'ripple';
             btn.appendChild(ripple);
-            setTimeout(()=>btn.removeChild(ripple), 500);
+            setTimeout(() => {
+                if (ripple.parentNode === btn) {
+                    btn.removeChild(ripple);
+                }
+            }, 500);
         });
     }
     document.querySelectorAll('button, .comuni-btn, .invite-btn').forEach(addRippleEffect);

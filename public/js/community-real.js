@@ -1,9 +1,10 @@
-// Sistema de comunidade com banco de dados real
+// Sistema de comunidade com banco de dados real + fallback
 class CommunitySystem {
   constructor() {
     this.currentUser = this.getCurrentUser()
     this.users = []
     this.messages = new Map()
+    this.db = window.dbFallback || new DatabaseFallback()
   }
 
   getCurrentUser() {
@@ -16,8 +17,7 @@ class CommunitySystem {
 
   async loadUsers() {
     try {
-      const response = await fetch('/api/users')
-      this.users = await response.json()
+      this.users = await this.db.getUsers()
       return this.users
     } catch (error) {
       console.error('Erro ao carregar usuários:', error)
@@ -27,12 +27,7 @@ class CommunitySystem {
 
   async saveUser(userData) {
     try {
-      const response = await fetch('/api/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData)
-      })
-      return await response.json()
+      return await this.db.saveUser(userData)
     } catch (error) {
       console.error('Erro ao salvar usuário:', error)
       return null
@@ -41,8 +36,7 @@ class CommunitySystem {
 
   async loadMessages(userEmail) {
     try {
-      const response = await fetch(`/api/messages?from=${this.currentUser.email}&to=${userEmail}`)
-      const messages = await response.json()
+      const messages = await this.db.getMessages(this.currentUser.email, userEmail)
       this.messages.set(userEmail, messages)
       return messages
     } catch (error) {
@@ -62,13 +56,7 @@ class CommunitySystem {
         read: false
       }
 
-      const response = await fetch('/api/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(messageData)
-      })
-
-      const newMessage = await response.json()
+      const newMessage = await this.db.saveMessage(messageData)
       
       // Atualizar cache local
       const messages = this.messages.get(to) || []
@@ -167,13 +155,56 @@ class CommunitySystem {
   }
 }
 
-// Inicializar sistema
-const community = new CommunitySystem()
+// Aguardar o sistema de fallback estar pronto
+let community
+
+// Inicializar quando o DOM estiver pronto
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initCommunity)
+} else {
+  initCommunity()
+}
+
+function initCommunity() {
+  // Aguardar um pouco para garantir que o fallback foi carregado
+  setTimeout(() => {
+    community = new CommunitySystem()
+  }, 100)
+}
 
 // Carregar usuários quando a página carregar
 document.addEventListener('DOMContentLoaded', async () => {
   if (community.currentUser) {
     await community.loadUsers()
     community.renderUsersList('chat-list')
+    
+    // Mostrar status do banco de dados
+    const status = community.db.getStatus()
+    console.log(`💾 Banco de dados: ${status.storage} (${status.online ? 'Online' : 'Offline'})`)
+    
+    // Adicionar indicador visual (opcional)
+    const statusIndicator = document.createElement('div')
+    statusIndicator.style.cssText = `
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: ${status.online ? '#10b981' : '#f59e0b'};
+      color: white;
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      z-index: 9999;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    `
+    statusIndicator.textContent = `💾 ${status.storage}`
+    statusIndicator.title = status.online ? 'Usando banco de dados online' : 'Usando armazenamento local (desenvolvimento)'
+    document.body.appendChild(statusIndicator)
+    
+    // Remover indicador após 5 segundos
+    setTimeout(() => {
+      if (statusIndicator.parentNode) {
+        statusIndicator.remove()
+      }
+    }, 5000)
   }
 })

@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "vercel dev",
     "build": "echo 'Build complete'",
-    "start": "vercel dev"
+    "start": "vercel dev",
+    "init-db": "node init-database.js",
+    "create-tables": "node create-tables.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0"

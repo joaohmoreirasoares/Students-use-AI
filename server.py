@@ -36,6 +36,7 @@ def main():
         print(f"📄 Homepage: http://localhost:{PORT}/homepage.html")
         print(f"🔐 Login: http://localhost:{PORT}/public/login.html")
         print(f"📊 Dashboard: http://localhost:{PORT}/public/dashboard.html")
+
         print("\n" + "="*50)
         print("Pressione Ctrl+C para parar o servidor")
         print("="*50 + "\n")
