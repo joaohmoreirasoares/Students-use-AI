@@ -341,6 +341,39 @@
                 width: 180px !important;
             }
         }
+        
+        /* Quick action buttons styling */
+        .quick-action-btn {
+            background: #6366f1;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 0.875rem;
+        }
+        .quick-action-btn:hover {
+            background: #4f46e5;
+        }
+        .quick-action-btn.secondary {
+            background: #ec4899;
+        }
+        .quick-action-btn.secondary:hover {
+            background: #db2777;
+        }
+        .quick-action-btn.success {
+            background: #10b981;
+        }
+        .quick-action-btn.success:hover {
+            background: #059669;
+        }
+        .quick-action-btn.warning {
+            background: #f59e0b;
+        }
+        .quick-action-btn.warning:hover {
+            background: #d97706;
+        }
     </style>
 </head>
 <body class="font-sans sidebar-dark">
@@ -833,8 +866,9 @@ Aluno: O que é um narrador em primeira pessoa?
 IA: Ah! Você não sabe a resposta? Não se preocupe! O narrador em primeira pessoa conta a história usando pronomes como "eu" ou "nós".  
 Vamos pensar juntos: Qual a vantagem de usar esse tipo de narrador?
 
-                },`
-                ,machado: {
+`
+                },
+                machado: {
                     name: "Machado",
                     area: "Redação",
                     icon: "fas fa-pen-fancy",
@@ -924,17 +958,29 @@ Vamos pensar juntos: Que tipo de atividades ou matérias você se sente mais à 
 `
 
                 }
-            },
+            };
+            
+            // ===== GLOBAL STATE =====
+            let currentUser = null;
             
             // ===== AUTHENTICATION =====
             function initAuth() {
-                const user = JSON.parse(localStorage.getItem('enemai_user'));
-                if (!user) {
+                try {
+                    const userStr = localStorage.getItem('enemai_user');
+                    if (!userStr) {
+                        window.location.href = 'login.html';
+                        return;
+                    }
+                    const user = JSON.parse(userStr);
+                    currentUser = user;
+                    const userNameEl = document.getElementById('user-name');
+                    if (userNameEl) {
+                        userNameEl.textContent = user.name || user.email;
+                    }
+                } catch (error) {
+                    console.error('Error parsing user data:', error);
                     window.location.href = 'login.html';
-                    return;
                 }
-                currentUser = user;
-                document.getElementById('user-name').textContent = user.name || user.email;
             }
             
             function logout() {
@@ -944,9 +990,16 @@ Vamos pensar juntos: Que tipo de atividades ou matérias você se sente mais à 
             
             // ===== DATA MANAGEMENT =====
             function getConversations() {
-                return JSON.parse(localStorage.getItem('enemai_conversations_' + currentUser.email)) || [];
+                if (!currentUser || !currentUser.email) return [];
+                try {
+                    const conversationsStr = localStorage.getItem('enemai_conversations_' + currentUser.email);
+                    return conversationsStr ? JSON.parse(conversationsStr) : [];
+                } catch (error) {
+                    console.error('Error parsing conversations:', error);
+                    return [];
+                }
             }
-            
+ 
             function saveConversations() {
                 localStorage.setItem('enemai_conversations_' + currentUser.email, JSON.stringify(conversations));
             }
@@ -1127,27 +1180,6 @@ Vamos pensar juntos: Que tipo de atividades ou matérias você se sente mais à 
                     addMessageToUI(message);
                 });
                 scrollToBottom();
-            }
-            
-            function addMessage(message) {
-                if (!currentConversation) return;
-                
-                currentConversation.messages.push(message);
-                currentConversation.updatedAt = new Date().toISOString();
-                
-                addMessageToUI(message);
-                scrollToBottom();
-                
-                // Se é a primeira mensagem do usuário, salva a conversa no histórico
-                if (message.type === 'user' && currentConversation.isTemporary) {
-                    const userMessages = currentConversation.messages.filter(m => m.type === 'user');
-                    if (userMessages.length === 1) {
-                        saveConversationToHistory(currentConversation, message.content);
-                    }
-                } else if (!currentConversation.isTemporary) {
-                    // Se já não é temporária, apenas atualiza
-                    saveConversations();
-                }
             }
             
             function addMessage(message) {
@@ -1529,7 +1561,12 @@ Vamos pensar juntos: Que tipo de atividades ou matérias você se sente mais à 
             
             async function sendMessage(message) {
                 if (!currentAgent || !currentConversation) return;
-                incrementAction('ask_ai');
+                
+                // Try to increment action if function exists
+                if (typeof incrementAction === 'function') {
+                    incrementAction('ask_ai');
+                }
+                
                 // Add user message
                 addMessage({
                     type: 'user',
@@ -1560,7 +1597,11 @@ Vamos pensar juntos: Que tipo de atividades ou matérias você se sente mais à 
                         content: response,
                         timestamp: new Date().toISOString()
                     });
-                    incrementAction('answer_ai');
+                    
+                    // Try to increment action if function exists
+                    if (typeof incrementAction === 'function') {
+                        incrementAction('answer_ai');
+                    }
                 } catch (error) {
                     removeTypingIndicator();
                     addMessage({
@@ -1740,7 +1781,13 @@ Me conte um pouco sobre você:
             
             // Função para buscar as anotações do localStorage
             function getNotes() {
-                return JSON.parse(localStorage.getItem('enemai_notes')) || [];
+                try {
+                    const notesStr = localStorage.getItem('enemai_notes');
+                    return notesStr ? JSON.parse(notesStr) : [];
+                } catch (error) {
+                    console.error('Error parsing notes:', error);
+                    return [];
+                }
             }
 
             // Função para abrir o modal de seleção de anotação
@@ -1871,6 +1918,16 @@ Me conte um pouco sobre você:
 
                 // Use note button
                 document.getElementById('use-note-btn').addEventListener('click', openNotesModal);
+                
+                // Notes modal close button
+                document.getElementById('close-notes-modal').addEventListener('click', closeNotesModal);
+                
+                // Close modal when clicking outside
+                document.getElementById('notes-modal').addEventListener('click', (e) => {
+                    if (e.target.id === 'notes-modal') {
+                        closeNotesModal();
+                    }
+                });
             }
             
             function updateCharCount() {
@@ -1925,10 +1982,13 @@ Me conte um pouco sobre você:
             });
         });
 
-        document.getElementById('sidebar-toggle').onclick = function() {
-            document.body.classList.toggle('sidebar-collapsed');
-            document.getElementById('sidebar').classList.toggle('collapsed');
-        };
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        if (sidebarToggle) {
+            sidebarToggle.onclick = function() {
+                document.body.classList.toggle('sidebar-collapsed');
+                document.getElementById('sidebar').classList.toggle('collapsed');
+            };
+        }
     </script>
 </body>
 </html> 
