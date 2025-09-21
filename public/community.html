@@ -506,21 +506,59 @@
         .sidebar:hover ~ main, .sidebar:focus-within ~ main {
             margin-left: 220px;
         }
+        /* CSS Mobile */
         @media (max-width: 900px) {
             body {
-                margin-left: 60px;
+                margin-left: 0 !important;
+            }
+            
+            main.container {
+                width: 100vw !important;
+                min-width: 100vw !important;
+                max-width: 100vw !important;
+                margin-left: 0 !important;
+                padding: 1rem !important;
+            }
+            
+            .sidebar:hover ~ main.container, .sidebar:focus-within ~ main.container {
+                width: 100vw !important;
+                min-width: 100vw !important;
+                max-width: 100vw !important;
+                margin-left: 0 !important;
+            }
+            
+            #mobile-menu-btn {
+                display: flex !important;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1001;
+                width: 280px !important;
+            }
+            
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            
+            .sidebar:hover, .sidebar:focus-within {
+                width: 280px !important;
             }
         }
+        
+
     </style>
 </head>
 <body class="font-sans sidebar-dark">
-    <!-- Botão menu mobile -->
-    <button class="fixed top-4 left-4 z-50 md:hidden bg-purple-600 text-white p-3 rounded-full shadow-lg" id="mobile-menu-btn">
-        <i class="fas fa-bars"></i>
-    </button>
+    <!-- Botão mobile -->
+    <div id="mobile-menu-btn" style="position: fixed; top: 1rem; left: 1rem; z-index: 9999; display: none; width: 48px; height: 48px; background: #7F00FF; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); align-items: center; justify-content: center;">
+        <i class="fas fa-bars" style="color: white; font-size: 1.2rem;"></i>
+    </div>
     
     <!-- Overlay -->
-    <div class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden" id="sidebar-overlay"></div>
+    <div id="sidebar-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 1000; display: none;"></div>
+
     
     <!-- Sidebar moderna padronizada -->
     <aside class="sidebar" id="sidebar">
@@ -615,17 +653,13 @@
         <stop offset="1" stop-color="#FF61A6"/>
       </radialGradient>
     </defs>
-    <header class="glass-card shadow-sm border-b border-gray-600">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+    <header style="background: transparent; padding: 1rem 0;">
+        <div class="container mx-auto px-6 flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <i class="fas fa-users text-2xl text-pink-400"></i>
-                <h1 class="text-xl font-bold text-gray-100">Comunidade ENEM AI</h1>
+                <h1 class="text-xl font-bold text-white">Comunidade ENEM AI</h1>
             </div>
             <button id="back-dashboard" class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-purple-700 transition flex items-center gap-2">
-                <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
-            </button>
-            <button id="settings-btn" class="bg-gray-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition flex items-center gap-2 ml-2">
-                <i class="fas fa-cog"></i> Configurações
+                <i class="fas fa-arrow-left"></i> Voltar
             </button>
         </div>
     </header>
@@ -642,6 +676,7 @@
         <div id="community-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
     </main>
     <script>
+    
     function normalizeUser(user) {
         if (!user.type) user.type = user.professor ? 'professor' : 'estudante';
         if (!user.materiasGosta && user.materias_gosta) user.materiasGosta = user.materias_gosta;
@@ -661,8 +696,6 @@
         }
         users.forEach(user => {
             user = normalizeUser(user);
-            let stats = JSON.parse(localStorage.getItem('enemai_stats_' + user.email) || '{}');
-            let level = stats.level || 1;
             const card = document.createElement('div');
             card.className = 'glass-card rounded-2xl p-6 flex flex-col gap-2 shadow-lg relative user-card-card animate-fade-in';
             card.innerHTML = `
@@ -671,9 +704,7 @@
                         <img src="${user.avatar ? user.avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name||'ENEM AI')}`}" alt="Avatar" class="w-full h-full object-cover"/>
                     </div>
                     <div class="flex-1">
-                        <div class="font-bold text-gray-100 text-xl flex items-center gap-2">${user.name}
-                          <span class='ml-2 px-2 py-1 bg-yellow-900 text-yellow-200 rounded-full text-xs font-bold' title='Nível do usuário'><i class='fas fa-bolt'></i> Nível ${level}</span>
-                        </div>
+                        <div class="font-bold text-gray-100 text-xl">${user.name}</div>
                         <div class="text-xs text-gray-400">${user.email}</div>
                     </div>
                     ${invites[user.email] === currentUser.email ? `<span class='px-3 py-1 bg-green-700 text-green-200 rounded-full text-xs font-bold animate-pulse'>Convite enviado</span>` : ''}
@@ -719,12 +750,13 @@
             };
         });
     }
+    let allUsers = [];
+    
     function filterCommunity() {
         const search = document.getElementById('search-user').value.toLowerCase();
         const type = document.getElementById('filter-type').value;
         const materia = document.getElementById('filter-materia').value.toLowerCase();
-        let users = JSON.parse(localStorage.getItem('enemai_users') || '[]');
-        users = users.map(normalizeUser);
+        let users = [...allUsers].map(normalizeUser);
         if (type) users = users.filter(u => u.type === type);
         if (search) {
             users = users.filter(u =>
@@ -750,10 +782,24 @@
     document.getElementById('back-dashboard').onclick = function() {
         window.location.href = 'main-dashboard.html';
     };
-    document.getElementById('settings-btn').onclick = function() {
-        window.location.href = 'settings.html';
-    };
+    // Mostrar dados dos usuários no console automaticamente
+    console.log('Usuários no localStorage:', JSON.parse(localStorage.getItem('enemai_users') || '[]'));
+    // Usuários exemplo
+    const exampleUsers = [
+        { name: "Ana Silva", email: "ana@exemplo.com", type: "estudante", materiasGosta: ["Matemática", "Física"], formacao: "Engenharia", avatar: "https://ui-avatars.com/api/?name=Ana+Silva&background=7F00FF&color=fff", public: true },
+        { name: "Carlos Santos", email: "carlos@exemplo.com", type: "professor", materias: ["História", "Geografia"], avatar: "https://ui-avatars.com/api/?name=Carlos+Santos&background=00C3FF&color=fff", public: true },
+        { name: "Maria Oliveira", email: "maria@exemplo.com", type: "estudante", materiasGosta: ["Biologia", "Química"], formacao: "Medicina", avatar: "https://ui-avatars.com/api/?name=Maria+Oliveira&background=FF61A6&color=fff", public: true },
+        { name: "João Pedro", email: "joao@exemplo.com", type: "estudante", materiasGosta: ["Literatura", "Redação"], formacao: "Jornalismo", avatar: "https://ui-avatars.com/api/?name=João+Pedro&background=7F00FF&color=fff", public: true },
+        { name: "Prof. Roberto", email: "roberto@exemplo.com", type: "professor", materias: ["Matemática", "Física"], avatar: "https://ui-avatars.com/api/?name=Prof+Roberto&background=00C3FF&color=fff", public: true }
+    ];
+    
+    // Sempre usar usuários exemplo
+    localStorage.setItem('enemai_users', JSON.stringify(exampleUsers));
+    allUsers = exampleUsers;
+    
+    // Inicializar
     filterCommunity();
+    
     // Atualizar badges de convite ao abrir a comunidade
     window.addEventListener('storage', function(e) {
         if (e.key === 'enemai_invites') filterCommunity();
@@ -810,22 +856,26 @@
         });
     });
     
-    // Menu mobile
-    const mobileBtn = document.getElementById('mobile-menu-btn');
-    const sidebar = document.querySelector('.sidebar');
-    const overlay = document.getElementById('sidebar-overlay');
+
     
-    if (mobileBtn && sidebar && overlay) {
-        mobileBtn.onclick = () => {
-            sidebar.classList.add('mobile-open');
-            overlay.classList.remove('hidden');
-        };
+    // JavaScript Mobile
+    (function() {
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
         
-        overlay.onclick = () => {
-            sidebar.classList.remove('mobile-open');
-            overlay.classList.add('hidden');
-        };
-    }
+        if (mobileBtn && sidebar && overlay) {
+            mobileBtn.addEventListener('click', function() {
+                sidebar.classList.add('mobile-open');
+                overlay.style.display = 'block';
+            });
+            
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('mobile-open');
+                overlay.style.display = 'none';
+            });
+        }
+    })();
     </script>
 </body>
 </html>
